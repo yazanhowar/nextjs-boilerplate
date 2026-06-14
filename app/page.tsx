@@ -5,9 +5,9 @@ import { supabase } from '../lib/supabase'
 import ThemeToggle from '../components/ThemeToggle'
 
 export default function Dashboard() {
-  const [banks, setBanks] = useState([])
-  const [tariffs, setTariffs] = useState([])
-  const [rates, setRates] = useState([])
+ const [banks, setBanks] = useState<any[]>([])
+const [tariffs, setTariffs] = useState<any[]>([])
+const [rates, setRates] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
