@@ -1,18 +1,34 @@
-import { getBanks, getBankTariffs, getLatestRates } from '../lib/queries'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { supabase } from '../lib/supabase'
 import ThemeToggle from '../components/ThemeToggle'
 
-export default async function Dashboard() {
-  let banks = []
-  let tariffs = []
-  let rates = []
+export default function Dashboard() {
+  const [banks, setBanks] = useState([])
+  const [tariffs, setTariffs] = useState([])
+  const [rates, setRates] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  try {
-    banks = await getBanks()
-    tariffs = await getBankTariffs()
-    rates = await getLatestRates()
-  } catch (e) {
-    console.error('Data fetch error:', e)
-  }
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [{ data: banksData }, { data: tariffsData }, { data: ratesData }] = await Promise.all([
+          supabase.from('banks').select('*').eq('is_active', true).order('name_en'),
+          supabase.from('bank_tariffs').select('*, banks(name_en, short_name)'),
+          supabase.from('bank_rates').select('*, banks(name_en, short_name)'),
+        ])
+        setBanks(banksData || [])
+        setTariffs(tariffsData || [])
+        setRates(ratesData || [])
+      } catch (e) {
+        console.error(e)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-[#0a0f1e] text-gray-900 dark:text-white transition-colors">
@@ -38,9 +54,9 @@ export default async function Dashboard() {
         {/* Stats Row */}
         <div className="grid grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Banks Tracked', value: banks.length || 15 },
-            { label: 'Tariff Records', value: tariffs.length || 0 },
-            { label: 'Rate Records', value: rates.length || 0 },
+            { label: 'Banks Tracked', value: loading ? '...' : banks.length },
+            { label: 'Tariff Records', value: loading ? '...' : tariffs.length },
+            { label: 'Rate Records', value: loading ? '...' : rates.length },
             { label: 'Data Sources', value: '40+' },
           ].map((s) => (
             <div key={s.label} className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-[#1f2937] rounded-xl p-5 shadow-sm">
@@ -59,54 +75,58 @@ export default async function Dashboard() {
               <span className="text-xs text-gray-400 dark:text-[#4b5563]">Jordan Banking Sector</span>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-100 dark:border-[#1f2937] bg-gray-50 dark:bg-[#0a0f1e]">
-                    {['Bank', 'Type', 'Website', 'Tariff Data', 'Rate Data'].map(h => (
-                      <th key={h} className="px-6 py-3 text-left text-xs font-semibold text-gray-400 dark:text-[#4b5563] uppercase tracking-wider">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {banks.map((bank) => {
-                    const hasTariff = tariffs.some(t => t.bank_id === bank.id)
-                    const hasRate = rates.some(r => r.bank_id === bank.id)
-                    return (
-                      <tr key={bank.id} className="border-b border-gray-100 dark:border-[#1f2937] hover:bg-gray-50 dark:hover:bg-[#0a0f1e] transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="font-medium text-gray-900 dark:text-white text-sm">{bank.short_name}</div>
-                          <div className="text-xs text-gray-400 dark:text-[#4b5563] mt-0.5">{bank.name_en}</div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                            bank.bank_type === 'islamic'
-                              ? 'bg-green-100 text-green-700 dark:bg-[#1a2e1a] dark:text-[#22c55e]'
-                              : 'bg-blue-100 text-blue-700 dark:bg-[#1e3a5f] dark:text-[#4a9eff]'
-                          }`}>
-                            {bank.bank_type === 'islamic' ? 'Islamic' : 'Conventional'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <a href={bank.website_url} target="_blank" rel="noopener noreferrer"
-                            className="text-xs text-blue-600 dark:text-[#4a9eff] hover:underline">
-                            {bank.website_url?.replace('https://', '').replace('www.', '')}
-                          </a>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`text-xs font-medium ${hasTariff ? 'text-green-600 dark:text-[#22c55e]' : 'text-gray-300 dark:text-[#4b5563]'}`}>
-                            {hasTariff ? '✓ Available' : '— Pending'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`text-xs font-medium ${hasRate ? 'text-green-600 dark:text-[#22c55e]' : 'text-gray-300 dark:text-[#4b5563]'}`}>
-                            {hasRate ? '✓ Available' : '— Pending'}
-                          </span>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
+              {loading ? (
+                <div className="px-6 py-12 text-center text-sm text-gray-400">Loading banks...</div>
+              ) : (
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-100 dark:border-[#1f2937] bg-gray-50 dark:bg-[#0a0f1e]">
+                      {['Bank', 'Type', 'Website', 'Tariff Data', 'Rate Data'].map(h => (
+                        <th key={h} className="px-6 py-3 text-left text-xs font-semibold text-gray-400 dark:text-[#4b5563] uppercase tracking-wider">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {banks.map((bank) => {
+                      const hasTariff = tariffs.some(t => t.bank_id === bank.id)
+                      const hasRate = rates.some(r => r.bank_id === bank.id)
+                      return (
+                        <tr key={bank.id} className="border-b border-gray-100 dark:border-[#1f2937] hover:bg-gray-50 dark:hover:bg-[#0a0f1e] transition-colors">
+                          <td className="px-6 py-4">
+                            <div className="font-medium text-gray-900 dark:text-white text-sm">{bank.short_name}</div>
+                            <div className="text-xs text-gray-400 dark:text-[#4b5563] mt-0.5">{bank.name_en}</div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                              bank.bank_type === 'islamic'
+                                ? 'bg-green-100 text-green-700 dark:bg-[#1a2e1a] dark:text-[#22c55e]'
+                                : 'bg-blue-100 text-blue-700 dark:bg-[#1e3a5f] dark:text-[#4a9eff]'
+                            }`}>
+                              {bank.bank_type === 'islamic' ? 'Islamic' : 'Conventional'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <a href={bank.website_url} target="_blank" rel="noopener noreferrer"
+                              className="text-xs text-blue-600 dark:text-[#4a9eff] hover:underline">
+                              {bank.website_url?.replace('https://', '').replace('www.', '')}
+                            </a>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`text-xs font-medium ${hasTariff ? 'text-green-600 dark:text-[#22c55e]' : 'text-gray-300 dark:text-[#4b5563]'}`}>
+                              {hasTariff ? '✓ Available' : '— Pending'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`text-xs font-medium ${hasRate ? 'text-green-600 dark:text-[#22c55e]' : 'text-gray-300 dark:text-[#4b5563]'}`}>
+                              {hasRate ? '✓ Available' : '— Pending'}
+                            </span>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
 
