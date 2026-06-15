@@ -17,13 +17,16 @@ export default function RankingsPage() {
   const [loading, setLoading] = useState(true)
   const [sortBy, setSortBy] = useState<'total_assets'|'net_profit'|'customer_deposits'|'roe'|'car'>('total_assets')
   const [selectedYear, setSelectedYear] = useState(2025)
-  const availableYears = [2025, 2024, 2023]
+  const years = [2025, 2024, 2023]
 
   useEffect(() => {
-    supabase.from('bank_financials').select('*, banks(name_en, short_name, bank_type, name_ar, short_name_ar)').order('fiscal_year', { ascending: false })
+    supabase.from('bank_financials').select('*, banks(name_en, short_name, bank_type, name_ar, short_name_ar)')
+      .order('fiscal_year', { ascending: false })
       .then(({ data }) => {
         setAllFinancials(data || [])
-        const latest = Object.values((data || []).reduce((acc: any, f: any) => { if (!acc[f.bank_id]) acc[f.bank_id] = f; return acc }, {})) as any[]
+        const latest = Object.values((data || []).reduce((acc: any, f: any) => {
+          if (!acc[f.bank_id]) acc[f.bank_id] = f; return acc
+        }, {})) as any[]
         setFinancials(latest)
         setLoading(false)
       })
@@ -32,7 +35,10 @@ export default function RankingsPage() {
   useEffect(() => {
     const filtered = allFinancials.filter(f => f.fiscal_year === selectedYear)
     const bankIds = new Set(filtered.map((f: any) => f.bank_id))
-    const fallbacks = Object.values(allFinancials.filter((f: any) => !bankIds.has(f.bank_id)).reduce((acc: any, f: any) => { if (!acc[f.bank_id]) acc[f.bank_id] = f; return acc }, {})) as any[]
+    const fallbacks = Object.values(
+      allFinancials.filter((f: any) => !bankIds.has(f.bank_id))
+        .reduce((acc: any, f: any) => { if (!acc[f.bank_id]) acc[f.bank_id] = f; return acc }, {})
+    ) as any[]
     setFinancials([...filtered, ...fallbacks])
   }, [selectedYear, allFinancials])
 
@@ -49,100 +55,115 @@ export default function RankingsPage() {
   const fmtB = (v: any, currency = 'JOD') => {
     if (!v) return '—'
     const n = Number(v)
-    if (currency === 'USD') {
-      if (n >= 1000000) return `$${(n/1000000).toFixed(1)}B`
-      return `$${(n/1000).toFixed(0)}M`
-    }
-    if (n >= 1000000) return `${isAr ? 'د.أ' : 'JOD'} ${(n/1000000).toFixed(1)}B`
-    return `${isAr ? 'د.أ' : 'JOD'} ${(n/1000).toFixed(0)}M`
+    const prefix = currency === 'USD' ? '$' : (isAr ? 'د.أ ' : 'JOD ')
+    if (n >= 1000000) return `${prefix}${(n/1000000).toFixed(1)}B`
+    return `${prefix}${(n/1000).toFixed(0)}M`
   }
   const fmtPct = (v: any) => v != null ? `${Number(v).toFixed(1)}%` : '—'
-  const bankName = (f: any) => isAr ? (f.banks?.short_name_ar || f.banks?.name_ar || f.banks?.short_name) : f.banks?.short_name
+  const bName = (f: any) => isAr ? (f.banks?.short_name_ar || f.banks?.name_ar || f.banks?.short_name) : f.banks?.short_name
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-[#0a0f1e] text-gray-900 dark:text-white transition-colors">
-      <header className="border-b border-gray-200 dark:border-[#1f2937] bg-white dark:bg-[#111827] px-8 py-5 flex items-center justify-between">
+    <main className="min-h-screen" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+      <header className="hbtf-header">
         <div>
-          <div className="text-xs font-semibold tracking-widest text-blue-600 dark:text-[#4a9eff] uppercase mb-1">
-            <a href="/" className="hover:underline">{isAr ? 'الرئيسية' : 'Rapid Intelligence'}</a> / {T.rankings}
+          <div className="hbtf-logo-eyebrow">
+            <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>{isAr ? 'الرئيسية' : 'Rapid Intelligence'}</a>
+            {' / '}{T.rankings}
           </div>
-          <h1 className="text-xl font-bold">{T.sectorRankings}</h1>
+          <div className="hbtf-logo-title">{T.sectorRankings}</div>
         </div>
-        <div className="flex items-center gap-3">
-          <a href="/" className="text-xs text-gray-400 hover:text-blue-600 dark:hover:text-[#4a9eff]">{isAr ? 'الرئيسية ←' : '← Dashboard'}</a>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <a href="/" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textDecoration: 'none' }}>
+            {isAr ? 'الرئيسية ←' : '← Dashboard'}
+          </a>
           <LangToggle /><ThemeToggle />
         </div>
       </header>
 
-      <div className="px-8 py-8 max-w-[1400px] mx-auto">
-        {/* Year Selector */}
-        <div className="flex gap-2 mb-4 flex-wrap">
-          {availableYears.map(year => (
-            <button key={year} onClick={() => setSelectedYear(year)}
-              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${selectedYear === year ? 'bg-gray-800 text-white dark:bg-white dark:text-black' : 'bg-white dark:bg-[#111827] border border-gray-200 dark:border-[#1f2937] text-gray-500 dark:text-gray-400 hover:border-gray-400'}`}>
-              {isAr ? `السنة ${year}` : `FY${year}`}
+      <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
+
+        {/* Controls */}
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+          {years.map(y => (
+            <button key={y} onClick={() => setSelectedYear(y)}
+              className={selectedYear === y ? 'hbtf-btn hbtf-btn-active' : 'hbtf-btn'}>
+              {isAr ? `السنة ${y}` : `FY${y}`}
             </button>
           ))}
         </div>
 
-        {/* Sort Tabs */}
-        <div className="flex gap-2 mb-6 flex-wrap">
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
           {tabs.map(tab => (
             <button key={tab.key} onClick={() => setSortBy(tab.key as any)}
-              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${sortBy === tab.key ? 'bg-blue-600 text-white dark:bg-[#4a9eff] dark:text-black' : 'bg-white dark:bg-[#111827] border border-gray-200 dark:border-[#1f2937] text-gray-500 dark:text-gray-400 hover:border-blue-400 dark:hover:border-[#4a9eff]'}`}>
+              className={sortBy === tab.key ? 'hbtf-btn hbtf-btn-active' : 'hbtf-btn'}>
               {tab.label}
             </button>
           ))}
         </div>
 
-        <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-[#1f2937] rounded-xl overflow-hidden shadow-sm">
-          <div className="px-6 py-4 border-b border-gray-100 dark:border-[#1f2937] bg-gray-50 dark:bg-[#0a0f1e]">
-            <span className="text-xs font-semibold text-gray-500 dark:text-[#9ca3af] uppercase tracking-wider">
-              {isAr ? `مرتبة حسب ${tabs.find(t => t.key === sortBy)?.label} · ${isAr ? 'السنة المالية' : 'FY'}${selectedYear}` : `Ranked ${tabs.find(t => t.key === sortBy)?.label.replace('By ', 'by ')} · FY${selectedYear}`}
+        <div className="hbtf-card">
+          <div className="hbtf-card-header">
+            <span className="hbtf-card-label">
+              {isAr
+                ? `مرتبة حسب ${tabs.find(t => t.key === sortBy)?.label} · السنة ${selectedYear}`
+                : `Ranked ${tabs.find(t => t.key === sortBy)?.label.replace('By ', 'by ')} · FY${selectedYear}`}
             </span>
+            <div className="gold-accent" style={{ marginBottom: 0 }} />
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div style={{ overflowX: 'auto' }}>
+            <table className="hbtf-table">
               <thead>
-                <tr className="border-b border-gray-100 dark:border-[#1f2937] bg-gray-50 dark:bg-[#0a0f1e]">
-                  <th className="px-4 py-3 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider w-8">#</th>
-                  <th className="px-4 py-3 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.bank}</th>
-                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.totalAssets}</th>
-                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.netProfit}</th>
-                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.deposits}</th>
-                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.roe}</th>
-                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.roa}</th>
-                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.car}</th>
-                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.npl}</th>
-                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.year}</th>
+                <tr>
+                  <th style={{ textAlign: 'start', width: '2.5rem' }}>#</th>
+                  <th style={{ textAlign: 'start' }}>{T.bank}</th>
+                  <th style={{ textAlign: 'end' }}>{T.totalAssets}</th>
+                  <th style={{ textAlign: 'end' }}>{T.netProfit}</th>
+                  <th style={{ textAlign: 'end' }}>{T.deposits}</th>
+                  <th style={{ textAlign: 'end' }}>{T.roe}</th>
+                  <th style={{ textAlign: 'end' }}>{T.roa}</th>
+                  <th style={{ textAlign: 'end' }}>{T.car}</th>
+                  <th style={{ textAlign: 'end' }}>{T.npl}</th>
+                  <th style={{ textAlign: 'end' }}>{T.year}</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={10} className="text-center py-12 text-gray-400 text-sm">{isAr ? 'جارٍ التحميل...' : 'Loading...'}</td></tr>
+                  <tr><td colSpan={10} style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+                    {isAr ? 'جارٍ التحميل...' : 'Loading...'}
+                  </td></tr>
                 ) : sorted.map((f, i) => (
-                  <tr key={f.id || i} className={`border-b border-gray-50 dark:border-[#1f2937] hover:bg-gray-50 dark:hover:bg-[#0d1117] transition-colors ${i === 0 ? 'bg-blue-50 dark:bg-[#0d1a2d]' : ''}`}>
-                    <td className={`px-4 py-4 text-sm font-bold ${i === 0 ? 'text-blue-600 dark:text-[#4a9eff]' : 'text-gray-400'}`}>{i + 1}</td>
-                    <td className="px-4 py-4">
-                      <div className="text-sm font-semibold text-gray-900 dark:text-white">{bankName(f)}</div>
-                      <div className={`text-xs mt-0.5 ${f.banks?.bank_type === 'islamic' ? 'text-green-600 dark:text-[#22c55e]' : 'text-gray-400 dark:text-[#4b5563]'}`}>
-                        {f.banks?.bank_type === 'islamic' ? T.islamic : T.conventional}
-                      </div>
+                  <tr key={f.id || i} className={i === 0 ? 'rank-1' : ''}>
+                    <td>
+                      <span style={{
+                        fontWeight: 800,
+                        fontSize: '0.875rem',
+                        color: i === 0 ? 'var(--hbtf-blue)' : 'var(--text-muted)'
+                      }}>
+                        {i === 0 ? '①' : i + 1}
+                      </span>
                     </td>
-                    <td className="px-4 py-4 text-end text-sm font-medium text-gray-900 dark:text-white">{fmtB(f.total_assets, f.currency)}</td>
-                    <td className="px-4 py-4 text-end text-sm font-medium text-gray-900 dark:text-white">{fmtB(f.net_profit, f.currency)}</td>
-                    <td className="px-4 py-4 text-end text-sm text-gray-700 dark:text-gray-300">{fmtB(f.customer_deposits, f.currency)}</td>
-                    <td className="px-4 py-4 text-end text-sm text-gray-700 dark:text-gray-300">{fmtPct(f.roe)}</td>
-                    <td className="px-4 py-4 text-end text-sm text-gray-700 dark:text-gray-300">{fmtPct(f.roa)}</td>
-                    <td className="px-4 py-4 text-end text-sm text-gray-700 dark:text-gray-300">{fmtPct(f.car)}</td>
-                    <td className="px-4 py-4 text-end text-sm text-gray-700 dark:text-gray-300">{fmtPct(f.npl_ratio)}</td>
-                    <td className="px-4 py-4 text-end text-xs text-gray-400">{f.fiscal_year}</td>
+                    <td>
+                      <div style={{ fontWeight: 600 }}>{bName(f)}</div>
+                      <span className={f.banks?.bank_type === 'islamic' ? 'badge-islamic' : 'badge-conventional'}>
+                        {f.banks?.bank_type === 'islamic' ? T.islamic : T.conventional}
+                      </span>
+                    </td>
+                    <td style={{ textAlign: 'end', fontWeight: 600 }}>{fmtB(f.total_assets, f.currency)}</td>
+                    <td style={{ textAlign: 'end', fontWeight: 600 }}>{fmtB(f.net_profit, f.currency)}</td>
+                    <td style={{ textAlign: 'end', color: 'var(--text-secondary)' }}>{fmtB(f.customer_deposits, f.currency)}</td>
+                    <td style={{ textAlign: 'end', color: 'var(--text-secondary)' }}>{fmtPct(f.roe)}</td>
+                    <td style={{ textAlign: 'end', color: 'var(--text-secondary)' }}>{fmtPct(f.roa)}</td>
+                    <td style={{ textAlign: 'end', color: 'var(--text-secondary)' }}>{fmtPct(f.car)}</td>
+                    <td style={{ textAlign: 'end', color: 'var(--text-secondary)' }}>{fmtPct(f.npl_ratio)}</td>
+                    <td style={{ textAlign: 'end', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{f.fiscal_year}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <div className="px-6 py-3 border-t border-gray-100 dark:border-[#1f2937] text-xs text-gray-400">{T.sourceNote}</div>
+          <div style={{ padding: '0.75rem 1.25rem', borderTop: '1px solid var(--border-subtle)', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+            {T.sourceNote}
+          </div>
         </div>
       </div>
     </main>
