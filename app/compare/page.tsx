@@ -191,7 +191,7 @@ export default function ComparePage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-100 dark:border-[#1f2937] bg-gray-50 dark:bg-[#0a0f1e]">
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider w-48">Metric</th>
+                    <th className="px-6 py-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider w-48">Metric</th>
                     {selectedBanks.map(b => (
                       <th key={b.id} className="px-6 py-4 text-center">
                         <div className="text-sm font-bold text-gray-900 dark:text-white">{b.short_name}</div>
