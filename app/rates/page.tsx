@@ -59,16 +59,16 @@ export default function RatesPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-[#1f2937]">
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-400 uppercase">{T.bank}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">{T.savings}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">{isAr ? 'و.آ 1ش' : 'TD 1M'}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">{isAr ? 'و.آ 3ش' : 'TD 3M'}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">{isAr ? 'و.آ 6ش' : 'TD 6M'}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">{isAr ? 'و.آ 12ش' : 'TD 12M'}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">{isAr ? 'دولار 3ش' : 'USD 3M'}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">{isAr ? 'دولار 6ش' : 'USD 6M'}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">{isAr ? 'دولار 12ش' : 'USD 12M'}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">{T.asOf}</th>
+                  <th className="px-6 py-3 text-start text-xs font-semibold text-gray-400 uppercase">{T.bank}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase">{T.savings}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase">{isAr ? 'و.آ 1ش' : 'TD 1M'}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase">{isAr ? 'و.آ 3ش' : 'TD 3M'}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase">{isAr ? 'و.آ 6ش' : 'TD 6M'}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase">{isAr ? 'و.آ 12ش' : 'TD 12M'}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase">{isAr ? 'دولار 3ش' : 'USD 3M'}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase">{isAr ? 'دولار 6ش' : 'USD 6M'}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase">{isAr ? 'دولار 12ش' : 'USD 12M'}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase">{T.asOf}</th>
                 </tr>
               </thead>
               <tbody>
@@ -83,9 +83,9 @@ export default function RatesPage() {
                       </div>
                     </td>
                     {cols.map(col => (
-                      <td key={col} className={`px-4 py-4 text-right text-sm ${getColor(rates.map(x => x[col]), r[col], true)}`}>{fmtPct(r[col])}</td>
+                      <td key={col} className={`px-4 py-4 text-end text-sm ${getColor(rates.map(x => x[col]), r[col], true)}`}>{fmtPct(r[col])}</td>
                     ))}
-                    <td className="px-4 py-4 text-right text-xs text-gray-400">{r.effective_date?.slice(0,10)?.split('-').reverse().join('/')}</td>
+                    <td className="px-4 py-4 text-end text-xs text-gray-400">{r.effective_date?.slice(0,10)?.split('-').reverse().join('/')}</td>
                   </tr>
                 ))}
               </tbody>
@@ -102,14 +102,14 @@ export default function RatesPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-[#1f2937]">
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-400 uppercase">{T.bank}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">{T.homeLoanMin}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">{T.homeLoanMax}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">{T.personalMin}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">{T.personalMax}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">{T.carMin}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">{T.carMax}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase">{T.asOf}</th>
+                  <th className="px-6 py-3 text-start text-xs font-semibold text-gray-400 uppercase">{T.bank}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase">{T.homeLoanMin}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase">{T.homeLoanMax}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase">{T.personalMin}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase">{T.personalMax}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase">{T.carMin}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase">{T.carMax}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase">{T.asOf}</th>
                 </tr>
               </thead>
               <tbody>
@@ -122,9 +122,9 @@ export default function RatesPage() {
                       </div>
                     </td>
                     {lendCols.map(col => (
-                      <td key={col} className={`px-4 py-4 text-right text-sm ${getColor(rates.map(x => x[col]), r[col], false)}`}>{fmtPct(r[col])}</td>
+                      <td key={col} className={`px-4 py-4 text-end text-sm ${getColor(rates.map(x => x[col]), r[col], false)}`}>{fmtPct(r[col])}</td>
                     ))}
-                    <td className="px-4 py-4 text-right text-xs text-gray-400">{r.effective_date?.slice(0,10)?.split('-').reverse().join('/')}</td>
+                    <td className="px-4 py-4 text-end text-xs text-gray-400">{r.effective_date?.slice(0,10)?.split('-').reverse().join('/')}</td>
                   </tr>
                 ))}
               </tbody>
