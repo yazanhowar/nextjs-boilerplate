@@ -5,9 +5,9 @@ import { supabase } from '../lib/supabase'
 import ThemeToggle from '../components/ThemeToggle'
 
 export default function Dashboard() {
- const [banks, setBanks] = useState<any[]>([])
-const [tariffs, setTariffs] = useState<any[]>([])
-const [rates, setRates] = useState<any[]>([])
+  const [banks, setBanks] = useState([])
+  const [tariffs, setTariffs] = useState([])
+  const [rates, setRates] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -167,6 +167,8 @@ const [rates, setRates] = useState<any[]>([])
               </div>
               <div className="p-4 space-y-2">
                 {[
+                  { label: 'Search', href: '/search', desc: 'Search banks, products, rates, fees' },
+                  { label: 'Compare Banks', href: '/compare', desc: 'Side-by-side bank comparison' },
                   { label: 'Rate Comparison', href: '/rates', desc: 'Compare lending & deposit rates' },
                   { label: 'Fee Comparison', href: '/tariffs', desc: 'Service fees across banks' },
                   { label: 'Sector Rankings', href: '/rankings', desc: 'Assets, profit, deposits' },
