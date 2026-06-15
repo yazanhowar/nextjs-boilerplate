@@ -6,9 +6,12 @@ import ThemeToggle from '../../components/ThemeToggle'
 
 export default function RankingsPage() {
   const [banks, setBanks] = useState<any[]>([])
+  const [allFinancials, setAllFinancials] = useState<any[]>([])
   const [financials, setFinancials] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [sortBy, setSortBy] = useState<'total_assets' | 'net_profit' | 'customer_deposits' | 'roe' | 'car'>('total_assets')
+  const [selectedYear, setSelectedYear] = useState<number>(2025)
+  const availableYears = [2025, 2024, 2023]
 
   useEffect(() => {
     async function fetchData() {
@@ -17,7 +20,8 @@ export default function RankingsPage() {
         supabase.from('bank_financials').select('*, banks(name_en, short_name, bank_type)').order('fiscal_year', { ascending: false }),
       ])
       setBanks(banksData || [])
-      // Get latest financials per bank
+      setAllFinancials(financialsData || [])
+      // Default: latest per bank
       const latest = Object.values(
         (financialsData || []).reduce((acc: any, f: any) => {
           if (!acc[f.bank_id]) acc[f.bank_id] = f
@@ -29,6 +33,21 @@ export default function RankingsPage() {
     }
     fetchData()
   }, [])
+
+  useEffect(() => {
+    const filtered = allFinancials.filter(f => f.fiscal_year === selectedYear)
+    // If a bank has no data for selected year, fall back to latest available
+    const bankIds = new Set(filtered.map((f: any) => f.bank_id))
+    const fallbacks = Object.values(
+      allFinancials
+        .filter((f: any) => !bankIds.has(f.bank_id))
+        .reduce((acc: any, f: any) => {
+          if (!acc[f.bank_id]) acc[f.bank_id] = f
+          return acc
+        }, {})
+    ) as any[]
+    setFinancials([...filtered, ...fallbacks])
+  }, [selectedYear, allFinancials])
 
   const sorted = [...financials].sort((a, b) => (b[sortBy] || 0) - (a[sortBy] || 0))
 
@@ -69,6 +88,23 @@ export default function RankingsPage() {
       </header>
 
       <div className="px-8 py-8 max-w-[1400px] mx-auto">
+
+        {/* Year Selector */}
+        <div className="flex gap-2 mb-4 flex-wrap">
+          {availableYears.map(year => (
+            <button
+              key={year}
+              onClick={() => setSelectedYear(year)}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                selectedYear === year
+                  ? 'bg-gray-800 text-white dark:bg-white dark:text-black'
+                  : 'bg-white dark:bg-[#111827] border border-gray-200 dark:border-[#1f2937] text-gray-500 dark:text-gray-400 hover:border-gray-400'
+              }`}
+            >
+              FY{year}
+            </button>
+          ))}
+        </div>
 
         {/* Sort Tabs */}
         <div className="flex gap-2 mb-6 flex-wrap">
@@ -141,7 +177,7 @@ export default function RankingsPage() {
           <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-[#1f2937] rounded-xl overflow-hidden shadow-sm">
             <div className="px-6 py-4 border-b border-gray-200 dark:border-[#1f2937] flex items-center justify-between">
               <span className="text-xs font-semibold text-gray-500 dark:text-[#9ca3af] uppercase tracking-wider">
-                Ranked {tabs.find(t => t.key === sortBy)?.label.replace('By ', 'by ')} · Latest available year
+                Ranked {tabs.find(t => t.key === sortBy)?.label.replace('By ', 'by ')} · FY{selectedYear}
               </span>
             </div>
             <div className="overflow-x-auto">
