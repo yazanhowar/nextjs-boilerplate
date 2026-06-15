@@ -8,6 +8,10 @@ import { useLang } from '../../lib/LangContext'
 import { t } from '../../lib/i18n'
 
 export default function ComparePage() {
+  const { lang } = useLang()
+  const T = t[lang]
+  const isAr = lang === 'ar'
+
   const [banks, setBanks] = useState<any[]>([])
   const [selected, setSelected] = useState<number[]>([])
   const [financials, setFinancials] = useState<any[]>([])
@@ -18,211 +22,194 @@ export default function ComparePage() {
   const [year, setYear] = useState(2025)
 
   useEffect(() => {
-    supabase.from('banks').select('*').eq('is_active', true).order('name_en').then(({ data }) => setBanks(data || []))
+    supabase.from('banks').select('*').eq('is_active', true).order('name_en')
+      .then(({ data }) => setBanks(data || []))
   }, [])
 
   useEffect(() => {
-    if (selected.length === 0) return
+    if (!selected.length) return
     setLoading(true)
     Promise.all([
       supabase.from('bank_financials').select('*').in('bank_id', selected).eq('fiscal_year', year),
       supabase.from('bank_rates').select('*').in('bank_id', selected),
       supabase.from('bank_tariffs').select('*').in('bank_id', selected),
       supabase.from('bank_products').select('*').in('bank_id', selected),
-    ]).then(([f, r, t, p]) => {
+    ]).then(([f, r, tar, p]) => {
       setFinancials(f.data || [])
       setRates(r.data || [])
-      setTariffs(t.data || [])
+      setTariffs(tar.data || [])
       setProducts(p.data || [])
       setLoading(false)
     })
   }, [selected, year])
 
-  const toggleBank = (id: number) => {
-    setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : prev.length < 4 ? [...prev, id] : prev)
-  }
+  const toggle = (id: number) => setSelected(prev =>
+    prev.includes(id) ? prev.filter(x => x !== id) : prev.length < 4 ? [...prev, id] : prev
+  )
 
-  const selectedBanks = banks.filter(b => selected.includes(b.id))
-  const getF = (bankId: number) => financials.find(f => f.bank_id === bankId) || {}
-  const getR = (bankId: number) => rates.find(r => r.bank_id === bankId) || {}
-  const getT = (bankId: number) => tariffs.find(t => t.bank_id === bankId) || {}
-  const getProducts = (bankId: number) => products.filter(p => p.bank_id === bankId)
+  const getF = (id: number) => financials.find(f => f.bank_id === id) || {}
+  const getR = (id: number) => rates.find(r => r.bank_id === id) || {}
+  const getT = (id: number) => tariffs.find(t => t.bank_id === id) || {}
+  const getProds = (id: number) => products.filter(p => p.bank_id === id)
+  const bName = (b: any) => isAr ? (b.short_name_ar || b.name_ar || b.short_name) : b.short_name
 
-  const fmt = (v: any, suffix = '') => (v !== null && v !== undefined) ? `${Number(v).toLocaleString()}${suffix}` : '—'
+  const fmt = (v: any, suffix = '') => (v != null) ? `${Number(v).toLocaleString()}${suffix}` : '—'
   const fmtB = (v: any) => {
     if (!v) return '—'
     const n = Number(v)
-    if (n >= 1000000) return `JOD ${(n / 1000000).toFixed(1)}B`
-    if (n >= 1000) return `JOD ${(n / 1000).toFixed(0)}M`
-    return `JOD ${n}`
+    const p = isAr ? 'د.أ ' : 'JOD '
+    if (n >= 1000000) return `${p}${(n/1000000).toFixed(1)}B`
+    return `${p}${(n/1000).toFixed(0)}M`
   }
-  const fmtPct = (v: any) => v !== null && v !== undefined ? `${Number(v).toFixed(2)}%` : '—'
-  const fmtFee = (v: any) => v !== null && v !== undefined ? `JOD ${Number(v).toFixed(2)}` : '—'
+  const fmtP = (v: any) => v != null ? `${Number(v).toFixed(2)}%` : '—'
+  const fmtF = (v: any) => v != null ? `JOD ${Number(v).toFixed(2)}` : '—'
 
-  const rows: { label: string; key: string; format: (bankId: number) => string; section?: string }[] = [
-    // Financial
-    { section: `Financial Highlights (FY${year})`, label: 'Total Assets', key: 'assets', format: id => fmtB(getF(id).total_assets) },
-    { label: 'Net Profit', key: 'profit', format: id => fmtB(getF(id).net_profit) },
-    { label: 'Customer Deposits', key: 'deposits', format: id => fmtB(getF(id).customer_deposits) },
-    { label: 'Net Loans', key: 'loans', format: id => fmtB(getF(id).net_loans) },
-    { label: 'Shareholders Equity', key: 'equity', format: id => fmtB(getF(id).shareholders_equity) },
-    { label: 'ROE', key: 'roe', format: id => fmtPct(getF(id).roe) },
-    { label: 'ROA', key: 'roa', format: id => fmtPct(getF(id).roa) },
-    { label: 'CAR', key: 'car', format: id => fmtPct(getF(id).car) },
-    { label: 'NPL Ratio', key: 'npl', format: id => fmtPct(getF(id).npl_ratio) },
-    { label: 'EPS (fils)', key: 'eps', format: id => fmt(getF(id).eps_fils) },
-    { label: 'Cash Dividend %', key: 'div', format: id => fmtPct(getF(id).dividends_cash_pct) },
-    // Deposit Rates
-    { section: 'Deposit Rates (JOD % p.a.)', label: 'Savings Rate', key: 'sav', format: id => fmtPct(getR(id).saving_rate) },
-    { label: 'TD 1 Month', key: 'td1', format: id => fmtPct(getR(id).td_1m) },
-    { label: 'TD 3 Months', key: 'td3', format: id => fmtPct(getR(id).td_3m) },
-    { label: 'TD 6 Months', key: 'td6', format: id => fmtPct(getR(id).td_6m) },
-    { label: 'TD 12 Months', key: 'td12', format: id => fmtPct(getR(id).td_12m) },
-    { label: 'USD TD 3M', key: 'usd3', format: id => fmtPct(getR(id).td_usd_3m) },
-    { label: 'USD TD 12M', key: 'usd12', format: id => fmtPct(getR(id).td_usd_12m) },
-    // Lending Rates
-    { section: 'Lending Rates (% p.a.)', label: 'Home Loan Min', key: 'hlmin', format: id => fmtPct(getR(id).home_loan_min) },
-    { label: 'Home Loan Max', key: 'hlmax', format: id => fmtPct(getR(id).home_loan_max) },
-    { label: 'Personal Loan Min', key: 'plmin', format: id => fmtPct(getR(id).personal_loan_min) },
-    { label: 'Personal Loan Max', key: 'plmax', format: id => fmtPct(getR(id).personal_loan_max) },
-    { label: 'Auto Loan Min', key: 'almin', format: id => fmtPct(getR(id).car_loan_min) },
-    { label: 'Auto Loan Max', key: 'almax', format: id => fmtPct(getR(id).car_loan_max) },
-    // Fees
-    { section: 'Fees & Charges (JOD)', label: 'Account Maintenance', key: 'maint', format: id => fmtFee(getT(id).account_maintenance_fee) },
-    { label: 'Dormant Account/mo', key: 'dorm', format: id => fmtFee(getT(id).dormant_account_fee) },
-    { label: 'Statement per page', key: 'stmt', format: id => fmtFee(getT(id).statement_fee) },
-    { label: 'Cheque Book', key: 'chq', format: id => fmtFee(getT(id).cheque_book_fee) },
-    { label: 'Stop Payment', key: 'stop', format: id => fmtFee(getT(id).stop_payment_fee) },
-    { label: 'Local Transfer', key: 'ltx', format: id => fmtFee(getT(id).local_transfer_fee) },
-    { label: 'SWIFT Transfer (flat)', key: 'swift', format: id => fmtFee(getT(id).swift_transfer_fee_jod) },
-    { label: 'Loan Origination %', key: 'orig', format: id => fmtPct(getT(id).loan_origination_fee_pct) },
-    { label: 'Early Settlement %', key: 'sett', format: id => fmtPct(getT(id).early_settlement_fee_pct) },
-    { label: 'Safe Box Small', key: 'sbs', format: id => fmtFee(getT(id).safe_box_small_annual) },
-    { label: 'Safe Box Large', key: 'sbl', format: id => fmtFee(getT(id).safe_box_large_annual) },
-    // Products count
-    { section: 'Products', label: 'Total Products', key: 'prods', format: id => String(getProducts(id).length) },
-    { label: 'Retail Loans', key: 'rl', format: id => String(getProducts(id).filter(p => p.category === 'retail_loan').length) },
-    { label: 'Deposit Products', key: 'dp', format: id => String(getProducts(id).filter(p => p.category === 'retail_deposit').length) },
-    { label: 'Cards', key: 'cards', format: id => String(getProducts(id).filter(p => p.category === 'retail_card').length) },
-    { label: 'Digital Services', key: 'dig', format: id => String(getProducts(id).filter(p => p.category === 'digital').length) },
-    { label: 'Islamic Products', key: 'isl', format: id => String(getProducts(id).filter(p => p.is_islamic).length) },
+  const selectedBanks = banks.filter(b => selected.includes(b.id))
+
+  type RowDef = { label: string; key: string; format: (id: number) => string; section?: string }
+  const rows: RowDef[] = [
+    { section: `${T.financialHighlights} (${year})`, label: T.totalAssets, key: 'assets', format: id => fmtB(getF(id).total_assets) },
+    { label: T.netProfit, key: 'profit', format: id => fmtB(getF(id).net_profit) },
+    { label: T.deposits, key: 'deps', format: id => fmtB(getF(id).customer_deposits) },
+    { label: T.roe, key: 'roe', format: id => fmtP(getF(id).roe) },
+    { label: T.roa, key: 'roa', format: id => fmtP(getF(id).roa) },
+    { label: T.car, key: 'car', format: id => fmtP(getF(id).car) },
+    { label: T.npl, key: 'npl', format: id => fmtP(getF(id).npl_ratio) },
+    { label: isAr ? 'ربحية السهم (فلس)' : 'EPS (fils)', key: 'eps', format: id => fmt(getF(id).eps_fils) },
+    { label: isAr ? 'الأرباح الموزعة %' : 'Cash Dividend %', key: 'div', format: id => fmtP(getF(id).dividends_cash_pct) },
+    { section: T.depositRatesSection, label: T.savings, key: 'sav', format: id => fmtP(getR(id).saving_rate) },
+    { label: isAr ? 'و.آ 3 أشهر' : 'TD 3M', key: 'td3', format: id => fmtP(getR(id).td_3m) },
+    { label: isAr ? 'و.آ 12 شهر' : 'TD 12M', key: 'td12', format: id => fmtP(getR(id).td_12m) },
+    { label: isAr ? 'دولار 12 شهر' : 'USD 12M', key: 'usd12', format: id => fmtP(getR(id).td_usd_12m) },
+    { section: T.lendingRatesSection, label: T.homeLoanMin, key: 'hlmin', format: id => fmtP(getR(id).home_loan_min) },
+    { label: T.homeLoanMax, key: 'hlmax', format: id => fmtP(getR(id).home_loan_max) },
+    { label: T.personalMin, key: 'plmin', format: id => fmtP(getR(id).personal_loan_min) },
+    { label: T.carMin, key: 'almin', format: id => fmtP(getR(id).car_loan_min) },
+    { section: T.feesSection, label: isAr ? 'رسوم الصيانة' : 'Account Maintenance', key: 'maint', format: id => fmtF(getT(id).account_maintenance_fee) },
+    { label: isAr ? 'الحساب الراكد' : 'Dormant/Month', key: 'dorm', format: id => fmtF(getT(id).dormant_account_fee) },
+    { label: isAr ? 'دفتر الشيكات' : 'Cheque Book', key: 'chq', format: id => fmtF(getT(id).cheque_book_fee) },
+    { label: isAr ? 'التحويل المحلي' : 'Local Transfer', key: 'ltx', format: id => fmtF(getT(id).local_transfer_fee) },
+    { label: isAr ? 'سويفت' : 'SWIFT Flat', key: 'swift', format: id => fmtF(getT(id).swift_transfer_fee_jod) },
+    { label: isAr ? '% رسوم القرض' : 'Loan Origination %', key: 'orig', format: id => fmtP(getT(id).loan_origination_fee_pct) },
+    { label: isAr ? 'صندوق أمانات (صغير)' : 'Safe Box Small', key: 'sbs', format: id => fmtF(getT(id).safe_box_small_annual) },
+    { section: T.productsSection, label: isAr ? 'إجمالي المنتجات' : 'Total Products', key: 'prods', format: id => String(getProds(id).length) },
+    { label: isAr ? 'قروض التجزئة' : 'Retail Loans', key: 'rl', format: id => String(getProds(id).filter(p => p.category === 'retail_loan').length) },
+    { label: isAr ? 'منتجات الودائع' : 'Deposit Products', key: 'dp', format: id => String(getProds(id).filter(p => p.category === 'retail_deposit').length) },
+    { label: isAr ? 'البطاقات' : 'Cards', key: 'cards', format: id => String(getProds(id).filter(p => p.category === 'retail_card').length) },
+    { label: isAr ? 'الخدمات الرقمية' : 'Digital Services', key: 'dig', format: id => String(getProds(id).filter(p => p.category === 'digital').length) },
+    { label: isAr ? 'المنتجات الإسلامية' : 'Islamic Products', key: 'isl', format: id => String(getProds(id).filter(p => p.is_islamic).length) },
   ]
 
-  // Find best value per row for highlighting
-  const getBest = (row: typeof rows[0], ids: number[]) => {
-    const vals = ids.map(id => {
-      const v = row.format(id)
-      const n = parseFloat(v.replace(/[^0-9.]/g, ''))
-      return { id, n, v }
-    }).filter(x => !isNaN(x.n) && x.v !== '—')
-    if (vals.length === 0) return null
-    // Higher is better for most metrics; lower is better for fees and NPL and loan rates
-    const lowerBetter = ['maint','dorm','stmt','chq','stop','ltx','swift','orig','sett','sbs','sbl','npl','plmin','plmax','hlmin','hlmax','almin','almax'].includes(row.key)
-    return lowerBetter ? vals.reduce((a, b) => a.n < b.n ? a : b).id : vals.reduce((a, b) => a.n > b.n ? a : b).id
+  const getBest = (row: RowDef) => {
+    const lowerBetter = ['maint','dorm','chq','ltx','swift','orig','sbs','npl','plmin','hlmin','almin','hlmax'].includes(row.key)
+    const vals = selectedBanks.map(b => ({ id: b.id, n: parseFloat(row.format(b.id).replace(/[^0-9.]/g, '')) })).filter(x => !isNaN(x.n))
+    if (!vals.length) return null
+    return (lowerBetter ? vals.reduce((a, b) => a.n < b.n ? a : b) : vals.reduce((a, b) => a.n > b.n ? a : b)).id
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-[#0a0f1e] text-gray-900 dark:text-white transition-colors">
-      <header className="border-b border-gray-200 dark:border-[#1f2937] bg-white dark:bg-[#111827] px-8 py-5 flex items-center justify-between">
+    <main className="min-h-screen" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+      <header className="hbtf-header">
         <div>
-          <div className="text-xs font-semibold tracking-widest text-blue-600 dark:text-[#4a9eff] uppercase mb-1">
-            <a href="/" className="hover:underline">Rapid Intelligence</a> / Compare
+          <div className="hbtf-logo-eyebrow">
+            <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>{isAr ? 'الرئيسية' : 'Rapid Intelligence'}</a>{' / '}{T.compare}
           </div>
-          <h1 className="text-xl font-bold">Bank Comparison</h1>
+          <div className="hbtf-logo-title">{T.bankComparison}</div>
         </div>
-        <div className="flex items-center gap-4">
-          <a href="/" className="text-xs text-gray-400 hover:text-blue-600 dark:hover:text-[#4a9eff]">← Dashboard</a>
-          <ThemeToggle />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <a href="/" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textDecoration: 'none' }}>{isAr ? 'الرئيسية ←' : '← Dashboard'}</a>
+          <LangToggle /><ThemeToggle />
         </div>
       </header>
 
-      <div className="px-8 py-6 max-w-[1400px] mx-auto">
-
-        {/* Bank Selector */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-sm text-gray-500 dark:text-[#9ca3af]">Select up to 4 banks to compare</p>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-400">Year:</span>
+      <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
+        <div style={{ marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{T.selectBanks}</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               {[2025, 2024, 2023].map(y => (
-                <button key={y} onClick={() => setYear(y)}
-                  className={`px-3 py-1 rounded text-xs font-medium transition-colors ${year === y ? 'bg-blue-600 text-white dark:bg-[#4a9eff] dark:text-black' : 'bg-white dark:bg-[#111827] border border-gray-200 dark:border-[#1f2937] text-gray-500 dark:text-gray-400'}`}>
-                  {y}
-                </button>
+                <button key={y} onClick={() => setYear(y)} className={year === y ? 'hbtf-btn hbtf-btn-active' : 'hbtf-btn'}>{y}</button>
               ))}
               {selected.length > 0 && (
-                <button onClick={() => setSelected([])} className="ml-2 px-3 py-1 rounded text-xs text-red-500 border border-red-200 dark:border-red-900 hover:bg-red-50 dark:hover:bg-[#2d1a1a] transition-colors">
-                  Clear
+                <button onClick={() => setSelected([])}
+                  style={{ fontSize: '0.75rem', padding: '0.4rem 0.75rem', borderRadius: '0.5rem', border: '1px solid var(--negative)', color: 'var(--negative)', background: 'none', cursor: 'pointer' }}>
+                  {T.clear}
                 </button>
               )}
             </div>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
             {banks.map(b => (
-              <button key={b.id} onClick={() => toggleBank(b.id)}
-                className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors border ${
-                  selected.includes(b.id)
-                    ? 'bg-blue-600 border-blue-600 text-white dark:bg-[#4a9eff] dark:border-[#4a9eff] dark:text-black'
-                    : selected.length >= 4
-                    ? 'bg-gray-50 dark:bg-[#0a0f1e] border-gray-200 dark:border-[#1f2937] text-gray-300 dark:text-[#374151] cursor-not-allowed'
-                    : 'bg-white dark:bg-[#111827] border-gray-200 dark:border-[#1f2937] text-gray-700 dark:text-gray-300 hover:border-blue-400 dark:hover:border-[#4a9eff]'
-                }`}>
-                {b.short_name}
-                {b.bank_type === 'islamic' && <span className="ml-1 text-green-500">●</span>}
+              <button key={b.id} onClick={() => toggle(b.id)}
+                style={{
+                  padding: '0.5rem 0.875rem',
+                  borderRadius: '0.5rem',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  border: '1px solid',
+                  cursor: selected.length >= 4 && !selected.includes(b.id) ? 'not-allowed' : 'pointer',
+                  borderColor: selected.includes(b.id) ? 'var(--hbtf-blue)' : 'var(--border)',
+                  background: selected.includes(b.id) ? 'var(--hbtf-blue)' : 'var(--bg-card)',
+                  color: selected.includes(b.id) ? 'white' : selected.length >= 4 ? 'var(--border)' : 'var(--text-secondary)',
+                  opacity: selected.length >= 4 && !selected.includes(b.id) ? 0.4 : 1,
+                  transition: 'all 0.15s',
+                }}>
+                {bName(b)}
+                {b.bank_type === 'islamic' && <span style={{ color: selected.includes(b.id) ? '#90EE90' : 'var(--positive)', marginInlineStart: '0.25rem' }}>●</span>}
               </button>
             ))}
           </div>
         </div>
 
-        {selected.length === 0 && (
-          <div className="text-center py-20 text-gray-400">
-            <p className="text-base mb-2">Select banks above to start comparing</p>
-            <p className="text-sm">Up to 4 banks side by side · Financial data, rates, fees, and products</p>
+        {!selected.length && (
+          <div style={{ textAlign: 'center', padding: '5rem', color: 'var(--text-muted)' }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>⇄</div>
+            <p style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>{T.selectBanksHint}</p>
+            <p style={{ fontSize: '0.8rem' }}>{T.selectBanksSubhint}</p>
           </div>
         )}
 
         {selected.length > 0 && loading && (
-          <div className="text-center py-16 text-gray-400 text-sm">Loading comparison data...</div>
+          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>{T.loadingComparison}</div>
         )}
 
         {selected.length > 0 && !loading && (
-          <div className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-[#1f2937] rounded-xl overflow-hidden shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full">
+          <div className="hbtf-card">
+            <div style={{ overflowX: 'auto' }}>
+              <table className="hbtf-table">
                 <thead>
-                  <tr className="border-b border-gray-100 dark:border-[#1f2937] bg-gray-50 dark:bg-[#0a0f1e]">
-                    <th className="px-6 py-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider w-48">Metric</th>
+                  <tr>
+                    <th style={{ textAlign: 'start', width: '12rem' }}>{T.metric}</th>
                     {selectedBanks.map(b => (
-                      <th key={b.id} className="px-6 py-4 text-center">
-                        <div className="text-sm font-bold text-gray-900 dark:text-white">{b.short_name}</div>
-                        <div className="flex items-center justify-center gap-1 mt-1">
-                          <span className={`text-xs px-2 py-0.5 rounded-full ${b.bank_type === 'islamic' ? 'bg-green-100 text-green-700 dark:bg-[#1a2e1a] dark:text-[#22c55e]' : 'bg-blue-100 text-blue-700 dark:bg-[#1e3a5f] dark:text-[#4a9eff]'}`}>
-                            {b.bank_type === 'islamic' ? 'Islamic' : 'Conventional'}
-                          </span>
-                        </div>
+                      <th key={b.id} style={{ textAlign: 'center' }}>
+                        <div style={{ fontWeight: 800 }}>{bName(b)}</div>
+                        <span className={b.bank_type === 'islamic' ? 'badge-islamic' : 'badge-conventional'} style={{ marginTop: '0.25rem', display: 'inline-block' }}>
+                          {b.bank_type === 'islamic' ? T.islamic : T.conventional}
+                        </span>
                       </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((row, i) => {
-                    const bestId = getBest(row, selected)
+                    const bestId = getBest(row)
                     return (
                       <>
                         {row.section && (
-                          <tr key={`section-${i}`} className="bg-gray-50 dark:bg-[#0d1117]">
-                            <td colSpan={selected.length + 1} className="px-6 py-2 text-xs font-semibold text-gray-500 dark:text-[#4b5563] uppercase tracking-wider">{row.section}</td>
+                          <tr key={`s-${i}`}>
+                            <td colSpan={selectedBanks.length + 1} style={{ background: 'var(--bg-primary)', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', padding: '0.5rem 1.25rem' }}>
+                              {row.section}
+                            </td>
                           </tr>
                         )}
-                        <tr key={row.key} className="border-b border-gray-50 dark:border-[#1f2937] hover:bg-gray-50 dark:hover:bg-[#0d1117] transition-colors">
-                          <td className="px-6 py-3 text-xs text-gray-500 dark:text-[#6b7280]">{row.label}</td>
+                        <tr key={row.key}>
+                          <td style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{row.label}</td>
                           {selectedBanks.map(b => {
                             const val = row.format(b.id)
                             const isBest = bestId === b.id && val !== '—'
                             return (
-                              <td key={b.id} className={`px-6 py-3 text-center text-sm font-medium ${isBest ? 'text-blue-600 dark:text-[#4a9eff]' : val === '—' ? 'text-gray-300 dark:text-[#374151]' : 'text-gray-800 dark:text-gray-200'}`}>
-                                {val}
-                                {isBest && <span className="ml-1 text-xs">★</span>}
+                              <td key={b.id} style={{ textAlign: 'center', fontWeight: isBest ? 700 : 400, color: isBest ? 'var(--hbtf-blue)' : val === '—' ? 'var(--border)' : 'var(--text-primary)', fontSize: '0.8125rem' }}>
+                                {val}{isBest && <span style={{ marginInlineStart: '0.25rem', color: 'var(--gold)' }}>★</span>}
                               </td>
                             )
                           })}
@@ -233,8 +220,8 @@ export default function ComparePage() {
                 </tbody>
               </table>
             </div>
-            <div className="px-6 py-3 border-t border-gray-100 dark:border-[#1f2937] text-xs text-gray-400 dark:text-[#4b5563]">
-              ★ Best value in category · Blue = highest (or lowest for fees/rates) · Source: Audited annual reports, official bank PDFs
+            <div style={{ padding: '0.75rem 1.25rem', borderTop: '1px solid var(--border-subtle)', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+              {T.bestNote}
             </div>
           </div>
         )}
