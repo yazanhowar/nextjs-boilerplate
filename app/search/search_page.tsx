@@ -3,6 +3,9 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
 import ThemeToggle from '../../components/ThemeToggle'
+import LangToggle from '../../components/LangToggle'
+import { useLang } from '../../lib/LangContext'
+import { t } from '../../lib/i18n'
 
 type Result = {
   type: string
