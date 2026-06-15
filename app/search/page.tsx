@@ -182,3 +182,4 @@ export default function SearchPage() {
     </main>
   )
 }
+no errropr
