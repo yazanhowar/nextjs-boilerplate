@@ -82,9 +82,9 @@ export default function Dashboard() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-100 dark:border-[#1f2937] bg-gray-50 dark:bg-[#0a0f1e]">
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.bank}</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.type}</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.website}</th>
+                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.bank}</th>
+                    <th className="px-4 py-3 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.type}</th>
+                    <th className="px-4 py-3 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.website}</th>
                     <th className="px-4 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.tariffData}</th>
                     <th className="px-4 py-3 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.rateData}</th>
                   </tr>
