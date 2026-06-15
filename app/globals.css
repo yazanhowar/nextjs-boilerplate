@@ -1,14 +1,421 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@variant dark (&:where(.dark, .dark *));
+/* ============================================================
+   HBTF BRAND DESIGN SYSTEM
+   Primary: Core Blue #004D8F | Core Gold #CEBA95
+   ============================================================ */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* HBTF Core Colors */
+  --hbtf-blue:        #004D8F;
+  --hbtf-blue-dark:   #003D72;
+  --hbtf-blue-light:  #0062B3;
+  --hbtf-gold:        #CEBA95;
+  --hbtf-gold-light:  #DDD0B0;
+  --hbtf-gold-dark:   #B8A47E;
+  --hbtf-cyan:        #23ABE2;
+
+  /* Edge palette */
+  --hbtf-dark-grey:   #545759;
+  --hbtf-mid-grey:    #7B868C;
+  --hbtf-light-grey:  #A8A9AC;
+  --hbtf-silver:      #CCD0D2;
+  --hbtf-misty-blue:  #B1D0D6;
+
+  /* Light mode */
+  --bg-primary:       #F5F6F8;
+  --bg-card:          #FFFFFF;
+  --bg-header:        #FFFFFF;
+  --border:           #E2E5EA;
+  --border-subtle:    #EEF0F3;
+  --text-primary:     #0A1628;
+  --text-secondary:   #545759;
+  --text-muted:       #7B868C;
+  --accent:           #004D8F;
+  --accent-hover:     #003D72;
+  --gold:             #CEBA95;
+  --positive:         #1A7A4A;
+  --negative:         #C0392B;
+}
+
+.dark {
+  /* Dark mode — deep navy inspired by HBTF blue */
+  --bg-primary:       #060D1A;
+  --bg-card:          #0D1829;
+  --bg-header:        #091221;
+  --border:           #1A2A42;
+  --border-subtle:    #112038;
+  --text-primary:     #EEF2F8;
+  --text-secondary:   #8FA5C0;
+  --text-muted:       #4D6480;
+  --accent:           #23ABE2;
+  --accent-hover:     #1B8EC0;
+  --gold:             #CEBA95;
+  --positive:         #2ECC71;
+  --negative:         #E74C3C;
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+
+* { box-sizing: border-box; }
+
+html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+html[lang="ar"] {
+  font-family: 'Segoe UI', 'Tahoma', 'Arial', system-ui, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background 0.2s, color 0.2s;
 }
+
+/* ============================================================
+   HBTF COMPONENT SYSTEM
+   ============================================================ */
+
+/* Header */
+.hbtf-header {
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border);
+  padding: 1.125rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.hbtf-logo-eyebrow {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--hbtf-blue);
+  margin-bottom: 0.2rem;
+}
+.dark .hbtf-logo-eyebrow { color: var(--gold); }
+
+.hbtf-logo-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+/* Cards */
+.hbtf-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  overflow: hidden;
+}
+
+.hbtf-card-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hbtf-card-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Stat cards */
+.hbtf-stat {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hbtf-stat::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--hbtf-blue);
+}
+.dark .hbtf-stat::before { background: var(--gold); }
+
+.hbtf-stat-value {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--hbtf-blue);
+  line-height: 1;
+  margin-bottom: 0.375rem;
+  letter-spacing: -0.02em;
+}
+.dark .hbtf-stat-value { color: var(--gold); }
+
+.hbtf-stat-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+/* Tables */
+.hbtf-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.hbtf-table th {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.hbtf-table td {
+  padding: 0.875rem 1.25rem;
+  font-size: 0.8125rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.hbtf-table tr:last-child td { border-bottom: none; }
+
+.hbtf-table tr:hover td {
+  background: color-mix(in srgb, var(--hbtf-blue) 4%, transparent);
+}
+
+.hbtf-table .rank-1 td { background: color-mix(in srgb, var(--hbtf-blue) 6%, transparent); }
+
+/* Buttons / Pills */
+.hbtf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.hbtf-btn:hover {
+  border-color: var(--hbtf-blue);
+  color: var(--hbtf-blue);
+}
+.dark .hbtf-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.hbtf-btn-active {
+  background: var(--hbtf-blue);
+  border-color: var(--hbtf-blue);
+  color: white;
+}
+.dark .hbtf-btn-active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #060D1A;
+}
+
+/* Nav links */
+.hbtf-nav-link {
+  display: block;
+  padding: 0.75rem 1rem;
+  border-radius: 0.625rem;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-primary);
+  transition: all 0.15s;
+  text-decoration: none;
+}
+
+.hbtf-nav-link:hover {
+  border-color: var(--hbtf-blue);
+  background: color-mix(in srgb, var(--hbtf-blue) 5%, var(--bg-card));
+}
+.dark .hbtf-nav-link:hover {
+  border-color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 8%, var(--bg-card));
+}
+
+.hbtf-nav-link-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.hbtf-nav-link:hover .hbtf-nav-link-title {
+  color: var(--hbtf-blue);
+}
+.dark .hbtf-nav-link:hover .hbtf-nav-link-title {
+  color: var(--gold);
+}
+
+.hbtf-nav-link-desc {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 0.125rem;
+}
+
+/* Badges */
+.badge-conventional {
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--hbtf-blue) 12%, transparent);
+  color: var(--hbtf-blue);
+}
+.dark .badge-conventional {
+  background: color-mix(in srgb, var(--hbtf-cyan) 15%, transparent);
+  color: var(--hbtf-cyan);
+}
+
+.badge-islamic {
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 99px;
+  background: color-mix(in srgb, #1A7A4A 12%, transparent);
+  color: #1A7A4A;
+}
+.dark .badge-islamic {
+  background: color-mix(in srgb, #2ECC71 15%, transparent);
+  color: #2ECC71;
+}
+
+/* Value highlights */
+.val-best { color: var(--positive); font-weight: 600; }
+.val-worst { color: var(--text-muted); }
+.val-empty { color: var(--border); }
+
+/* Gold accent line */
+.gold-accent {
+  display: inline-block;
+  width: 2.5rem;
+  height: 2px;
+  background: var(--gold);
+  border-radius: 1px;
+  margin-bottom: 0.75rem;
+}
+
+/* Progress bar */
+.hbtf-progress {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.hbtf-progress-fill {
+  height: 100%;
+  background: var(--hbtf-blue);
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+.dark .hbtf-progress-fill { background: var(--gold); }
+
+/* Search input */
+.hbtf-search {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.hbtf-search:focus {
+  border-color: var(--hbtf-blue);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--hbtf-blue) 15%, transparent);
+}
+.dark .hbtf-search:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 15%, transparent);
+}
+
+/* Result cards */
+.hbtf-result {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  transition: border-color 0.15s;
+}
+.hbtf-result:hover { border-color: var(--hbtf-blue); }
+.dark .hbtf-result:hover { border-color: var(--gold); }
+
+/* Announcement cards */
+.hbtf-announcement {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  padding: 1.25rem 1.5rem;
+  border-left: 3px solid var(--hbtf-blue);
+  transition: border-color 0.15s;
+}
+.dark .hbtf-announcement { border-left-color: var(--gold); }
+
+/* Category badges */
+.cat-financial_results { background: color-mix(in srgb, var(--hbtf-blue) 12%, transparent); color: var(--hbtf-blue); }
+.dark .cat-financial_results { background: color-mix(in srgb, var(--hbtf-cyan) 15%, transparent); color: var(--hbtf-cyan); }
+
+.cat-dividend { background: color-mix(in srgb, #1A7A4A 12%, transparent); color: #1A7A4A; }
+.dark .cat-dividend { background: color-mix(in srgb, #2ECC71 15%, transparent); color: #2ECC71; }
+
+.cat-merger_acquisition { background: color-mix(in srgb, #6B3FA0 12%, transparent); color: #6B3FA0; }
+.dark .cat-merger_acquisition { background: color-mix(in srgb, #A78BFA 15%, transparent); color: #A78BFA; }
+
+.cat-leadership_change { background: color-mix(in srgb, #C8B18B 15%, transparent); color: #8A6D3B; }
+.dark .cat-leadership_change { background: color-mix(in srgb, var(--gold) 20%, transparent); color: var(--gold); }
+
+.cat-product_launch { background: color-mix(in srgb, #23ABE2 12%, transparent); color: #1580AA; }
+.dark .cat-product_launch { background: color-mix(in srgb, #23ABE2 15%, transparent); color: #23ABE2; }
+
+.cat-strategic, .cat-agm, .cat-other, .cat-rating, .cat-regulation {
+  background: color-mix(in srgb, var(--text-muted) 12%, transparent);
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   SCROLLBAR STYLING
+   ============================================================ */
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ============================================================
+   TAILWIND OVERRIDE — ensure RTL works with logical properties
+   ============================================================ */
+
+[dir="rtl"] table { direction: rtl; }
+[dir="rtl"] .hbtf-header { flex-direction: row-reverse; }
