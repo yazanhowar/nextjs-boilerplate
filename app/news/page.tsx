@@ -106,7 +106,7 @@ export default function NewsPage() {
                       {isAr && a.summary_ar ? a.summary_ar : a.summary_en}
                     </p>
                   </div>
-                  <div className="shrink-0 text-right">
+                  <div className="shrink-0 text-end">
                     <div className="text-xs text-gray-400 dark:text-[#4b5563] mb-1">{a.announcement_date?.slice(0,10)}</div>
                     {a.source_url && (
                       <a href={a.source_url} target="_blank" rel="noopener noreferrer"
