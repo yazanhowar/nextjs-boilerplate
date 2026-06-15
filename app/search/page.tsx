@@ -8,17 +8,15 @@ import { useLang } from '../../lib/LangContext'
 import { t } from '../../lib/i18n'
 
 type Result = {
-  type: string
-  bank_name: string
-  bank_type: string
-  title: string
-  subtitle: string
-  value?: string
-  url?: string
-  tag?: string
+  type: string; bank_name: string; bank_type: string
+  title: string; subtitle: string; value?: string; url?: string; tag?: string
 }
 
 export default function SearchPage() {
+  const { lang } = useLang()
+  const T = t[lang]
+  const isAr = lang === 'ar'
+
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Result[]>([])
   const [loading, setLoading] = useState(false)
@@ -26,150 +24,134 @@ export default function SearchPage() {
 
   const search = useCallback(async (q: string) => {
     if (!q.trim()) { setResults([]); setSearched(false); return }
-    setLoading(true)
-    setSearched(true)
+    setLoading(true); setSearched(true)
     const term = q.toLowerCase()
 
-    const [
-      { data: banks },
-      { data: products },
-      { data: rates },
-      { data: tariffs },
-      { data: announcements },
-    ] = await Promise.all([
-      supabase.from('banks').select('*').or(`name_en.ilike.%${q}%,short_name.ilike.%${q}%`),
-      supabase.from('bank_products').select('*, banks(name_en, short_name, bank_type)').or(`product_name_en.ilike.%${q}%,description_en.ilike.%${q}%,category.ilike.%${q}%`).limit(20),
-      supabase.from('bank_rates').select('*, banks(name_en, short_name, bank_type)').limit(15),
-      supabase.from('bank_tariffs').select('*, banks(name_en, short_name, bank_type)').limit(15),
-      supabase.from('bank_announcements').select('*, banks(name_en, short_name, bank_type)').or(`headline_en.ilike.%${q}%,summary_en.ilike.%${q}%`).order('announcement_date', { ascending: false }).limit(10),
+    const [{ data: banks }, { data: products }, { data: rates }, { data: tariffs }, { data: announcements }] = await Promise.all([
+      supabase.from('banks').select('*').or(`name_en.ilike.%${q}%,short_name.ilike.%${q}%,name_ar.ilike.%${q}%`),
+      supabase.from('bank_products').select('*, banks(name_en, short_name, bank_type, name_ar, short_name_ar)').or(`product_name_en.ilike.%${q}%,description_en.ilike.%${q}%,category.ilike.%${q}%`).limit(20),
+      supabase.from('bank_rates').select('*, banks(name_en, short_name, bank_type, name_ar, short_name_ar)').limit(15),
+      supabase.from('bank_tariffs').select('*, banks(name_en, short_name, bank_type, name_ar, short_name_ar)').limit(15),
+      supabase.from('bank_announcements').select('*, banks(name_en, short_name, bank_type, name_ar, short_name_ar)').or(`headline_en.ilike.%${q}%,summary_en.ilike.%${q}%,headline_ar.ilike.%${q}%`).order('announcement_date', { ascending: false }).limit(10),
     ])
 
     const out: Result[] = []
+    const bName = (b: any) => isAr ? (b?.short_name_ar || b?.name_ar || b?.short_name) : b?.short_name
 
     for (const b of banks || []) {
-      out.push({ type: 'bank', bank_name: b.short_name, bank_type: b.bank_type, title: b.name_en, subtitle: `${b.bank_type === 'islamic' ? 'Islamic' : 'Conventional'} · ${b.website || b.slug + '.com'}`, tag: 'Bank' })
+      out.push({ type: 'bank', bank_name: isAr ? (b.short_name_ar || b.name_ar || b.short_name) : b.short_name, bank_type: b.bank_type, title: isAr ? (b.name_ar || b.name_en) : b.name_en, subtitle: b.website || '', tag: isAr ? 'بنك' : 'Bank' })
     }
-
     for (const p of products || []) {
-      out.push({ type: 'product', bank_name: p.banks?.short_name, bank_type: p.banks?.bank_type, title: p.product_name_en, subtitle: p.description_en || '', value: p.category?.replace(/_/g, ' '), tag: 'Product', url: p.source_url })
+      out.push({ type: 'product', bank_name: bName(p.banks), bank_type: p.banks?.bank_type, title: p.product_name_en, subtitle: p.description_en || '', value: p.category?.replace(/_/g, ' '), tag: isAr ? 'منتج' : 'Product', url: p.source_url })
     }
-
     for (const r of rates || []) {
-      const bankMatch = r.banks?.name_en?.toLowerCase().includes(term) || r.banks?.short_name?.toLowerCase().includes(term)
-      const rateMatch = ['deposit', 'rate', 'saving', 'td', 'loan', 'interest', 'profit', 'murabaha', 'mudaraba'].some(k => term.includes(k))
-      if (bankMatch || rateMatch) {
-        out.push({ type: 'rate', bank_name: r.banks?.short_name, bank_type: r.banks?.bank_type, title: `${r.banks?.short_name} — Interest / Profit Rates`, subtitle: `Savings ${r.saving_rate ?? '—'}% · TD 12M ${r.td_12m ?? '—'}% · Home loan ${r.home_loan_min ?? '—'}–${r.home_loan_max ?? '—'}%`, tag: 'Rates', url: r.source_url })
-      }
+      const bMatch = r.banks?.name_en?.toLowerCase().includes(term) || r.banks?.short_name?.toLowerCase().includes(term)
+      const rMatch = ['deposit','rate','saving','td','loan','interest','profit','murabaha','ودائع','معدل','توفير','قرض'].some(k => term.includes(k))
+      if (bMatch || rMatch) out.push({ type: 'rate', bank_name: bName(r.banks), bank_type: r.banks?.bank_type, title: `${bName(r.banks)} — ${isAr ? 'أسعار الفائدة / الأرباح' : 'Interest / Profit Rates'}`, subtitle: `${isAr ? 'توفير' : 'Savings'} ${r.saving_rate ?? '—'}% · TD 12M ${r.td_12m ?? '—'}% · ${isAr ? 'قرض سكني' : 'Home'} ${r.home_loan_min ?? '—'}–${r.home_loan_max ?? '—'}%`, tag: isAr ? 'أسعار' : 'Rates', url: r.source_url })
     }
-
-    for (const t of tariffs || []) {
-      const bankMatch = t.banks?.name_en?.toLowerCase().includes(term) || t.banks?.short_name?.toLowerCase().includes(term)
-      const feeMatch = ['fee', 'charge', 'tariff', 'transfer', 'cheque', 'card', 'atm', 'swift', 'loan', 'safe deposit'].some(k => term.includes(k))
-      if (bankMatch || feeMatch) {
-        out.push({ type: 'tariff', bank_name: t.banks?.short_name, bank_type: t.banks?.bank_type, title: `${t.banks?.short_name} — Fees & Charges`, subtitle: `Maintenance JOD ${t.account_maintenance_fee ?? '—'}/mo · Local transfer JOD ${t.local_transfer_fee ?? '—'} · Origination ${t.loan_origination_fee_pct ?? '—'}%`, tag: 'Tariffs', url: t.source_url })
-      }
+    for (const tar of tariffs || []) {
+      const bMatch = tar.banks?.name_en?.toLowerCase().includes(term) || tar.banks?.short_name?.toLowerCase().includes(term)
+      const fMatch = ['fee','charge','tariff','transfer','cheque','card','atm','swift','loan','رسوم','عمولة','تحويل'].some(k => term.includes(k))
+      if (bMatch || fMatch) out.push({ type: 'tariff', bank_name: bName(tar.banks), bank_type: tar.banks?.bank_type, title: `${bName(tar.banks)} — ${isAr ? 'الرسوم والعمولات' : 'Fees & Charges'}`, subtitle: `${isAr ? 'صيانة' : 'Maintenance'} JOD ${tar.account_maintenance_fee ?? '—'} · ${isAr ? 'تحويل محلي' : 'Local transfer'} JOD ${tar.local_transfer_fee ?? '—'}`, tag: isAr ? 'تعريفات' : 'Tariffs', url: tar.source_url })
     }
-
     for (const a of announcements || []) {
-      out.push({ type: 'announcement', bank_name: a.banks?.short_name, bank_type: a.banks?.bank_type, title: a.headline_en, subtitle: (a.summary_en || '').slice(0, 140) + '...', value: a.announcement_date?.slice(0, 10), tag: a.category?.replace(/_/g, ' '), url: a.source_url })
+      out.push({ type: 'announcement', bank_name: bName(a.banks), bank_type: a.banks?.bank_type, title: isAr && a.headline_ar ? a.headline_ar : a.headline_en, subtitle: ((isAr && a.summary_ar ? a.summary_ar : a.summary_en) || '').slice(0, 140) + '...', value: a.announcement_date?.slice(0,10), tag: a.category?.replace(/_/g, ' '), url: a.source_url })
     }
 
-    setResults(out)
-    setLoading(false)
-  }, [])
+    setResults(out); setLoading(false)
+  }, [isAr])
 
   useEffect(() => {
-    const t = setTimeout(() => search(query), 350)
-    return () => clearTimeout(t)
+    const timer = setTimeout(() => search(query), 350)
+    return () => clearTimeout(timer)
   }, [query, search])
 
   const tagColors: Record<string, string> = {
-    Bank: 'bg-blue-100 text-blue-700 dark:bg-[#1e3a5f] dark:text-[#4a9eff]',
-    Product: 'bg-purple-100 text-purple-700 dark:bg-[#2d1b4e] dark:text-[#a78bfa]',
-    Rates: 'bg-green-100 text-green-700 dark:bg-[#1a2e1a] dark:text-[#22c55e]',
-    Tariffs: 'bg-orange-100 text-orange-700 dark:bg-[#2e1a0a] dark:text-[#fb923c]',
+    Bank: '#004D8F', 'بنك': '#004D8F',
+    Product: '#6B3FA0', 'منتج': '#6B3FA0',
+    Rates: '#1A7A4A', 'أسعار': '#1A7A4A',
+    Tariffs: '#8A6D3B', 'تعريفات': '#8A6D3B',
   }
-  const tagColor = (tag: string) => tagColors[tag] || 'bg-gray-100 text-gray-600 dark:bg-[#1f2937] dark:text-[#9ca3af]'
 
-  const quickSearches = ['home loan', 'credit card', 'savings rate', 'transfer fee', 'Islamic banking', 'Arab Bank', 'Capital Bank', 'dividend', 'CEO appointment', 'safe deposit box']
+  const quickSearches = isAr
+    ? ['قرض سكني', 'بطاقة ائتمان', 'سعر التوفير', 'رسوم التحويل', 'بنك إسلامي', 'البنك العربي', 'أرباح', 'مدير عام']
+    : ['home loan', 'credit card', 'savings rate', 'transfer fee', 'Islamic banking', 'Arab Bank', 'dividend', 'CEO']
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-[#0a0f1e] text-gray-900 dark:text-white transition-colors">
-      <header className="border-b border-gray-200 dark:border-[#1f2937] bg-white dark:bg-[#111827] px-8 py-5 flex items-center justify-between">
+    <main className="min-h-screen" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+      <header className="hbtf-header">
         <div>
-          <div className="text-xs font-semibold tracking-widest text-blue-600 dark:text-[#4a9eff] uppercase mb-1">
-            <a href="/" className="hover:underline">Rapid Intelligence</a> / Search
+          <div className="hbtf-logo-eyebrow">
+            <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>{isAr ? 'الرئيسية' : 'Rapid Intelligence'}</a>{' / '}{T.search}
           </div>
-          <h1 className="text-xl font-bold">Search</h1>
+          <div className="hbtf-logo-title">{T.search}</div>
         </div>
-        <div className="flex items-center gap-4">
-          <a href="/" className="text-xs text-gray-400 hover:text-blue-600 dark:hover:text-[#4a9eff]">← Dashboard</a>
-          <ThemeToggle />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <a href="/" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textDecoration: 'none' }}>{isAr ? 'الرئيسية ←' : '← Dashboard'}</a>
+          <LangToggle /><ThemeToggle />
         </div>
       </header>
 
-      <div className="px-8 py-8 max-w-4xl mx-auto">
-        <div className="relative mb-8">
-          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
+        <div style={{ position: 'relative', marginBottom: '2rem' }}>
+          <svg style={{ position: 'absolute', insetInlineStart: '1rem', top: '50%', transform: 'translateY(-50%)', width: '1.25rem', height: '1.25rem', color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <input
-            autoFocus
-            type="text"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder="Search banks, products, rates, fees, announcements..."
-            className="w-full pl-12 pr-10 py-4 text-base rounded-xl border border-gray-200 dark:border-[#1f2937] bg-white dark:bg-[#111827] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#4a9eff]"
+          <input autoFocus type="text" value={query} onChange={e => setQuery(e.target.value)}
+            placeholder={T.searchPlaceholder}
+            className="hbtf-search"
+            style={{ paddingInlineStart: '3rem', paddingInlineEnd: '2.5rem' }}
           />
           {query && (
-            <button onClick={() => setQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg">×</button>
+            <button onClick={() => setQuery('')} style={{ position: 'absolute', insetInlineEnd: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem' }}>×</button>
           )}
         </div>
 
         {!searched && (
           <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Try searching for</p>
-            <div className="flex flex-wrap gap-2">
+            <p style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>{T.trySearhing}</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
               {quickSearches.map(s => (
-                <button key={s} onClick={() => setQuery(s)}
-                  className="px-3 py-1.5 text-xs rounded-lg bg-white dark:bg-[#111827] border border-gray-200 dark:border-[#1f2937] text-gray-600 dark:text-gray-400 hover:border-blue-400 dark:hover:border-[#4a9eff] hover:text-blue-600 dark:hover:text-[#4a9eff] transition-colors">
-                  {s}
-                </button>
+                <button key={s} onClick={() => setQuery(s)} className="hbtf-btn" style={{ fontSize: '0.75rem' }}>{s}</button>
               ))}
             </div>
           </div>
         )}
 
-        {loading && <div className="text-center py-12 text-gray-400 text-sm">Searching...</div>}
+        {loading && <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>{T.searching}</div>}
 
         {!loading && searched && (
           <div>
-            <p className="text-xs text-gray-400 mb-4">{results.length} result{results.length !== 1 ? 's' : ''} for &quot;{query}&quot;</p>
+            <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+              {results.length} {T.searchResults} &quot;{query}&quot;
+            </p>
             {results.length === 0 ? (
-              <div className="text-center py-16 text-gray-400">
-                <p className="text-base mb-2">No results found</p>
-                <p className="text-sm">Try a bank name, product type, or financial term</p>
+              <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+                <p style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>{T.noResults}</p>
+                <p style={{ fontSize: '0.8rem' }}>{T.noResultsHint}</p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {results.map((r, i) => (
-                  <div key={i} className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-[#1f2937] rounded-xl px-5 py-4 hover:border-blue-300 dark:hover:border-[#4a9eff] transition-colors">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${tagColor(r.tag || '')}`}>{r.tag}</span>
-                          <span className="text-xs text-gray-400 dark:text-[#4b5563]">{r.bank_name}</span>
-                          {r.bank_type === 'islamic' && <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-[#1a2e1a] dark:text-[#22c55e]">Islamic</span>}
+                  <div key={i} className="hbtf-result">
+                    <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between', gap: '1rem' }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem', flexWrap: 'wrap' }}>
+                          <span style={{
+                            fontSize: '0.625rem', fontWeight: 700, padding: '0.15rem 0.5rem',
+                            borderRadius: '99px', textTransform: 'capitalize',
+                            background: `color-mix(in srgb, ${tagColors[r.tag || ''] || '#585A5B'} 15%, transparent)`,
+                            color: tagColors[r.tag || ''] || 'var(--text-muted)'
+                          }}>{r.tag}</span>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{r.bank_name}</span>
+                          {r.bank_type === 'islamic' && <span className="badge-islamic">{isAr ? 'إسلامي' : 'Islamic'}</span>}
                         </div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{r.title}</p>
-                        <p className="text-xs text-gray-500 dark:text-[#6b7280] mt-0.5 line-clamp-2">{r.subtitle}</p>
+                        <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>{r.title}</p>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem', lineHeight: 1.5 }}>{r.subtitle}</p>
                       </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        {r.value && <span className="text-xs text-gray-400 dark:text-[#4b5563]">{r.value}</span>}
-                        {r.url && (
-                          <a href={r.url} target="_blank" rel="noopener noreferrer"
-                            className="text-xs text-blue-600 dark:text-[#4a9eff] hover:underline whitespace-nowrap">Source ↗</a>
-                        )}
+                      <div style={{ flexShrink: 0, textAlign: 'end' }}>
+                        {r.value && <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.25rem' }}>{r.value}</span>}
+                        {r.url && <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.7rem', color: 'var(--hbtf-blue)', textDecoration: 'none' }}>{T.viewSource} ↗</a>}
                       </div>
                     </div>
                   </div>
