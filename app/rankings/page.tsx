@@ -105,16 +105,16 @@ export default function RankingsPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-[#1f2937] bg-gray-50 dark:bg-[#0a0f1e]">
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider w-8">#</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.bank}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.totalAssets}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.netProfit}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.deposits}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.roe}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.roa}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.car}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.npl}</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.year}</th>
+                  <th className="px-4 py-3 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider w-8">#</th>
+                  <th className="px-4 py-3 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.bank}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.totalAssets}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.netProfit}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.deposits}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.roe}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.roa}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.car}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.npl}</th>
+                  <th className="px-4 py-3 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{T.year}</th>
                 </tr>
               </thead>
               <tbody>
@@ -129,14 +129,14 @@ export default function RankingsPage() {
                         {f.banks?.bank_type === 'islamic' ? T.islamic : T.conventional}
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-right text-sm font-medium text-gray-900 dark:text-white">{fmtB(f.total_assets, f.currency)}</td>
-                    <td className="px-4 py-4 text-right text-sm font-medium text-gray-900 dark:text-white">{fmtB(f.net_profit, f.currency)}</td>
-                    <td className="px-4 py-4 text-right text-sm text-gray-700 dark:text-gray-300">{fmtB(f.customer_deposits, f.currency)}</td>
-                    <td className="px-4 py-4 text-right text-sm text-gray-700 dark:text-gray-300">{fmtPct(f.roe)}</td>
-                    <td className="px-4 py-4 text-right text-sm text-gray-700 dark:text-gray-300">{fmtPct(f.roa)}</td>
-                    <td className="px-4 py-4 text-right text-sm text-gray-700 dark:text-gray-300">{fmtPct(f.car)}</td>
-                    <td className="px-4 py-4 text-right text-sm text-gray-700 dark:text-gray-300">{fmtPct(f.npl_ratio)}</td>
-                    <td className="px-4 py-4 text-right text-xs text-gray-400">{f.fiscal_year}</td>
+                    <td className="px-4 py-4 text-end text-sm font-medium text-gray-900 dark:text-white">{fmtB(f.total_assets, f.currency)}</td>
+                    <td className="px-4 py-4 text-end text-sm font-medium text-gray-900 dark:text-white">{fmtB(f.net_profit, f.currency)}</td>
+                    <td className="px-4 py-4 text-end text-sm text-gray-700 dark:text-gray-300">{fmtB(f.customer_deposits, f.currency)}</td>
+                    <td className="px-4 py-4 text-end text-sm text-gray-700 dark:text-gray-300">{fmtPct(f.roe)}</td>
+                    <td className="px-4 py-4 text-end text-sm text-gray-700 dark:text-gray-300">{fmtPct(f.roa)}</td>
+                    <td className="px-4 py-4 text-end text-sm text-gray-700 dark:text-gray-300">{fmtPct(f.car)}</td>
+                    <td className="px-4 py-4 text-end text-sm text-gray-700 dark:text-gray-300">{fmtPct(f.npl_ratio)}</td>
+                    <td className="px-4 py-4 text-end text-xs text-gray-400">{f.fiscal_year}</td>
                   </tr>
                 ))}
               </tbody>
