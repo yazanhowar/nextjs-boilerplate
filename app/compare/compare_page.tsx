@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import ThemeToggle from '../../components/ThemeToggle'
+import LangToggle from '../../components/LangToggle'
+import { useLang } from '../../lib/LangContext'
+import { t } from '../../lib/i18n'
 
 export default function ComparePage() {
   const [banks, setBanks] = useState<any[]>([])
