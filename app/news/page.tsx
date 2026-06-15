@@ -7,7 +7,7 @@ import LangToggle from '../../components/LangToggle'
 import { useLang } from '../../lib/LangContext'
 import { t } from '../../lib/i18n'
 
-const CATEGORIES = ['agm','financial_results','dividend','rating','merger_acquisition','regulation','product_launch','leadership_change','strategic','other']
+const CATS = ['agm','financial_results','dividend','rating','merger_acquisition','regulation','product_launch','leadership_change','strategic','other']
 
 export default function NewsPage() {
   const { lang } = useLang()
@@ -37,87 +37,94 @@ export default function NewsPage() {
     return map[c] || c
   }
 
-  const catColor: Record<string, string> = {
-    financial_results: 'bg-blue-100 text-blue-700 dark:bg-[#1e3a5f] dark:text-[#4a9eff]',
-    dividend: 'bg-green-100 text-green-700 dark:bg-[#1a2e1a] dark:text-[#22c55e]',
-    merger_acquisition: 'bg-purple-100 text-purple-700 dark:bg-[#2d1b4e] dark:text-[#a78bfa]',
-    leadership_change: 'bg-orange-100 text-orange-700 dark:bg-[#2e1a0a] dark:text-[#fb923c]',
-    product_launch: 'bg-cyan-100 text-cyan-700 dark:bg-[#0a2e2e] dark:text-[#22d3ee]',
-    strategic: 'bg-indigo-100 text-indigo-700 dark:bg-[#1a1e3a] dark:text-[#818cf8]',
-  }
-  const getCatColor = (c: string) => catColor[c] || 'bg-gray-100 text-gray-600 dark:bg-[#1f2937] dark:text-[#9ca3af]'
-
-  const bankName = (a: any) => isAr ? (a.banks?.short_name_ar || a.banks?.name_ar || a.banks?.short_name) : a.banks?.short_name
+  const bName = (a: any) => isAr ? (a.banks?.short_name_ar || a.banks?.name_ar || a.banks?.short_name) : a.banks?.short_name
 
   const filtered = announcements.filter(a =>
     (filterBank === 'all' || String(a.bank_id) === filterBank) &&
     (filterCat === 'all' || a.category === filterCat)
   )
 
+  const selectStyle = {
+    fontSize: '0.75rem',
+    padding: '0.5rem 0.75rem',
+    borderRadius: '0.5rem',
+    border: '1px solid var(--border)',
+    background: 'var(--bg-card)',
+    color: 'var(--text-secondary)',
+    outline: 'none',
+  }
+
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-[#0a0f1e] text-gray-900 dark:text-white transition-colors">
-      <header className="border-b border-gray-200 dark:border-[#1f2937] bg-white dark:bg-[#111827] px-8 py-5 flex items-center justify-between">
+    <main className="min-h-screen" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+      <header className="hbtf-header">
         <div>
-          <div className="text-xs font-semibold tracking-widest text-blue-600 dark:text-[#4a9eff] uppercase mb-1">
-            <a href="/" className="hover:underline">{isAr ? 'الرئيسية' : 'Rapid Intelligence'}</a> / {T.news}
+          <div className="hbtf-logo-eyebrow">
+            <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>{isAr ? 'الرئيسية' : 'Rapid Intelligence'}</a>{' / '}{T.news}
           </div>
-          <h1 className="text-xl font-bold">{T.announcements}</h1>
+          <div className="hbtf-logo-title">{T.announcements}</div>
         </div>
-        <div className="flex items-center gap-3">
-          <a href="/" className="text-xs text-gray-400 hover:text-blue-600 dark:hover:text-[#4a9eff]">{isAr ? 'الرئيسية ←' : '← Dashboard'}</a>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <a href="/" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textDecoration: 'none' }}>{isAr ? 'الرئيسية ←' : '← Dashboard'}</a>
           <LangToggle /><ThemeToggle />
         </div>
       </header>
 
-      <div className="px-8 py-8 max-w-4xl mx-auto">
+      <div style={{ padding: '2rem', maxWidth: '860px', margin: '0 auto' }}>
         {/* Filters */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          <select value={filterBank} onChange={e => setFilterBank(e.target.value)}
-            className="text-xs px-3 py-2 rounded-lg border border-gray-200 dark:border-[#1f2937] bg-white dark:bg-[#111827] text-gray-600 dark:text-gray-300 focus:outline-none">
+        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          <select value={filterBank} onChange={e => setFilterBank(e.target.value)} style={selectStyle}>
             <option value="all">{T.allBanksFilter}</option>
             {banks.map(b => <option key={b.id} value={b.id}>{isAr ? (b.short_name_ar || b.name_ar) : b.short_name}</option>)}
           </select>
-          <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
-            className="text-xs px-3 py-2 rounded-lg border border-gray-200 dark:border-[#1f2937] bg-white dark:bg-[#111827] text-gray-600 dark:text-gray-300 focus:outline-none">
+          <select value={filterCat} onChange={e => setFilterCat(e.target.value)} style={selectStyle}>
             <option value="all">{T.allCategories}</option>
-            {CATEGORIES.map(c => <option key={c} value={c}>{catLabel(c)}</option>)}
+            {CATS.map(c => <option key={c} value={c}>{catLabel(c)}</option>)}
           </select>
-          <span className="text-xs text-gray-400 self-center">{filtered.length} {isAr ? 'إعلان' : 'announcements'}</span>
+          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginInlineStart: 'auto' }}>
+            {filtered.length} {isAr ? 'إعلان' : 'announcements'}
+          </span>
         </div>
 
         {loading ? (
-          <div className="text-center py-12 text-gray-400 text-sm">{isAr ? 'جارٍ التحميل...' : 'Loading...'}</div>
+          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>{isAr ? 'جارٍ التحميل...' : 'Loading...'}</div>
         ) : (
-          <div className="space-y-3">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {filtered.map(a => (
-              <div key={a.id} className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-[#1f2937] rounded-xl px-6 py-5 hover:border-blue-300 dark:hover:border-[#4a9eff] transition-colors">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2 flex-wrap">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${getCatColor(a.category)}`}>{catLabel(a.category)}</span>
-                      <span className="text-xs font-medium text-gray-600 dark:text-gray-300">{bankName(a)}</span>
-                      {a.banks?.bank_type === 'islamic' && <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-[#1a2e1a] dark:text-[#22c55e]">{T.islamic}</span>}
-                      {a.is_verified && <span className="text-xs text-green-500">✓ {isAr ? 'موثق' : 'Verified'}</span>}
+              <div key={a.id} className="hbtf-announcement">
+                <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between', gap: '1rem' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+                      <span className={`cat-${a.category}`} style={{ fontSize: '0.625rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: '99px', textTransform: 'capitalize' }}>
+                        {catLabel(a.category)}
+                      </span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{bName(a)}</span>
+                      {a.banks?.bank_type === 'islamic' && <span className="badge-islamic">{T.islamic}</span>}
+                      {a.is_verified && <span style={{ fontSize: '0.65rem', color: 'var(--positive)' }}>✓ {isAr ? 'موثق' : 'Verified'}</span>}
                     </div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                    <h3 style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.375rem', lineHeight: 1.4 }}>
                       {isAr && a.headline_ar ? a.headline_ar : a.headline_en}
                     </h3>
-                    <p className="text-xs text-gray-500 dark:text-[#6b7280] leading-relaxed">
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                       {isAr && a.summary_ar ? a.summary_ar : a.summary_en}
                     </p>
                   </div>
-                  <div className="shrink-0 text-end">
-                    <div className="text-xs text-gray-400 dark:text-[#4b5563] mb-1">{a.announcement_date?.slice(0,10)}</div>
+                  <div style={{ flexShrink: 0, textAlign: 'end' }}>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.375rem' }}>{a.announcement_date?.slice(0,10)}</div>
                     {a.source_url && (
                       <a href={a.source_url} target="_blank" rel="noopener noreferrer"
-                        className="text-xs text-blue-600 dark:text-[#4a9eff] hover:underline">{T.viewSource} ↗</a>
+                        style={{ fontSize: '0.7rem', color: 'var(--hbtf-blue)', textDecoration: 'none' }}
+                        className="dark:text-[#CEBA95]">
+                        {T.viewSource} ↗
+                      </a>
                     )}
                   </div>
                 </div>
               </div>
             ))}
             {filtered.length === 0 && (
-              <div className="text-center py-12 text-gray-400 text-sm">{isAr ? 'لا توجد إعلانات' : 'No announcements found'}</div>
+              <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+                {isAr ? 'لا توجد إعلانات' : 'No announcements found'}
+              </div>
             )}
           </div>
         )}
