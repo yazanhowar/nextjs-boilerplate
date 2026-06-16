@@ -1,5 +1,5 @@
 // app/api/chat/route.ts
-// Claude-powered banking analyst ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ strictly answers from DB data, no hallucination
+// Claude-powered banking analyst — strictly answers from DB data, no hallucination
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
@@ -25,9 +25,6 @@ function detectBankIds(prompt: string): number[] {
   return found
 }
 
-function needsFinancials(p: string): boolean {
-  return /profit|asset|deposit|loan|revenue|income|equity|roe|roa|capital|ratio|growth|financial|earn|return|dividend|performance|result|balance/i.test(p)
-}
 function needsRates(p: string): boolean {
   return /rate|interest|mortgage|home loan|personal loan|car loan|saving|term deposit|td |murabaha|wakala/i.test(p)
 }
@@ -50,62 +47,43 @@ function needsAnnouncements(p: string): boolean {
 async function fetchContext(prompt: string, bankIds: number[]) {
   const targetIds = bankIds.length > 0 ? bankIds : BANKS.map(b => b.id)
   const context: Record<string, any> = {}
-
   const jobs: Array<() => Promise<void>> = []
 
-  { // Always fetch financials as baseline — core data for any banking question
-    jobs.push(async () => {
-      const { data } = await supabase
-        .from('bank_financials')
-        .select('bank_id, fiscal_year, net_profit, total_assets, total_deposits, net_loans, total_equity, roe, roa, car, npl_ratio, net_interest_income, eps_fils')
-        .in('bank_id', targetIds)
-        .order('fiscal_year', { ascending: true })
-      if (error) console.error("[HBTF] financials error:", error)
-      if (data) context.financials = data
-    })
-  }
+  // Always fetch financials — core data for every banking question
+  jobs.push(async () => {
+    const { data, error } = await supabase
+      .from('bank_financials')
+      .select('bank_id, fiscal_year, net_profit, total_assets, total_deposits, net_loans, total_equity, roe, roa, car, npl_ratio, net_interest_income, eps_fils')
+      .in('bank_id', targetIds)
+      .order('fiscal_year', { ascending: true })
+    if (error) console.error('[HBTF] financials error:', error.message)
+    if (data) context.financials = data
+  })
 
   if (needsRates(prompt)) {
     jobs.push(async () => {
-      const { data } = await supabase
-        .from('bank_rates')
-        .select('*')
-        .in('bank_id', targetIds)
+      const { data } = await supabase.from('bank_rates').select('*').in('bank_id', targetIds)
       if (data) context.rates = data
     })
   }
-
   if (needsTariffs(prompt)) {
     jobs.push(async () => {
-      const { data } = await supabase
-        .from('bank_tariffs')
-        .select('*')
-        .in('bank_id', targetIds)
+      const { data } = await supabase.from('bank_tariffs').select('*').in('bank_id', targetIds)
       if (data) context.tariffs = data
     })
   }
-
   if (needsProducts(prompt)) {
     jobs.push(async () => {
-      const { data } = await supabase
-        .from('bank_products')
-        .select('bank_id, category, product_name_en, description_en, is_islamic, sharia_structure')
-        .in('bank_id', targetIds)
+      const { data } = await supabase.from('bank_products').select('bank_id, category, product_name_en, description_en, is_islamic, sharia_structure').in('bank_id', targetIds)
       if (data) context.products = data
     })
   }
-
   if (needsOwnership(prompt)) {
     jobs.push(async () => {
-      const { data } = await supabase
-        .from('bank_ownership')
-        .select('bank_id, fiscal_year, shareholder_name_en, ownership_pct, shareholder_type, country')
-        .in('bank_id', targetIds)
-        .order('ownership_pct', { ascending: false })
+      const { data } = await supabase.from('bank_ownership').select('bank_id, fiscal_year, shareholder_name_en, ownership_pct, shareholder_type, country').in('bank_id', targetIds).order('ownership_pct', { ascending: false })
       if (data) context.ownership = data
     })
   }
-
   if (needsGovernance(prompt)) {
     jobs.push(async () => {
       const [exec, board] = await Promise.all([
@@ -116,29 +94,19 @@ async function fetchContext(prompt: string, bankIds: number[]) {
       if (board.data) context.board = board.data
     })
   }
-
   if (needsAnnouncements(prompt)) {
     jobs.push(async () => {
-      const { data } = await supabase
-        .from('bank_announcements')
-        .select('bank_id, announcement_date, category, headline_en, summary_en')
-        .in('bank_id', targetIds)
-        .order('announcement_date', { ascending: false })
-        .limit(30)
+      const { data } = await supabase.from('bank_announcements').select('bank_id, announcement_date, category, headline_en, summary_en').in('bank_id', targetIds).order('announcement_date', { ascending: false }).limit(30)
       if (data) context.announcements = data
     })
   }
 
   context.banks = BANKS.filter(b => targetIds.includes(b.id)).map(b => ({
-    id: b.id,
-    name: b.name,
-    shortName: b.shortName,
-    ticker: b.ticker,
-    sector: b.sector,
-    description: b.description,
+    id: b.id, name: b.name, shortName: b.shortName, ticker: b.ticker, sector: b.sector, description: b.description,
   }))
 
   await Promise.allSettled(jobs.map(j => j()))
+  console.log('[HBTF] context keys:', Object.keys(context), '| financials:', context.financials?.length ?? 0)
   return context
 }
 
@@ -148,37 +116,33 @@ function buildSystemPrompt(context: Record<string, any>): string {
 CRITICAL RULES:
 1. You ONLY answer using the data provided below. Never invent numbers, rates, names, or facts.
 2. If the data does not contain what the user is asking for, say exactly: "I don't have that data available."
-3. Always be specific ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ cite actual numbers from the data.
+3. Always be specific — cite actual numbers from the data.
 4. Format responses clearly using bullet points, bold for key numbers, and markdown tables where useful.
 5. When comparing banks, always mention where HBTF (bank_id: 2) stands relative to competitors.
-6. Keep responses concise and executive-friendly ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ no fluff.
+6. Keep responses concise and executive-friendly — no fluff.
 7. For chart requests, output a JSON block at the END of your response in this exact format:
 \`\`\`chart
 {"type":"bar","title":"Chart Title","data":[{"name":"HBTF","value":150},{"name":"Arab Bank","value":200}],"series":["value"],"insight":"Key takeaway here"}
 \`\`\`
-8. Financials in the DB are stored in THOUSANDS (not raw JOD). To display: value/1000 = "JOD XXXM", value/1000000 = "JOD X.XB". Arab Bank (bank_id:1) values are in USD thousands ÃÂ¢ÃÂÃÂ multiply by 0.71 for JOD. Always show correct scale.
+8. CRITICAL — Financials stored in THOUSANDS. Display: value/1000 = "JOD XXXM", value/1000000 = "JOD X.XB". Arab Bank (bank_id:1) is USD thousands — multiply by 0.71 for JOD.
 9. Rates are already percentages. Fees are in JOD.
+10. Today: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}.
 
 AVAILABLE DATA:
-${JSON.stringify(context, null, 2)}
-
-Today: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}.`
+${JSON.stringify(context, null, 2)}`
 }
 
 export async function POST(req: NextRequest) {
   const { messages, bankId } = await req.json()
+  if (!messages?.length) return NextResponse.json({ error: 'No messages provided' }, { status: 400 })
 
-  if (!messages?.length) {
-    return NextResponse.json({ error: 'No messages provided' }, { status: 400 })
-  }
-
-  const lastUserMsg = [...messages].reverse().find(m => m.role === 'user')
+  const lastUserMsg = [...messages].reverse().find((m: any) => m.role === 'user')
   const lastMessage = (typeof lastUserMsg?.content === 'string' ? lastUserMsg.content : JSON.stringify(lastUserMsg?.content)) || ''
+
   const bankIds = detectBankIds(lastMessage)
   if (bankId && !bankIds.includes(bankId)) bankIds.push(bankId)
 
   const context = await fetchContext(lastMessage, bankIds)
-  console.log('[HBTF Chat] context keys:', Object.keys(context), '| financials:', context.financials?.length ?? 0, '| banks:', context.banks?.length ?? 0)
   const systemPrompt = buildSystemPrompt(context)
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -199,6 +163,7 @@ export async function POST(req: NextRequest) {
 
   if (!response.ok) {
     const err = await response.text()
+    console.error('[HBTF] Anthropic error:', err)
     return NextResponse.json({ error: err }, { status: 500 })
   }
 
@@ -206,35 +171,24 @@ export async function POST(req: NextRequest) {
     async start(controller) {
       const reader = response.body!.getReader()
       const decoder = new TextDecoder()
-
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
-
         const chunk = decoder.decode(value)
         const lines = chunk.split('\n').filter(l => l.startsWith('data: '))
-
         for (const line of lines) {
-          const data = line.replace('data: ', '')
-          if (data === '[DONE]') break
+          const data = line.slice(6)
+          if (data === '[DONE]') continue
           try {
             const parsed = JSON.parse(data)
-            if (parsed.type === 'content_block_delta') {
-              controller.enqueue(new TextEncoder().encode(parsed.delta.text || ''))
-            }
-          } catch {
-            // skip malformed chunks
-          }
+            const text = parsed.delta?.text || parsed.content?.[0]?.text || ''
+            if (text) controller.enqueue(new TextEncoder().encode(text))
+          } catch {}
         }
       }
       controller.close()
-    }
-  })
-
-  return new NextResponse(stream, {
-    headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-      'Transfer-Encoding': 'chunked',
     },
   })
+
+  return new NextResponse(stream, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
 }
