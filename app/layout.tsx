@@ -1,57 +1,32 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { LangProvider } from "../lib/LangContext";
+// app/layout.tsx — Root layout with Inter font + metadata
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: "Rapid Intelligence Platform",
-  description: "Jordan Banking Sector Intelligence — HBTF",
-};
+  title: 'HBTF Intelligence | Jordanian Banking Sector',
+  description: 'Competitive intelligence platform covering all 15 Jordanian banks — financial data, rates, products, governance.',
+}
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="en" dir="ltr">
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var theme = localStorage.getItem('theme');
-                  var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  if (theme === 'dark' || (!theme && prefersDark)) {
-                    document.documentElement.classList.add('dark');
-                  }
-                  var lang = localStorage.getItem('lang');
-                  if (lang === 'ar') {
-                    document.documentElement.dir = 'rtl';
-                    document.documentElement.lang = 'ar';
-                  }
-                } catch(e) {}
-              })();
-            `,
-          }}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col">
-        <LangProvider>{children}</LangProvider>
+      <body className={inter.className}>
+        {children}
       </body>
     </html>
-  );
+  )
 }
