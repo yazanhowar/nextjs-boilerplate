@@ -4,10 +4,12 @@ import { useRouter } from 'next/navigation'
 import { BANKS } from '@/lib/banks-config'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
 
 function useTheme() {
   const [dark, setDark] = useState(false)
@@ -32,9 +34,9 @@ function toJOD(n: number | null | undefined, bankId: number): number | null {
 }
 
 function fmtK(n: number | null | undefined, bankId?: number): string {
-  if (n == null) return '—'
+  if (n == null) return 'â'
   const jod = bankId != null ? toJOD(n, bankId) : n
-  if (jod == null) return '—'
+  if (jod == null) return 'â'
   const abs = Math.abs(jod)
   if (abs >= 1_000_000) return `JOD ${(jod / 1_000_000).toFixed(2)}B`
   if (abs >= 1_000) return `JOD ${(jod / 1_000).toFixed(1)}M`
@@ -73,8 +75,8 @@ export default function Dashboard() {
   useEffect(() => {
     async function load() {
       const [curr, prev] = await Promise.all([
-        supabase.from('bank_financials').select('*').eq('fiscal_year', 2024),
-        supabase.from('bank_financials').select('*').eq('fiscal_year', 2023),
+        getSupabase().from('bank_financials').select('*').eq('fiscal_year', 2024),
+        getSupabase().from('bank_financials').select('*').eq('fiscal_year', 2023),
       ])
       if (curr.data) {
         const m: Record<number, any> = {}
@@ -124,7 +126,7 @@ export default function Dashboard() {
             <span style={{ fontSize: 12, color: t.textMuted, marginLeft: 4 }}>Jordan Banking Sector</span>
           </div>
           <button onClick={() => router.push('/chat')} style={{ backgroundColor: t.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '7px 16px', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>
-            Open AI Analyst →
+            Open AI Analyst â
           </button>
         </div>
       </header>
@@ -132,15 +134,15 @@ export default function Dashboard() {
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
         <div style={{ marginBottom: 28 }}>
           <h1 style={{ fontSize: 28, fontWeight: 700, margin: 0, color: t.text }}>Jordanian Banks</h1>
-          <p style={{ fontSize: 14, color: t.textSub, margin: '6px 0 0' }}>FY2024 data · All figures in JOD unless noted</p>
+          <p style={{ fontSize: 14, color: t.textSub, margin: '6px 0 0' }}>FY2024 data Â· All figures in JOD unless noted</p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 32 }}>
           {[
             { label: 'Sector Total Assets', value: fmtK(grandTotalAssets), sub: 'All 15 banks combined' },
             { label: 'Sector Net Profit', value: fmtK(grandTotalProfit), sub: 'FY2024' },
-            { label: 'Avg ROE', value: avgROE != null ? `${avgROE.toFixed(1)}%` : '—', sub: 'Return on equity' },
-            { label: 'Avg CAR', value: avgCAR != null ? `${avgCAR.toFixed(1)}%` : '—', sub: 'Capital adequacy' },
+            { label: 'Avg ROE', value: avgROE != null ? `${avgROE.toFixed(1)}%` : 'â', sub: 'Return on equity' },
+            { label: 'Avg CAR', value: avgCAR != null ? `${avgCAR.toFixed(1)}%` : 'â', sub: 'Capital adequacy' },
           ].map((kpi, i) => (
             <div key={i} style={{ backgroundColor: t.surface, borderRadius: 12, padding: '16px 18px', border: `1px solid ${t.border}` }}>
               <div style={{ fontSize: 11, color: t.textSub, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>{kpi.label}</div>
@@ -152,7 +154,7 @@ export default function Dashboard() {
 
         <div style={{ display: 'flex', gap: 12, marginBottom: 24, alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
-            <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: t.textMuted, fontSize: 14 }}>🔍</span>
+            <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: t.textMuted, fontSize: 14 }}>ð</span>
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search banks..." style={{ width: '100%', backgroundColor: t.inputBg, border: `1px solid ${t.border}`, borderRadius: 10, padding: '9px 12px 9px 34px', fontSize: 14, color: t.text, outline: 'none', boxSizing: 'border-box' }} />
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
@@ -201,14 +203,14 @@ function BankCard({ bank, fin, delta, loading, dark, t, hovered, onMouseEnter, o
         </div>
         <div>
           <div style={{ fontWeight: 600, fontSize: 15, color: t.text }}>{bank.name}</div>
-          <div style={{ fontSize: 12, color: t.textSub, marginTop: 2 }}>{bank.sector === 'islamic' ? 'Islamic' : 'Commercial'} · {bank.ticker}</div>
+          <div style={{ fontSize: 12, color: t.textSub, marginTop: 2 }}>{bank.sector === 'islamic' ? 'Islamic' : 'Commercial'} Â· {bank.ticker}</div>
         </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
         <div style={{ backgroundColor: dark ? '#2C2C2E' : '#F5F5F7', borderRadius: 10, padding: '12px 14px' }}>
           <div style={{ fontSize: 11, color: t.textSub, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Net Profit</div>
           <div style={{ fontSize: 16, fontWeight: 700, color: t.text }}>{loading ? '...' : fmtK(fin?.net_profit, bank.id)}</div>
-          {delta != null && !loading && <div style={{ fontSize: 11, color: delta >= 0 ? t.green : t.red, marginTop: 3, fontWeight: 500 }}>{delta >= 0 ? '↑' : '↓'} {Math.abs(delta).toFixed(1)}% vs 2023</div>}
+          {delta != null && !loading && <div style={{ fontSize: 11, color: delta >= 0 ? t.green : t.red, marginTop: 3, fontWeight: 500 }}>{delta >= 0 ? 'â' : 'â'} {Math.abs(delta).toFixed(1)}% vs 2023</div>}
         </div>
         <div style={{ backgroundColor: dark ? '#2C2C2E' : '#F5F5F7', borderRadius: 10, padding: '12px 14px' }}>
           <div style={{ fontSize: 11, color: t.textSub, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Total Assets</div>
@@ -218,7 +220,7 @@ function BankCard({ bank, fin, delta, loading, dark, t, hovered, onMouseEnter, o
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: 12, color: t.textSub }}>{bank.description.slice(0, 48)}...</span>
-        <span style={{ backgroundColor: hovered ? t.accent : (dark ? '#2C2C2E' : '#F0F0F2'), color: hovered ? '#fff' : t.textSub, borderRadius: 8, padding: '5px 12px', fontSize: 12, fontWeight: 500, transition: 'all 0.15s ease', whiteSpace: 'nowrap', marginLeft: 8 }}>Ask AI →</span>
+        <span style={{ backgroundColor: hovered ? t.accent : (dark ? '#2C2C2E' : '#F0F0F2'), color: hovered ? '#fff' : t.textSub, borderRadius: 8, padding: '5px 12px', fontSize: 12, fontWeight: 500, transition: 'all 0.15s ease', whiteSpace: 'nowrap', marginLeft: 8 }}>Ask AI â</span>
       </div>
     </div>
   )
