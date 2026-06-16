@@ -1,5 +1,5 @@
 // app/api/chat/route.ts
-// Claude-powered banking analyst â strictly answers from DB data, no hallucination
+// Claude-powered banking analyst Ã¢ÂÂ strictly answers from DB data, no hallucination
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
@@ -147,15 +147,15 @@ function buildSystemPrompt(context: Record<string, any>): string {
 CRITICAL RULES:
 1. You ONLY answer using the data provided below. Never invent numbers, rates, names, or facts.
 2. If the data does not contain what the user is asking for, say exactly: "I don't have that data available."
-3. Always be specific â cite actual numbers from the data.
+3. Always be specific Ã¢ÂÂ cite actual numbers from the data.
 4. Format responses clearly using bullet points, bold for key numbers, and markdown tables where useful.
 5. When comparing banks, always mention where HBTF (bank_id: 2) stands relative to competitors.
-6. Keep responses concise and executive-friendly â no fluff.
+6. Keep responses concise and executive-friendly Ã¢ÂÂ no fluff.
 7. For chart requests, output a JSON block at the END of your response in this exact format:
 \`\`\`chart
 {"type":"bar","title":"Chart Title","data":[{"name":"HBTF","value":150},{"name":"Arab Bank","value":200}],"series":["value"],"insight":"Key takeaway here"}
 \`\`\`
-8. Financials in the DB are stored in THOUSANDS (not raw JOD). To display: value/1000 = "JOD XXXM", value/1000000 = "JOD X.XB". Arab Bank (bank_id:1) values are in USD thousands — multiply by 0.71 for JOD. Always show correct scale.
+8. Financials in the DB are stored in THOUSANDS (not raw JOD). To display: value/1000 = "JOD XXXM", value/1000000 = "JOD X.XB". Arab Bank (bank_id:1) values are in USD thousands â multiply by 0.71 for JOD. Always show correct scale.
 9. Rates are already percentages. Fees are in JOD.
 
 AVAILABLE DATA:
@@ -176,6 +176,7 @@ export async function POST(req: NextRequest) {
   if (bankId && !bankIds.includes(bankId)) bankIds.push(bankId)
 
   const context = await fetchContext(lastMessage, bankIds)
+  console.log('[HBTF Chat] context keys:', Object.keys(context), '| financials:', context.financials?.length ?? 0, '| banks:', context.banks?.length ?? 0)
   const systemPrompt = buildSystemPrompt(context)
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
