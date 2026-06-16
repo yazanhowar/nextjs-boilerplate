@@ -1,511 +1,112 @@
+/* app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ============================================================
-   HBTF DESIGN SYSTEM
-   Light: Clean white + Core Blue #004D8F accents
-   Dark: Deep charcoal + Core Blue/Gold accents
-   ============================================================ */
-
+/* ── Base ───────────────────────────────────────────────────────────────────── */
 :root {
-  /* HBTF Brand */
-  --hbtf-blue:       #004D8F;
-  --hbtf-blue-hover: #003D72;
-  --hbtf-blue-light: #E8F0F9;
-  --hbtf-gold:       #CEBA95;
-  --hbtf-gold-dark:  #B8A47E;
-  --hbtf-cyan:       #23ABE2;
-
-  /* Light Mode */
-  --bg:              #F4F6F9;
-  --bg-card:         #FFFFFF;
-  --bg-header:       #FFFFFF;
-  --bg-table-head:   #F8F9FB;
-  --bg-row-hover:    #F0F4FA;
-  --bg-row-alt:      #FAFBFC;
-  --border:          #DDE1E8;
-  --border-subtle:   #ECEEF2;
-  --text-primary:    #0D1B2A;
-  --text-secondary:  #4A5568;
-  --text-muted:      #8896A4;
-  --accent:          #004D8F;
-  --accent-text:     #004D8F;
-  --accent-bg:       #E8F0F9;
-  --gold:            #B8942A;
-  --gold-bg:         #FBF6E9;
-  --positive:        #1A7A4A;
-  --positive-bg:     #E8F5EE;
-  --negative:        #C0392B;
-  --shadow:          0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md:       0 4px 12px rgba(0,0,0,0.08);
+  --hbtf-blue: #004D8F;
+  --hbtf-gold: #CEBA95;
+  --bg-primary: #0A1628;
+  --bg-card: #0F1E35;
+  --bg-hover: #132240;
+  --border: #1E3450;
+  --text-primary: #FFFFFF;
+  --text-secondary: #8B9AB0;
+  --text-muted: #4A5568;
+  --green: #2ECC71;
+  --red: #E05252;
 }
 
-.dark {
-  /* Dark Mode — charcoal, NOT navy */
-  --bg:              #111418;
-  --bg-card:         #1A1E24;
-  --bg-header:       #141820;
-  --bg-table-head:   #141820;
-  --bg-row-hover:    #1F252D;
-  --bg-row-alt:      #1C2028;
-  --border:          #272D36;
-  --border-subtle:   #1F2530;
-  --text-primary:    #E8EDF4;
-  --text-secondary:  #8FA3BC;
-  --text-muted:      #505C6B;
-  --accent:          #4A9EE8;
-  --accent-text:     #4A9EE8;
-  --accent-bg:       #1A2535;
-  --gold:            #CEBA95;
-  --gold-bg:         #252015;
-  --positive:        #27AE60;
-  --positive-bg:     #152A1E;
-  --negative:        #E74C3C;
-  --shadow:          0 1px 3px rgba(0,0,0,0.3);
-  --shadow-md:       0 4px 12px rgba(0,0,0,0.4);
+* {
+  box-sizing: border-box;
 }
-
-/* ============================================================
-   BASE
-   ============================================================ */
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-html[lang="ar"] body {
-  font-family: 'Segoe UI', 'Tahoma', 'Arabic Typesetting', system-ui, sans-serif;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
-  background: var(--bg);
+  background-color: var(--bg-primary);
   color: var(--text-primary);
-  transition: background 0.2s ease, color 0.2s ease;
+  min-height: 100vh;
 }
 
-/* ============================================================
-   HEADER
-   ============================================================ */
-
-.hbtf-header {
-  background: var(--bg-header);
-  border-bottom: 1px solid var(--border);
-  padding: 0.875rem 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: var(--shadow);
+/* ── Language toggle fix ────────────────────────────────────────────────────── */
+/* Fix: black background making text unreadable */
+.lang-toggle,
+[data-lang-toggle],
+button[aria-label*="lang"],
+button[aria-label*="عربي"],
+button[aria-label*="English"] {
+  background-color: var(--bg-card) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  transition: all 0.15s !important;
 }
 
-.hbtf-logo-eyebrow {
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 0.2rem;
+.lang-toggle:hover,
+button[aria-label*="عربي"]:hover,
+button[aria-label*="English"]:hover {
+  border-color: var(--hbtf-gold) !important;
+  color: var(--hbtf-gold) !important;
 }
 
-.hbtf-logo-eyebrow a {
-  color: inherit;
-  text-decoration: none;
-}
-.hbtf-logo-eyebrow a:hover { text-decoration: underline; }
-
-.hbtf-logo-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
+/* ── RTL support ────────────────────────────────────────────────────────────── */
+[dir="rtl"] {
+  font-family: 'Cairo', 'Noto Sans Arabic', system-ui, sans-serif;
 }
 
-/* ============================================================
-   LAYOUT
-   ============================================================ */
+[dir="rtl"] .text-start { text-align: right; }
+[dir="rtl"] .text-end { text-align: left; }
 
-.page-container {
-  padding: 1.75rem 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
+/* ── Scrollbar ──────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
-
-/* ============================================================
-   CARDS
-   ============================================================ */
-
-.hbtf-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  overflow: hidden;
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
 }
-
-.hbtf-card-header {
-  padding: 0.875rem 1.5rem;
-  border-bottom: 1px solid var(--border-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--bg-table-head);
-}
-
-.hbtf-card-label {
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-/* ============================================================
-   STAT CARDS
-   ============================================================ */
-
-.hbtf-stat {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: var(--shadow);
-  border-top: 3px solid var(--accent);
-}
-
-.dark .hbtf-stat { border-top-color: var(--gold); }
-
-.hbtf-stat-value {
-  font-size: 2.25rem;
-  font-weight: 800;
-  color: var(--accent);
-  line-height: 1;
-  margin-bottom: 0.375rem;
-  letter-spacing: -0.03em;
-}
-
-.dark .hbtf-stat-value { color: var(--gold); }
-
-.hbtf-stat-label {
-  font-size: 0.625rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-muted);
-}
-
-/* ============================================================
-   TABLES
-   ============================================================ */
-
-.hbtf-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.8125rem;
-}
-
-.hbtf-table thead tr {
-  background: var(--bg-table-head);
-}
-
-.hbtf-table th {
-  padding: 0.625rem 1.25rem;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-
-.hbtf-table td {
-  padding: 0.75rem 1.25rem;
-  color: var(--text-primary);
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.hbtf-table tbody tr:last-child td { border-bottom: none; }
-
-.hbtf-table tbody tr:hover td { background: var(--bg-row-hover); }
-
-.hbtf-table tbody tr.rank-1 td {
-  background: var(--accent-bg);
-}
-
-/* ============================================================
-   BUTTONS
-   ============================================================ */
-
-.hbtf-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.4rem 0.875rem;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
-}
-
-.hbtf-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-bg);
-}
-
-.hbtf-btn-active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white !important;
-}
-
-.dark .hbtf-btn-active {
-  background: var(--gold);
-  border-color: var(--gold);
-  color: #111418 !important;
-}
-
-/* ============================================================
-   NAV LINKS
-   ============================================================ */
-
-.hbtf-nav-link {
-  display: block;
-  padding: 0.625rem 0.875rem;
-  border-radius: 8px;
-  border: 1px solid var(--border-subtle);
-  background: var(--bg);
-  transition: all 0.15s;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.hbtf-nav-link:hover {
-  border-color: var(--accent);
-  background: var(--accent-bg);
-}
-
-.dark .hbtf-nav-link:hover { border-color: var(--gold); background: var(--gold-bg); }
-
-.hbtf-nav-link-title {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  transition: color 0.15s;
-}
-
-.hbtf-nav-link:hover .hbtf-nav-link-title { color: var(--accent); }
-.dark .hbtf-nav-link:hover .hbtf-nav-link-title { color: var(--gold); }
-
-.hbtf-nav-link-desc {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  margin-top: 0.1rem;
-}
-
-/* ============================================================
-   BADGES
-   ============================================================ */
-
-.badge-conventional {
-  display: inline-block;
-  font-size: 0.6rem;
-  font-weight: 600;
-  padding: 0.15rem 0.5rem;
-  border-radius: 99px;
-  background: var(--accent-bg);
-  color: var(--accent);
-  letter-spacing: 0.02em;
-}
-
-.badge-islamic {
-  display: inline-block;
-  font-size: 0.6rem;
-  font-weight: 600;
-  padding: 0.15rem 0.5rem;
-  border-radius: 99px;
-  background: var(--positive-bg);
-  color: var(--positive);
-  letter-spacing: 0.02em;
-}
-
-/* ============================================================
-   ANNOUNCEMENT CARDS
-   ============================================================ */
-
-.hbtf-announcement {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 1.125rem 1.375rem;
-  border-inline-start: 3px solid var(--accent);
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.hbtf-announcement:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--accent);
-}
-
-.dark .hbtf-announcement { border-inline-start-color: var(--gold); }
-
-/* ============================================================
-   SEARCH
-   ============================================================ */
-
-.hbtf-search {
-  width: 100%;
-  padding: 0.875rem 1rem 0.875rem 3rem;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text-primary);
-  font-size: 0.9375rem;
-  outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
-  box-shadow: var(--shadow);
-}
-
-.hbtf-search::placeholder { color: var(--text-muted); }
-
-.hbtf-search:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
-}
-
-/* ============================================================
-   RESULT CARDS
-   ============================================================ */
-
-.hbtf-result {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.875rem 1.125rem;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.hbtf-result:hover {
-  border-color: var(--accent);
-  box-shadow: var(--shadow);
-}
-
-/* ============================================================
-   CATEGORY BADGES (announcements)
-   ============================================================ */
-
-.cat-badge {
-  display: inline-block;
-  font-size: 0.6rem;
-  font-weight: 700;
-  padding: 0.2rem 0.6rem;
-  border-radius: 99px;
-  text-transform: capitalize;
-  letter-spacing: 0.03em;
-}
-
-.cat-financial_results { background: var(--accent-bg); color: var(--accent); }
-.dark .cat-financial_results { background: #1A2535; color: #4A9EE8; }
-
-.cat-dividend { background: var(--positive-bg); color: var(--positive); }
-.dark .cat-dividend { background: #152A1E; color: #27AE60; }
-
-.cat-merger_acquisition { background: #F0EBF8; color: #6B3FA0; }
-.dark .cat-merger_acquisition { background: #1E1530; color: #A78BFA; }
-
-.cat-leadership_change { background: var(--gold-bg); color: #8A6D3B; }
-.dark .cat-leadership_change { background: var(--gold-bg); color: var(--gold); }
-
-.cat-product_launch { background: #E8F7FD; color: #1580AA; }
-.dark .cat-product_launch { background: #0D2030; color: #23ABE2; }
-
-.cat-strategic, .cat-agm, .cat-rating, .cat-regulation, .cat-other {
-  background: var(--bg-table-head);
-  color: var(--text-secondary);
-}
-
-/* ============================================================
-   PROGRESS BAR
-   ============================================================ */
-
-.hbtf-progress {
-  height: 4px;
+::-webkit-scrollbar-thumb {
   background: var(--border);
-  border-radius: 2px;
-  overflow: hidden;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--hbtf-blue);
 }
 
-.hbtf-progress-fill {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 2px;
-  transition: width 0.8s ease;
-}
-
-.dark .hbtf-progress-fill { background: var(--gold); }
-
-/* ============================================================
-   GOLD ACCENT LINE
-   ============================================================ */
-
-.gold-line {
-  display: block;
-  width: 2rem;
-  height: 2px;
-  background: var(--gold);
-  border-radius: 1px;
-}
-
-/* ============================================================
-   SECTION DIVIDER IN COMPARE TABLE
-   ============================================================ */
-
-.table-section-row td {
-  background: var(--bg-table-head) !important;
-  font-size: 0.6rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  color: var(--text-muted) !important;
-  padding: 0.4rem 1.25rem !important;
-}
-
-/* ============================================================
-   SCROLLBAR
-   ============================================================ */
-
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
-/* ============================================================
-   SELECT INPUTS
-   ============================================================ */
-
-select {
-  background: var(--bg-card);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 0.4rem 0.75rem;
-  font-size: 0.75rem;
+/* ── Chart tooltips ─────────────────────────────────────────────────────────── */
+.recharts-tooltip-wrapper {
   outline: none;
-  cursor: pointer;
 }
 
-select:focus { border-color: var(--accent); }
+/* ── Smooth transitions ─────────────────────────────────────────────────────── */
+a, button {
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s, opacity 0.15s;
+}
+
+/* ── Line clamp utility ─────────────────────────────────────────────────────── */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* ── Focus visible ──────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--hbtf-gold);
+  outline-offset: 2px;
+}
+
+/* ── Print / PDF export ─────────────────────────────────────────────────────── */
+@media print {
+  body { background: white; color: black; }
+  .no-print { display: none !important; }
+}
