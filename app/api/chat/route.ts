@@ -1,14 +1,9 @@
 // app/api/chat/route.ts
-// Claude-powered banking analyst â strictly answers from DB data, no hallucination
+// Claude-powered banking analyst Ã¢ÂÂ strictly answers from DB data, no hallucination
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
 import { BANKS } from '@/lib/banks-config'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
 
 function detectBankIds(prompt: string): number[] {
   const lower = prompt.toLowerCase()
@@ -49,7 +44,7 @@ async function fetchContext(prompt: string, bankIds: number[]) {
   const context: Record<string, any> = {}
   const jobs: Array<() => Promise<void>> = []
 
-  // Always fetch financials â core data for every banking question
+  // Always fetch financials Ã¢ÂÂ core data for every banking question
   jobs.push(async () => {
     const { data, error } = await supabase
       .from('bank_financials')
@@ -116,15 +111,15 @@ function buildSystemPrompt(context: Record<string, any>): string {
 CRITICAL RULES:
 1. You ONLY answer using the data provided below. Never invent numbers, rates, names, or facts.
 2. If the data does not contain what the user is asking for, say exactly: "I don't have that data available."
-3. Always be specific â cite actual numbers from the data.
+3. Always be specific Ã¢ÂÂ cite actual numbers from the data.
 4. Format responses clearly using bullet points, bold for key numbers, and markdown tables where useful.
 5. When comparing banks, always mention where HBTF (bank_id: 2) stands relative to competitors.
-6. Keep responses concise and executive-friendly â no fluff.
+6. Keep responses concise and executive-friendly Ã¢ÂÂ no fluff.
 7. For chart requests, output a JSON block at the END of your response in this exact format:
 \`\`\`chart
 {"type":"bar","title":"Chart Title","data":[{"name":"HBTF","value":150},{"name":"Arab Bank","value":200}],"series":["value"],"insight":"Key takeaway here"}
 \`\`\`
-8. CRITICAL â Financials stored in THOUSANDS. Display: value/1000 = "JOD XXXM", value/1000000 = "JOD X.XB". Arab Bank (bank_id:1) is USD thousands â multiply by 0.71 for JOD.
+8. CRITICAL Ã¢ÂÂ Financials stored in THOUSANDS. Display: value/1000 = "JOD XXXM", value/1000000 = "JOD X.XB". Arab Bank (bank_id:1) is USD thousands Ã¢ÂÂ multiply by 0.71 for JOD.
 9. Rates are already percentages. Fees are in JOD.
 10. Today: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}.
 
