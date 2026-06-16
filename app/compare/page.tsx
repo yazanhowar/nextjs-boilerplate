@@ -1,5 +1,5 @@
 'use client'
-// app/compare/page.tsx — Side-by-side bank comparison + AI chart generation
+// app/compare/page.tsx â Side-by-side bank comparison + AI chart generation
 
 import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
@@ -17,11 +17,20 @@ const supabase = createClient(
 
 const CHART_COLORS = ['#004D8F', '#CEBA95', '#2ECC71', '#E05252', '#8B9AB0', '#F39C12']
 
-function fmtJOD(n: number | null | undefined): string {
+// DB values stored in THOUSANDS. Arab Bank (id=1) = USD thousands, others = JOD thousands.
+const ARAB_BANK_ID = 1
+const USD_TO_JOD = 0.71
+function toJOD(n: number | null | undefined, bankId: number): number | null {
+  if (n == null) return null
+  return bankId === ARAB_BANK_ID ? n * USD_TO_JOD : n
+}
+function fmtJOD(n: number | null | undefined, bankId?: number): string {
   if (n == null) return '—'
-  if (Math.abs(n) >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`
-  if (Math.abs(n) >= 1_000_000) return `${(n / 1_000_000).toFixed(0)}M`
-  return `${n.toLocaleString()}`
+  const v = bankId != null ? (toJOD(n, bankId) ?? n) : n
+  const abs = Math.abs(v)
+  if (abs >= 1_000_000) return `JOD ${(v / 1_000_000).toFixed(2)}B`
+  if (abs >= 1_000) return `JOD ${(v / 1_000).toFixed(1)}M`
+  return `JOD ${v.toFixed(0)}K`
 }
 
 function CompareContent() {
@@ -126,7 +135,7 @@ function CompareContent() {
   return (
     <div className="min-h-screen bg-[#0A1628] text-white">
       <header className="border-b border-[#1E3450] px-6 py-4 flex items-center gap-4">
-        <button onClick={() => router.push('/')} className="text-[#8B9AB0] hover:text-white text-[13px]">← Dashboard</button>
+        <button onClick={() => router.push('/')} className="text-[#8B9AB0] hover:text-white text-[13px]">â Dashboard</button>
         <div className="w-px h-5 bg-[#1E3450]" />
         <div className="font-bold text-white">Compare Banks</div>
       </header>
@@ -158,7 +167,7 @@ function CompareContent() {
         {/* AI Chart prompt */}
         <div className="bg-[#0F1E35] border border-[#1E3450] rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-[#CEBA95]">⚡</span>
+            <span className="text-[#CEBA95]">â¡</span>
             <span className="font-semibold text-white">Generate a chart</span>
           </div>
 
@@ -205,7 +214,7 @@ function CompareContent() {
                 <button onClick={exportPDF}
                   className="text-[11px] px-3 py-1.5 rounded-lg border border-[#1E3450]
                              text-[#8B9AB0] hover:border-[#CEBA95] hover:text-[#CEBA95] transition-colors">
-                  ↓ Export PDF
+                  â Export PDF
                 </button>
               </div>
               <div ref={chartRef} className="bg-[#0A1628] rounded-xl p-4">
@@ -240,7 +249,7 @@ function CompareContent() {
                 </ResponsiveContainer>
                 {chartData.insight && (
                   <div className="mt-4 p-3 bg-[#CEBA95]/10 border border-[#CEBA95]/20 rounded-lg text-[12px] text-[#CEBA95]">
-                    💡 {chartData.insight}
+                    ð¡ {chartData.insight}
                   </div>
                 )}
               </div>
@@ -286,7 +295,7 @@ function CompareContent() {
                         return (
                           <td key={id} className={`px-5 py-3 text-end font-medium
                             ${isMax ? 'text-[#2ECC71]' : 'text-white'}`}>
-                            {val != null ? row.format(val) : '—'}
+                            {val != null ? row.format(val) : 'â'}
                           </td>
                         )
                       })}
