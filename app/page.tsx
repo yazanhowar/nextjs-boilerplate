@@ -279,7 +279,7 @@ export default function Dashboard() {
             <input
               value={chartPrompt}
               onChange={e => setChartPrompt(e.target.value)}
-              placeholder="Ask anything — e.g. "Compare credit card fees across all banks" or "Show HBTF profit trend vs JKB for 3 years""
+              placeholder="Ask anything — e.g. Compare credit card fees across all banks, or Show HBTF profit trend vs JKB for 3 years"
               className="w-full bg-[#0F1E35] border border-[#1E3450] rounded-xl pl-10 pr-32 py-4
                          text-[14px] text-white placeholder-[#4A5568]
                          focus:outline-none focus:border-[#CEBA95] transition-colors"
