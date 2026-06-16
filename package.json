@@ -2,6 +2,9 @@
   "name": "nextjs",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -14,8 +17,8 @@
     "react-dom": "19.2.4",
     "@supabase/supabase-js": "^2.39.0",
     "html2canvas": "^1.4.1",
-"jspdf": "^2.5.1",
-"recharts": "^2.12.7",
+    "jspdf": "^2.5.1",
+    "recharts": "^2.12.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
