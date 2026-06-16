@@ -3,216 +3,254 @@
 @tailwind utilities;
 
 /* ============================================================
-   HBTF BRAND DESIGN SYSTEM
-   Primary: Core Blue #004D8F | Core Gold #CEBA95
+   HBTF DESIGN SYSTEM
+   Light: Clean white + Core Blue #004D8F accents
+   Dark: Deep charcoal + Core Blue/Gold accents
    ============================================================ */
 
 :root {
-  /* HBTF Core Colors */
-  --hbtf-blue:        #004D8F;
-  --hbtf-blue-dark:   #003D72;
-  --hbtf-blue-light:  #0062B3;
-  --hbtf-gold:        #CEBA95;
-  --hbtf-gold-light:  #DDD0B0;
-  --hbtf-gold-dark:   #B8A47E;
-  --hbtf-cyan:        #23ABE2;
+  /* HBTF Brand */
+  --hbtf-blue:       #004D8F;
+  --hbtf-blue-hover: #003D72;
+  --hbtf-blue-light: #E8F0F9;
+  --hbtf-gold:       #CEBA95;
+  --hbtf-gold-dark:  #B8A47E;
+  --hbtf-cyan:       #23ABE2;
 
-  /* Edge palette */
-  --hbtf-dark-grey:   #545759;
-  --hbtf-mid-grey:    #7B868C;
-  --hbtf-light-grey:  #A8A9AC;
-  --hbtf-silver:      #CCD0D2;
-  --hbtf-misty-blue:  #B1D0D6;
-
-  /* Light mode */
-  --bg-primary:       #F5F6F8;
-  --bg-card:          #FFFFFF;
-  --bg-header:        #FFFFFF;
-  --border:           #E2E5EA;
-  --border-subtle:    #EEF0F3;
-  --text-primary:     #0A1628;
-  --text-secondary:   #545759;
-  --text-muted:       #7B868C;
-  --accent:           #004D8F;
-  --accent-hover:     #003D72;
-  --gold:             #CEBA95;
-  --positive:         #1A7A4A;
-  --negative:         #C0392B;
+  /* Light Mode */
+  --bg:              #F4F6F9;
+  --bg-card:         #FFFFFF;
+  --bg-header:       #FFFFFF;
+  --bg-table-head:   #F8F9FB;
+  --bg-row-hover:    #F0F4FA;
+  --bg-row-alt:      #FAFBFC;
+  --border:          #DDE1E8;
+  --border-subtle:   #ECEEF2;
+  --text-primary:    #0D1B2A;
+  --text-secondary:  #4A5568;
+  --text-muted:      #8896A4;
+  --accent:          #004D8F;
+  --accent-text:     #004D8F;
+  --accent-bg:       #E8F0F9;
+  --gold:            #B8942A;
+  --gold-bg:         #FBF6E9;
+  --positive:        #1A7A4A;
+  --positive-bg:     #E8F5EE;
+  --negative:        #C0392B;
+  --shadow:          0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:       0 4px 12px rgba(0,0,0,0.08);
 }
 
 .dark {
-  /* Dark mode — deep navy inspired by HBTF blue */
-  --bg-primary:       #060D1A;
-  --bg-card:          #0D1829;
-  --bg-header:        #091221;
-  --border:           #1A2A42;
-  --border-subtle:    #112038;
-  --text-primary:     #EEF2F8;
-  --text-secondary:   #8FA5C0;
-  --text-muted:       #4D6480;
-  --accent:           #23ABE2;
-  --accent-hover:     #1B8EC0;
-  --gold:             #CEBA95;
-  --positive:         #2ECC71;
-  --negative:         #E74C3C;
+  /* Dark Mode — charcoal, NOT navy */
+  --bg:              #111418;
+  --bg-card:         #1A1E24;
+  --bg-header:       #141820;
+  --bg-table-head:   #141820;
+  --bg-row-hover:    #1F252D;
+  --bg-row-alt:      #1C2028;
+  --border:          #272D36;
+  --border-subtle:   #1F2530;
+  --text-primary:    #E8EDF4;
+  --text-secondary:  #8FA3BC;
+  --text-muted:      #505C6B;
+  --accent:          #4A9EE8;
+  --accent-text:     #4A9EE8;
+  --accent-bg:       #1A2535;
+  --gold:            #CEBA95;
+  --gold-bg:         #252015;
+  --positive:        #27AE60;
+  --positive-bg:     #152A1E;
+  --negative:        #E74C3C;
+  --shadow:          0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md:       0 4px 12px rgba(0,0,0,0.4);
 }
 
 /* ============================================================
-   BASE STYLES
+   BASE
    ============================================================ */
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-html[lang="ar"] {
-  font-family: 'Segoe UI', 'Tahoma', 'Arial', system-ui, sans-serif;
+html[lang="ar"] body {
+  font-family: 'Segoe UI', 'Tahoma', 'Arabic Typesetting', system-ui, sans-serif;
 }
 
 body {
-  background: var(--bg-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  background: var(--bg);
   color: var(--text-primary);
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 /* ============================================================
-   HBTF COMPONENT SYSTEM
+   HEADER
    ============================================================ */
 
-/* Header */
 .hbtf-header {
   background: var(--bg-header);
   border-bottom: 1px solid var(--border);
-  padding: 1.125rem 2rem;
+  padding: 0.875rem 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 100;
+  box-shadow: var(--shadow);
 }
 
 .hbtf-logo-eyebrow {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--hbtf-blue);
+  color: var(--accent);
   margin-bottom: 0.2rem;
 }
-.dark .hbtf-logo-eyebrow { color: var(--gold); }
+
+.hbtf-logo-eyebrow a {
+  color: inherit;
+  text-decoration: none;
+}
+.hbtf-logo-eyebrow a:hover { text-decoration: underline; }
 
 .hbtf-logo-title {
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
-/* Cards */
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+
+.page-container {
+  padding: 1.75rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+
 .hbtf-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 0.875rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
   overflow: hidden;
 }
 
 .hbtf-card-header {
-  padding: 1rem 1.5rem;
+  padding: 0.875rem 1.5rem;
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: var(--bg-table-head);
 }
 
 .hbtf-card-label {
-  font-size: 0.65rem;
+  font-size: 0.625rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
-/* Stat cards */
+/* ============================================================
+   STAT CARDS
+   ============================================================ */
+
 .hbtf-stat {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 0.875rem;
+  border-radius: 12px;
   padding: 1.5rem;
-  position: relative;
-  overflow: hidden;
+  box-shadow: var(--shadow);
+  border-top: 3px solid var(--accent);
 }
 
-.hbtf-stat::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: var(--hbtf-blue);
-}
-.dark .hbtf-stat::before { background: var(--gold); }
+.dark .hbtf-stat { border-top-color: var(--gold); }
 
 .hbtf-stat-value {
   font-size: 2.25rem;
   font-weight: 800;
-  color: var(--hbtf-blue);
+  color: var(--accent);
   line-height: 1;
   margin-bottom: 0.375rem;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
+
 .dark .hbtf-stat-value { color: var(--gold); }
 
 .hbtf-stat-label {
-  font-size: 0.65rem;
+  font-size: 0.625rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   color: var(--text-muted);
 }
 
-/* Tables */
+/* ============================================================
+   TABLES
+   ============================================================ */
+
 .hbtf-table {
   width: 100%;
   border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.hbtf-table thead tr {
+  background: var(--bg-table-head);
 }
 
 .hbtf-table th {
-  padding: 0.75rem 1.25rem;
-  font-size: 0.625rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
-  background: var(--bg-primary);
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
 }
 
 .hbtf-table td {
-  padding: 0.875rem 1.25rem;
-  font-size: 0.8125rem;
+  padding: 0.75rem 1.25rem;
   color: var(--text-primary);
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.hbtf-table tr:last-child td { border-bottom: none; }
+.hbtf-table tbody tr:last-child td { border-bottom: none; }
 
-.hbtf-table tr:hover td {
-  background: color-mix(in srgb, var(--hbtf-blue) 4%, transparent);
+.hbtf-table tbody tr:hover td { background: var(--bg-row-hover); }
+
+.hbtf-table tbody tr.rank-1 td {
+  background: var(--accent-bg);
 }
 
-.hbtf-table .rank-1 td { background: color-mix(in srgb, var(--hbtf-blue) 6%, transparent); }
+/* ============================================================
+   BUTTONS
+   ============================================================ */
 
-/* Buttons / Pills */
 .hbtf-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  padding: 0.4rem 0.875rem;
+  border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 600;
   border: 1px solid var(--border);
@@ -220,110 +258,190 @@ body {
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.15s;
+  white-space: nowrap;
 }
 
 .hbtf-btn:hover {
-  border-color: var(--hbtf-blue);
-  color: var(--hbtf-blue);
-}
-.dark .hbtf-btn:hover {
-  border-color: var(--gold);
-  color: var(--gold);
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
 }
 
 .hbtf-btn-active {
-  background: var(--hbtf-blue);
-  border-color: var(--hbtf-blue);
-  color: white;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white !important;
 }
+
 .dark .hbtf-btn-active {
   background: var(--gold);
   border-color: var(--gold);
-  color: #060D1A;
+  color: #111418 !important;
 }
 
-/* Nav links */
+/* ============================================================
+   NAV LINKS
+   ============================================================ */
+
 .hbtf-nav-link {
   display: block;
-  padding: 0.75rem 1rem;
-  border-radius: 0.625rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 8px;
   border: 1px solid var(--border-subtle);
-  background: var(--bg-primary);
+  background: var(--bg);
   transition: all 0.15s;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .hbtf-nav-link:hover {
-  border-color: var(--hbtf-blue);
-  background: color-mix(in srgb, var(--hbtf-blue) 5%, var(--bg-card));
+  border-color: var(--accent);
+  background: var(--accent-bg);
 }
-.dark .hbtf-nav-link:hover {
-  border-color: var(--gold);
-  background: color-mix(in srgb, var(--gold) 8%, var(--bg-card));
-}
+
+.dark .hbtf-nav-link:hover { border-color: var(--gold); background: var(--gold-bg); }
 
 .hbtf-nav-link-title {
   font-size: 0.8125rem;
   font-weight: 600;
   color: var(--text-primary);
+  transition: color 0.15s;
 }
 
-.hbtf-nav-link:hover .hbtf-nav-link-title {
-  color: var(--hbtf-blue);
-}
-.dark .hbtf-nav-link:hover .hbtf-nav-link-title {
-  color: var(--gold);
-}
+.hbtf-nav-link:hover .hbtf-nav-link-title { color: var(--accent); }
+.dark .hbtf-nav-link:hover .hbtf-nav-link-title { color: var(--gold); }
 
 .hbtf-nav-link-desc {
   font-size: 0.7rem;
   color: var(--text-muted);
-  margin-top: 0.125rem;
+  margin-top: 0.1rem;
 }
 
-/* Badges */
+/* ============================================================
+   BADGES
+   ============================================================ */
+
 .badge-conventional {
-  font-size: 0.625rem;
+  display: inline-block;
+  font-size: 0.6rem;
   font-weight: 600;
-  padding: 0.2rem 0.5rem;
+  padding: 0.15rem 0.5rem;
   border-radius: 99px;
-  background: color-mix(in srgb, var(--hbtf-blue) 12%, transparent);
-  color: var(--hbtf-blue);
-}
-.dark .badge-conventional {
-  background: color-mix(in srgb, var(--hbtf-cyan) 15%, transparent);
-  color: var(--hbtf-cyan);
+  background: var(--accent-bg);
+  color: var(--accent);
+  letter-spacing: 0.02em;
 }
 
 .badge-islamic {
-  font-size: 0.625rem;
-  font-weight: 600;
-  padding: 0.2rem 0.5rem;
-  border-radius: 99px;
-  background: color-mix(in srgb, #1A7A4A 12%, transparent);
-  color: #1A7A4A;
-}
-.dark .badge-islamic {
-  background: color-mix(in srgb, #2ECC71 15%, transparent);
-  color: #2ECC71;
-}
-
-/* Value highlights */
-.val-best { color: var(--positive); font-weight: 600; }
-.val-worst { color: var(--text-muted); }
-.val-empty { color: var(--border); }
-
-/* Gold accent line */
-.gold-accent {
   display: inline-block;
-  width: 2.5rem;
-  height: 2px;
-  background: var(--gold);
-  border-radius: 1px;
-  margin-bottom: 0.75rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 99px;
+  background: var(--positive-bg);
+  color: var(--positive);
+  letter-spacing: 0.02em;
 }
 
-/* Progress bar */
+/* ============================================================
+   ANNOUNCEMENT CARDS
+   ============================================================ */
+
+.hbtf-announcement {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.125rem 1.375rem;
+  border-inline-start: 3px solid var(--accent);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.hbtf-announcement:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent);
+}
+
+.dark .hbtf-announcement { border-inline-start-color: var(--gold); }
+
+/* ============================================================
+   SEARCH
+   ============================================================ */
+
+.hbtf-search {
+  width: 100%;
+  padding: 0.875rem 1rem 0.875rem 3rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-shadow: var(--shadow);
+}
+
+.hbtf-search::placeholder { color: var(--text-muted); }
+
+.hbtf-search:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+/* ============================================================
+   RESULT CARDS
+   ============================================================ */
+
+.hbtf-result {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.875rem 1.125rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.hbtf-result:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+}
+
+/* ============================================================
+   CATEGORY BADGES (announcements)
+   ============================================================ */
+
+.cat-badge {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
+  text-transform: capitalize;
+  letter-spacing: 0.03em;
+}
+
+.cat-financial_results { background: var(--accent-bg); color: var(--accent); }
+.dark .cat-financial_results { background: #1A2535; color: #4A9EE8; }
+
+.cat-dividend { background: var(--positive-bg); color: var(--positive); }
+.dark .cat-dividend { background: #152A1E; color: #27AE60; }
+
+.cat-merger_acquisition { background: #F0EBF8; color: #6B3FA0; }
+.dark .cat-merger_acquisition { background: #1E1530; color: #A78BFA; }
+
+.cat-leadership_change { background: var(--gold-bg); color: #8A6D3B; }
+.dark .cat-leadership_change { background: var(--gold-bg); color: var(--gold); }
+
+.cat-product_launch { background: #E8F7FD; color: #1580AA; }
+.dark .cat-product_launch { background: #0D2030; color: #23ABE2; }
+
+.cat-strategic, .cat-agm, .cat-rating, .cat-regulation, .cat-other {
+  background: var(--bg-table-head);
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+
 .hbtf-progress {
   height: 4px;
   background: var(--border);
@@ -333,89 +451,61 @@ body {
 
 .hbtf-progress-fill {
   height: 100%;
-  background: var(--hbtf-blue);
+  background: var(--accent);
   border-radius: 2px;
-  transition: width 0.6s ease;
+  transition: width 0.8s ease;
 }
+
 .dark .hbtf-progress-fill { background: var(--gold); }
 
-/* Search input */
-.hbtf-search {
-  width: 100%;
-  padding: 1rem 1rem 1rem 3rem;
-  border-radius: 0.75rem;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text-primary);
-  font-size: 0.9375rem;
-  outline: none;
-  transition: border-color 0.15s;
-}
+/* ============================================================
+   GOLD ACCENT LINE
+   ============================================================ */
 
-.hbtf-search:focus {
-  border-color: var(--hbtf-blue);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--hbtf-blue) 15%, transparent);
-}
-.dark .hbtf-search:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 15%, transparent);
-}
-
-/* Result cards */
-.hbtf-result {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  padding: 1rem 1.25rem;
-  transition: border-color 0.15s;
-}
-.hbtf-result:hover { border-color: var(--hbtf-blue); }
-.dark .hbtf-result:hover { border-color: var(--gold); }
-
-/* Announcement cards */
-.hbtf-announcement {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 0.875rem;
-  padding: 1.25rem 1.5rem;
-  border-left: 3px solid var(--hbtf-blue);
-  transition: border-color 0.15s;
-}
-.dark .hbtf-announcement { border-left-color: var(--gold); }
-
-/* Category badges */
-.cat-financial_results { background: color-mix(in srgb, var(--hbtf-blue) 12%, transparent); color: var(--hbtf-blue); }
-.dark .cat-financial_results { background: color-mix(in srgb, var(--hbtf-cyan) 15%, transparent); color: var(--hbtf-cyan); }
-
-.cat-dividend { background: color-mix(in srgb, #1A7A4A 12%, transparent); color: #1A7A4A; }
-.dark .cat-dividend { background: color-mix(in srgb, #2ECC71 15%, transparent); color: #2ECC71; }
-
-.cat-merger_acquisition { background: color-mix(in srgb, #6B3FA0 12%, transparent); color: #6B3FA0; }
-.dark .cat-merger_acquisition { background: color-mix(in srgb, #A78BFA 15%, transparent); color: #A78BFA; }
-
-.cat-leadership_change { background: color-mix(in srgb, #C8B18B 15%, transparent); color: #8A6D3B; }
-.dark .cat-leadership_change { background: color-mix(in srgb, var(--gold) 20%, transparent); color: var(--gold); }
-
-.cat-product_launch { background: color-mix(in srgb, #23ABE2 12%, transparent); color: #1580AA; }
-.dark .cat-product_launch { background: color-mix(in srgb, #23ABE2 15%, transparent); color: #23ABE2; }
-
-.cat-strategic, .cat-agm, .cat-other, .cat-rating, .cat-regulation {
-  background: color-mix(in srgb, var(--text-muted) 12%, transparent);
-  color: var(--text-secondary);
+.gold-line {
+  display: block;
+  width: 2rem;
+  height: 2px;
+  background: var(--gold);
+  border-radius: 1px;
 }
 
 /* ============================================================
-   SCROLLBAR STYLING
+   SECTION DIVIDER IN COMPARE TABLE
    ============================================================ */
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
+.table-section-row td {
+  background: var(--bg-table-head) !important;
+  font-size: 0.6rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: var(--text-muted) !important;
+  padding: 0.4rem 1.25rem !important;
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 /* ============================================================
-   TAILWIND OVERRIDE — ensure RTL works with logical properties
+   SELECT INPUTS
    ============================================================ */
 
-[dir="rtl"] table { direction: rtl; }
-[dir="rtl"] .hbtf-header { flex-direction: row-reverse; }
+select {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.75rem;
+  outline: none;
+  cursor: pointer;
+}
+
+select:focus { border-color: var(--accent); }
