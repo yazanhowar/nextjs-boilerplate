@@ -42,6 +42,7 @@ export default function Dashboard() {
   const navLinks = [
     { label: T.search, href: '/search', desc: isAr ? 'ابحث في البنوك والمنتجات والأسعار' : 'Search banks, products, rates, fees', icon: '⌕' },
     { label: T.compare, href: '/compare', desc: isAr ? 'مقارنة البنوك جنباً إلى جنب' : 'Side-by-side bank comparison', icon: '⇄' },
+    { label: isAr ? 'مقارنة المنتجات' : 'Product Comparison', href: '/products', desc: isAr ? 'مصفوفة مقارنة المنتجات' : 'Banking product feature matrix', icon: '⊞' },
     { label: T.rates, href: '/rates', desc: isAr ? 'مقارنة أسعار الفائدة والودائع' : 'Compare lending & deposit rates', icon: '%' },
     { label: T.tariffs, href: '/tariffs', desc: isAr ? 'رسوم الخدمات في جميع البنوك' : 'Service fees across banks', icon: '₫' },
     { label: T.rankings, href: '/rankings', desc: isAr ? 'الموجودات والأرباح والودائع' : 'Assets, profit, deposits', icon: '↑' },
