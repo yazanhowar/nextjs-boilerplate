@@ -1,6 +1,4 @@
 // app/api/chart/route.ts
-// AI-powered chart generation — parses natural language prompts,
-// queries Supabase for real data, returns structured chart spec.
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
@@ -11,7 +9,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// ── Keyword matchers ──────────────────────────────────────────────────────────
 function detectBanks(prompt: string): number[] {
   const lower = prompt.toLowerCase()
   const found: number[] = []
@@ -24,7 +21,6 @@ function detectBanks(prompt: string): number[] {
       found.push(bank.id)
     }
   }
-  // If none found, return all (sector-wide)
   return found.length > 0 ? found : BANKS.map(b => b.id)
 }
 
@@ -36,7 +32,7 @@ function detectMetric(prompt: string): { column: string; label: string } {
     return { column: 'total_assets', label: 'Total Assets (JOD M)' }
   if (lower.includes('deposit'))
     return { column: 'total_deposits', label: 'Customer Deposits (JOD M)' }
-  if (lower.includes('loan') || lower.includes('credit facilit'))
+  if (lower.includes('loan'))
     return { column: 'net_loans', label: 'Net Loans (JOD M)' }
   if (lower.includes('roe') || lower.includes('return on equity'))
     return { column: 'roe', label: 'Return on Equity (%)' }
@@ -45,10 +41,9 @@ function detectMetric(prompt: string): { column: string; label: string } {
   if (lower.includes('capital') || lower.includes('car'))
     return { column: 'car', label: 'Capital Adequacy Ratio (%)' }
   if (lower.includes('equity'))
-    return { column: 'total_equity', label: "Shareholders' Equity (JOD M)" }
+    return { column: 'total_equity', label: "Shareholders Equity (JOD M)" }
   if (lower.includes('revenue') || lower.includes('interest income'))
     return { column: 'net_interest_income', label: 'Net Interest Income (JOD M)' }
-  // Default
   return { column: 'net_profit', label: 'Net Profit (JOD M)' }
 }
 
@@ -69,11 +64,20 @@ function detectYears(prompt: string): number[] {
   return [2023, 2024]
 }
 
-// ── Rate/fee queries ──────────────────────────────────────────────────────────
+const RATIO_COLUMNS = ['roe', 'roa', 'car', 'npl_ratio']
+
+function isRatioColumn(col: string): boolean {
+  return RATIO_COLUMNS.includes(col)
+}
+
+function scaleValue(val: number, column: string): number {
+  if (isRatioColumn(column)) return Math.round(val * 10) / 10
+  return Math.round(val / 1_000_000)
+}
+
 async function handleRatesQuery(prompt: string, bankIds: number[]) {
   const lower = prompt.toLowerCase()
 
-  // Credit card fees
   if (lower.includes('credit card')) {
     const { data } = await supabase
       .from('bank_tariffs')
@@ -82,7 +86,7 @@ async function handleRatesQuery(prompt: string, bankIds: number[]) {
 
     if (!data?.length) return null
 
-    const chartData = data.map(r => {
+    const chartData = data.map((r: any) => {
       const bank = BANKS.find(b => b.id === r.bank_id)
       return {
         name: bank?.shortName || `Bank ${r.bank_id}`,
@@ -92,9 +96,9 @@ async function handleRatesQuery(prompt: string, bankIds: number[]) {
       }
     })
 
-    // Find cheapest/most expensive for insight
-    const cheapest = [...chartData].sort((a, b) => a['Classic Card (JOD/yr)'] - b['Classic Card (JOD/yr)'])[0]
-    const hbtf = chartData.find(d => d.name === 'HBTF')
+    const sorted = [...chartData].sort((a, b) => a['Classic Card (JOD/yr)'] - b['Classic Card (JOD/yr)'])
+    const cheapest = sorted[0]
+    const hbtf = chartData.find((d: any) => d.name === 'HBTF')
 
     return {
       title: 'Annual Credit Card Fees — Bank Comparison',
@@ -102,17 +106,12 @@ async function handleRatesQuery(prompt: string, bankIds: number[]) {
       data: chartData,
       series: ['Classic Card (JOD/yr)', 'Gold Card (JOD/yr)', 'Platinum Card (JOD/yr)'],
       insight: hbtf
-        ? `HBTF's classic card fee is JOD ${hbtf['Classic Card (JOD/yr)']}. ${
-            cheapest.name !== 'HBTF'
-              ? `${cheapest.name} has the lowest at JOD ${cheapest['Classic Card (JOD/yr)']}.`
-              : 'HBTF has the lowest classic card fee in the comparison.'
-          }`
+        ? `HBTF classic card fee: JOD ${hbtf['Classic Card (JOD/yr)']}. ${cheapest.name !== 'HBTF' ? `${cheapest.name} has the lowest at JOD ${cheapest['Classic Card (JOD/yr)']}.` : 'HBTF has the lowest classic card fee.'}`
         : `${cheapest.name} has the lowest classic card fee at JOD ${cheapest['Classic Card (JOD/yr)']}.`,
     }
   }
 
-  // Home loan rates
-  if (lower.includes('home loan') || lower.includes('mortgage') || lower.includes('housing loan')) {
+  if (lower.includes('home loan') || lower.includes('mortgage')) {
     const { data } = await supabase
       .from('bank_rates')
       .select('bank_id, home_loan_min, home_loan_max')
@@ -120,12 +119,12 @@ async function handleRatesQuery(prompt: string, bankIds: number[]) {
 
     if (!data?.length) return null
 
-    const chartData = data.map(r => {
+    const chartData = data.map((r: any) => {
       const bank = BANKS.find(b => b.id === r.bank_id)
       return {
         name: bank?.shortName || `Bank ${r.bank_id}`,
-        'Minimum Rate (%)': r.home_loan_min || 0,
-        'Maximum Rate (%)': r.home_loan_max || 0,
+        'Min Rate (%)': r.home_loan_min || 0,
+        'Max Rate (%)': r.home_loan_max || 0,
       }
     })
 
@@ -133,12 +132,11 @@ async function handleRatesQuery(prompt: string, bankIds: number[]) {
       title: 'Home Loan Interest Rates — Bank Comparison',
       type: 'bar',
       data: chartData,
-      series: ['Minimum Rate (%)', 'Maximum Rate (%)'],
-      insight: 'Lower is better for borrowers. Check eligibility criteria as rates vary by loan size and term.',
+      series: ['Min Rate (%)', 'Max Rate (%)'],
+      insight: 'Lower is better for borrowers.',
     }
   }
 
-  // Deposit rates
   if (lower.includes('deposit') || lower.includes('saving')) {
     const { data } = await supabase
       .from('bank_rates')
@@ -147,7 +145,7 @@ async function handleRatesQuery(prompt: string, bankIds: number[]) {
 
     if (!data?.length) return null
 
-    const chartData = data.map(r => {
+    const chartData = data.map((r: any) => {
       const bank = BANKS.find(b => b.id === r.bank_id)
       return {
         name: bank?.shortName || `Bank ${r.bank_id}`,
@@ -163,32 +161,25 @@ async function handleRatesQuery(prompt: string, bankIds: number[]) {
       type: 'bar',
       data: chartData,
       series: ['Savings (%)', '3-Month TD (%)', '6-Month TD (%)', '12-Month TD (%)'],
-      insight: 'Higher is better for depositors. 12-month term deposits typically offer the best rates.',
+      insight: 'Higher is better for depositors.',
     }
   }
 
   return null
 }
 
-// ── Main handler ──────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   const { prompt, bankId } = await req.json()
   if (!prompt) return NextResponse.json({ error: 'No prompt provided' }, { status: 400 })
 
-  const lower = prompt.toLowerCase()
-
-  // Determine which banks to query
   let bankIds = detectBanks(prompt)
-  // If a specific bankId context is provided and no banks detected in prompt, use it
   if (bankId && bankIds.length === BANKS.length) {
     bankIds = [bankId]
   }
 
-  // Try rates/fees query first
   const ratesResult = await handleRatesQuery(prompt, bankIds)
   if (ratesResult) return NextResponse.json(ratesResult)
 
-  // Otherwise query financials
   const metric = detectMetric(prompt)
   const chartType = detectChartType(prompt)
   const years = detectYears(prompt)
@@ -201,63 +192,71 @@ export async function POST(req: NextRequest) {
     .order('fiscal_year', { ascending: true })
 
   if (!data?.length) {
-    return NextResponse.json({ error: 'No data found for this query. Try asking about profit, assets, deposits, or loans.' }, { status: 404 })
+    return NextResponse.json(
+      { error: 'No data found. Try asking about profit, assets, deposits, or loans.' },
+      { status: 404 }
+    )
   }
 
+  const rows = data as any[]
   const bankNames = bankIds.map(id => BANKS.find(b => b.id === id)?.shortName || `Bank ${id}`)
 
   let chartData: any[]
   let series: string[]
 
   if (chartType === 'line' && bankIds.length <= 4) {
-    // Multi-bank trend: X axis = year, one line per bank
     chartData = years.map(year => {
       const row: any = { name: `FY${year}` }
       bankIds.forEach(id => {
         const bankName = BANKS.find(b => b.id === id)?.shortName || `Bank ${id}`
-        const match = data.find(d => d.bank_id === id && d.fiscal_year === year)
-        const val = match?.[metric.column]
-        row[bankName] = val != null ? Math.round(val / (metric.column.includes('rate') || metric.column === 'roe' || metric.column === 'roa' || metric.column === 'car' || metric.column === 'npl_ratio' ? 1 : 1_000_000) * 10) / 10 : null
+        const match = rows.find(d => d.bank_id === id && d.fiscal_year === year)
+        const val = match ? match[metric.column] : null
+        row[bankName] = val != null ? scaleValue(val, metric.column) : null
       })
       return row
     })
     series = bankNames
   } else {
-    // Bar chart: X axis = bank name, group by year
     const bankRows: Record<number, any> = {}
-    data.forEach(row => {
+    rows.forEach(row => {
       if (!bankRows[row.bank_id]) {
-        bankRows[row.bank_id] = { name: BANKS.find(b => b.id === row.bank_id)?.shortName || `Bank ${row.bank_id}` }
+        bankRows[row.bank_id] = {
+          name: BANKS.find(b => b.id === row.bank_id)?.shortName || `Bank ${row.bank_id}`
+        }
       }
       const val = row[metric.column]
-      const isRatio = ['roe', 'roa', 'car', 'npl_ratio'].includes(metric.column)
-      bankRows[row.bank_id][`FY${row.fiscal_year}`] = val != null
-        ? (isRatio ? Math.round(val * 10) / 10 : Math.round(val / 1_000_000))
-        : null
+      bankRows[row.bank_id][`FY${row.fiscal_year}`] = val != null ? scaleValue(val, metric.column) : null
     })
     chartData = Object.values(bankRows)
     series = years.map(y => `FY${y}`)
   }
 
-  // Generate insight
   const latestYear = Math.max(...years)
-  const latestData = data.filter(d => d.fiscal_year === latestYear)
-  const sorted = [...latestData].sort((a, b) => (b[metric.column] || 0) - (a[metric.column] || 0))
+  const latestRows = rows.filter(d => d.fiscal_year === latestYear)
+  const sorted = [...latestRows].sort((a, b) => (b[metric.column] || 0) - (a[metric.column] || 0))
   const leader = sorted[0]
-  const leaderBank = BANKS.find(b => b.id === leader?.bank_id)
-  const hbtfEntry = data.find(d => d.bank_id === 2 && d.fiscal_year === latestYear)
-  const isRatio = ['roe', 'roa', 'car', 'npl_ratio'].includes(metric.column)
-
-  const leaderVal = leader?.[metric.column]
-  const hbtfVal = hbtfEntry?.[metric.column]
+  const leaderBank = leader ? BANKS.find(b => b.id === leader.bank_id) : null
+  const hbtfEntry = rows.find(d => d.bank_id === 2 && d.fiscal_year === latestYear)
 
   let insight = ''
-  if (leaderBank && leaderVal != null) {
-    insight = `${leaderBank.shortName} leads with ${metric.label.includes('%') || isRatio ? `${leaderVal.toFixed(1)}%` : `JOD ${Math.round(leaderVal / 1_000_000)}M`} in FY${latestYear}.`
+  if (leaderBank && leader) {
+    const leaderVal = leader[metric.column]
+    if (leaderVal != null) {
+      const formatted = isRatioColumn(metric.column)
+        ? `${leaderVal.toFixed(1)}%`
+        : `JOD ${Math.round(leaderVal / 1_000_000)}M`
+      insight = `${leaderBank.shortName} leads with ${formatted} in FY${latestYear}.`
+    }
   }
-  if (hbtfVal != null && leaderBank?.id !== 2) {
-    const rank = sorted.findIndex(d => d.bank_id === 2) + 1
-    insight += ` Housing Bank ranks #${rank} at ${isRatio ? `${hbtfVal.toFixed(1)}%` : `JOD ${Math.round(hbtfVal / 1_000_000)}M`}.`
+  if (hbtfEntry && leaderBank?.id !== 2) {
+    const hbtfVal = hbtfEntry[metric.column]
+    if (hbtfVal != null) {
+      const rank = sorted.findIndex(d => d.bank_id === 2) + 1
+      const formatted = isRatioColumn(metric.column)
+        ? `${hbtfVal.toFixed(1)}%`
+        : `JOD ${Math.round(hbtfVal / 1_000_000)}M`
+      insight += ` Housing Bank ranks #${rank} at ${formatted}.`
+    }
   }
 
   return NextResponse.json({
