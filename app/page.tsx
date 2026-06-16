@@ -62,7 +62,7 @@ function BankCard({ bank, financial, prevFinancial }: {
 
   return (
     <div
-      onClick={() => router.push(`/bank/${bank.id}`)}
+      onClick={() => router.push(`/chat?bank=${bank.id}`)}
       className="group relative bg-[#0F1E35] border border-[#1E3450] rounded-xl p-5 cursor-pointer
                  hover:border-[#CEBA95] hover:bg-[#132240] transition-all duration-200
                  hover:shadow-[0_0_24px_rgba(206,186,149,0.12)]"
