@@ -264,8 +264,8 @@ export default function BankPage() {
   // Profit trend data for sparkline
   const profitTrend = financials.map(f => ({
     name: `FY${f.fiscal_year}`,
-    'Net Profit': Math.round((f.net_profit || 0) / 1_000_000),
-    'Total Assets': Math.round((f.total_assets || 0) / 1_000_000),
+    'Net Profit': Math.round((f.net_profit || 0) / 1_000),
+    'Total Assets': Math.round((f.total_assets || 0) / 1_000),
   }))
 
   // Product categories
