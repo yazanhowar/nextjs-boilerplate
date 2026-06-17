@@ -204,11 +204,9 @@ export default function Dashboard() {
 function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMouseEnter, onMouseLeave, onClick }: any) {
   return (
     <div onClick={onClick} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={{ backgroundColor:hovered?t.surfaceHover:t.surface, border:`1px solid ${hovered?t.accent+'55':t.border}`, borderRadius:14, padding:20, cursor:'pointer', transition:'all 0.15s ease', transform:hovered?'translateY(-2px)':'none', boxShadow:hovered?`0 8px 24px ${dark?'rgba(0,0,0,0.4)':'rgba(0,0,0,0.1)'}`:t.shadow }}>
-      {bank.isHBTF && (
-        <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:8 }}>
-          <span style={{ fontSize:10, fontWeight:700, color:t.accent, backgroundColor:t.accent+'18', padding:'2px 8px', borderRadius:20, letterSpacing:'0.05em' }}>OUR BANK</span>
-        </div>
-      )}
+ <div style={{ minHeight:22, display:'flex', justifyContent:'flex-end', marginBottom:4 }}>
+      {bank.isHBTF && <span style={{ fontSize:10, fontWeight:700, color:t.accent, backgroundColor:t.accent+'18', padding:'2px 8px', borderRadius:20, letterSpacing:'0.05em' }}>OUR BANK</span>}
+      </div>
       <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:16 }}>
         <div style={{ width:44, height:44, borderRadius:10, backgroundColor:dark?'#1E3450':'#F0F4FA', border:`1px solid ${t.border}`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden' }}>
           <BankLogo bank={bank} />
