@@ -34,8 +34,9 @@ function pctDelta(curr: number, prev: number): number | null {
 // BankLogo: shows favicon if available, otherwise a clean colored-initials branded box
 function BankLogo({ bank, dark }: { bank: any; dark: boolean }) {
   const [failed, setFailed] = useState(false)
-  const abbr = (bank.shortName || bank.name || '?').replace(/[^A-Za-z\u0600-\u06FF]/g, '').slice(0, 3).toUpperCase()
-  const fontSize = abbr.length >= 3 ? 13 : abbr.length === 2 ? 16 : 20
+  const MONO: Record<number, string> = { 1:'AB', 2:'HBTF', 3:'JKB', 4:'CB', 5:'BAE', 6:'CAB', 7:'AHLI', 8:'AJIB', 9:'JIB', 10:'SIB', 11:'IIAB', 12:'BOJ', 13:'IB', 14:'ABC', 15:'JCB' }
+  const abbr = MONO[bank.id] || (bank.shortName || bank.name || '?').replace(/[^A-Za-z]/g, '').slice(0, 4).toUpperCase()
+  const fontSize = abbr.length >= 4 ? 12 : abbr.length === 3 ? 14 : abbr.length === 2 ? 17 : 20
   const base = bank.primaryColor || (dark ? '#3B82F6' : '#004D8F')
   // Subtle two-stop vertical gradient derived from the brand color for a crisp, intentional tile
   const grad = `linear-gradient(150deg, ${base} 0%, ${base}E6 55%, ${base}C8 100%)`
