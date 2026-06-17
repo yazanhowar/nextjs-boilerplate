@@ -101,3 +101,120 @@ a, button { transition: color 0.15s, background-color 0.15s, border-color 0.15s,
   body { background: white; color: black; }
   .no-print { display: none !important; }
 }
+
+/* ── HBTF Component Classes ────────────────────────────────────────────── */
+
+.positive { color: var(--green); }
+.negative { color: var(--red); }
+
+.hbtf-header {
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.hbtf-logo-eyebrow {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+
+.hbtf-logo-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.hbtf-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.hbtf-card-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hbtf-card-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.gold-accent {
+  width: 32px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--hbtf-gold), transparent);
+  border-radius: 2px;
+  margin-bottom: 12px;
+}
+
+.hbtf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.hbtf-table thead th {
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  background-color: var(--bg-card);
+}
+
+.hbtf-table tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.hbtf-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.hbtf-table tbody tr:hover {
+  background-color: var(--bg-hover);
+}
+
+.badge-islamic {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  color: #16a34a;
+  background-color: rgba(22, 163, 74, 0.1);
+  border: 1px solid rgba(22, 163, 74, 0.25);
+  padding: 1px 7px;
+  border-radius: 20px;
+  margin-top: 2px;
+}
+
+.badge-conventional {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--hbtf-blue);
+  background-color: rgba(0, 77, 143, 0.08);
+  border: 1px solid rgba(0, 77, 143, 0.2);
+  padding: 1px 7px;
+  border-radius: 20px;
+  margin-top: 2px;
+}
