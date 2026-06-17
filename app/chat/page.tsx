@@ -13,25 +13,28 @@ interface Message {
   chart?: any
 }
 
-// Parse chart JSON block from AI response using indexOf (avoids regex backtick issues)
+// Parse chart block using indexOf — no regex needed
 function extractChart(text: string): { text: string; chart: any | null } {
   const OPEN = '```chart'
   const CLOSE = '```'
-  const startIdx = text.indexOf(OPEN)
-  if (startIdx === -1) return { text, chart: null }
-  const afterOpen = startIdx + OPEN.length
-  // Skip leading newline
-  const jsonStart = text[afterOpen] === '\n' ? afterOpen + 1 : afterOpen
-  const closeIdx = text.indexOf(CLOSE, jsonStart)
-  if (closeIdx === -1) return { text, chart: null }
-  const jsonStr = text.slice(jsonStart, closeIdx).trim()
+  const si = text.indexOf(OPEN)
+  if (si === -1) return { text, chart: null }
+  const js = text[si + OPEN.length] === '\n' ? si + OPEN.length + 1 : si + OPEN.length
+  const ci = text.indexOf(CLOSE, js)
+  if (ci === -1) return { text, chart: null }
+  const raw = text.slice(js, ci).trim()
   try {
-    const chart = JSON.parse(jsonStr)
-    const cleaned = (text.slice(0, startIdx) + text.slice(closeIdx + CLOSE.length)).trim()
-    return { text: cleaned, chart }
+    const chart = JSON.parse(raw)
+    return { text: (text.slice(0, si) + text.slice(ci + CLOSE.length)).trim(), chart }
   } catch {
     return { text, chart: null }
   }
+}
+
+// Bold inline rendering — no regex, use split with delimiter
+function bold(text: string, t: any): React.ReactNode {
+  const parts = text.split('**')
+  return parts.map((p, i) => i % 2 === 1 ? <strong key={i} style={{ color: t.text }}>{p}</strong> : p) as React.ReactNode[]
 }
 
 function RenderText({ content, t }: { content: string; t: any }) {
@@ -40,42 +43,32 @@ function RenderText({ content, t }: { content: string; t: any }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       {lines.map((line, i) => {
         if (!line.trim()) return <div key={i} style={{ height: 6 }} />
-        if (line.startsWith('### ')) return <div key={i} style={{ fontWeight: 700, fontSize: 13, color: t.accent, marginTop: 10, textTransform: 'uppercase' as const, letterSpacing: '0.04em' }}>{line.slice(4)}</div>
+        if (line.startsWith('### ')) return <div key={i} style={{ fontWeight: 700, fontSize: 13, color: t.accent, marginTop: 10, letterSpacing: '0.04em' }}>{line.slice(4)}</div>
         if (line.startsWith('## ')) return <div key={i} style={{ fontWeight: 700, fontSize: 15, color: t.text, marginTop: 10 }}>{line.slice(3)}</div>
         if (line.startsWith('# ')) return <div key={i} style={{ fontWeight: 700, fontSize: 17, color: t.text, marginTop: 10 }}>{line.slice(2)}</div>
         if (line.startsWith('---')) return <hr key={i} style={{ border: 'none', borderTop: `1px solid ${t.border}`, margin: '8px 0' }} />
-        if (line.startsWith('- ') || line.startsWith('\u2022 ')) {
-          const raw = line.replace(/^[-\u2022] /, '')
-          const parts = raw.split(/(**[^*]+**)/)
+        const isBullet = line.startsWith('- ') || line.startsWith('\u2022 ')
+        if (isBullet) {
+          const raw = line.slice(2)
           return (
             <div key={i} style={{ display: 'flex', gap: 8, marginLeft: 4 }}>
-              <span style={{ color: t.accent, flexShrink: 0, fontWeight: 700, fontSize: 12, marginTop: 2 }}>\u2022</span>
-              <span style={{ fontSize: 14, color: t.textSub, lineHeight: 1.65 }}>
-                {parts.map((p, j) => p.startsWith('**') ? <strong key={j} style={{ color: t.text }}>{p.slice(2, -2)}</strong> : p)}
-              </span>
+              <span style={{ color: t.accent, flexShrink: 0, fontWeight: 700, marginTop: 2 }}>\u2022</span>
+              <span style={{ fontSize: 14, color: t.textSub, lineHeight: 1.65 }}>{bold(raw, t)}</span>
             </div>
           )
         }
-        if (/^\d+\.\s/.test(line)) {
-          const numMatch = line.match(/^(\d+)/)
-          const num = numMatch ? numMatch[1] : '1'
-          const raw = line.replace(/^\d+\.\s/, '')
-          const parts = raw.split(/(**[^*]+**)/)
+        const numDot = line.indexOf('. ')
+        if (numDot > 0 && numDot < 3 && line.slice(0, numDot).match(/^[0-9]$/)) {
+          const num = line.slice(0, numDot)
+          const raw = line.slice(numDot + 2)
           return (
             <div key={i} style={{ display: 'flex', gap: 8, marginLeft: 4 }}>
-              <span style={{ color: t.accent, flexShrink: 0, fontWeight: 600, fontSize: 13, minWidth: 18 }}>{num}.</span>
-              <span style={{ fontSize: 14, color: t.textSub, lineHeight: 1.65 }}>
-                {parts.map((p, j) => p.startsWith('**') ? <strong key={j} style={{ color: t.text }}>{p.slice(2, -2)}</strong> : p)}
-              </span>
+              <span style={{ color: t.accent, flexShrink: 0, fontWeight: 600, minWidth: 18 }}>{num}.</span>
+              <span style={{ fontSize: 14, color: t.textSub, lineHeight: 1.65 }}>{bold(raw, t)}</span>
             </div>
           )
         }
-        const parts = line.split(/(**[^*]+**)/)
-        return (
-          <p key={i} style={{ fontSize: 14, color: t.textSub, lineHeight: 1.7, margin: 0 }}>
-            {parts.map((p, j) => p.startsWith('**') ? <strong key={j} style={{ color: t.text }}>{p.slice(2, -2)}</strong> : p)}
-          </p>
-        )
+        return <p key={i} style={{ fontSize: 14, color: t.textSub, lineHeight: 1.7, margin: 0 }}>{bold(line, t)}</p>
       })}
     </div>
   )
@@ -84,6 +77,10 @@ function RenderText({ content, t }: { content: string; t: any }) {
 function ChartBlock({ chart, t }: { chart: any; t: any }) {
   const ref = useRef<HTMLDivElement>(null)
   const COLORS = ['#0071E3', '#FF9F0A', '#30D158', '#FF453A', '#BF5AF2', '#64D2FF', '#FF6B35', '#98989D']
+  const chartType = (chart.type || 'bar').toLowerCase()
+  const isDonut = chartType === 'donut' || chartType === 'pie'
+  const isPct = chart.unit === '%'
+  const series: string[] = chart.series || ['value']
 
   async function exportPDF() {
     if (!ref.current) return
@@ -93,22 +90,18 @@ function ChartBlock({ chart, t }: { chart: any; t: any }) {
     const img = canvas.toDataURL('image/png')
     const pdf = new jsPDF({ orientation: 'landscape' as const, unit: 'px' as const, format: [canvas.width, canvas.height] })
     pdf.addImage(img, 'PNG', 0, 0, canvas.width, canvas.height)
-    pdf.save(`${chart.title || 'chart'}.pdf`)
+    pdf.save((chart.title || 'chart') + '.pdf')
   }
 
-  const chartType = (chart.type || 'bar').toLowerCase()
-  const isDonut = chartType === 'donut' || chartType === 'pie'
-  const isPct = chart.unit === '%'
-
-  const customTooltip = ({ active, payload, label }: any) => {
+  const Tip = ({ active, payload, label }: any) => {
     if (!active || !payload?.length) return null
     return (
-      <div style={{ backgroundColor: t.surface, border: `1px solid ${t.border}`, borderRadius: 8, padding: '8px 12px', fontSize: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+      <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: 8, padding: '8px 12px', fontSize: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
         {label && <div style={{ fontWeight: 600, color: t.text, marginBottom: 4 }}>{label}</div>}
-        {(payload as any[]).map((entry: any, i: number) => (
-          <div key={i} style={{ color: entry.color || t.accent }}>
-            <span style={{ color: t.textSub }}>{entry.name}: </span>
-            <strong>{typeof entry.value === 'number' ? entry.value.toFixed(1) : entry.value}</strong>
+        {(payload as any[]).map((e: any, i: number) => (
+          <div key={i} style={{ color: e.color || t.accent }}>
+            <span style={{ color: t.textSub }}>{e.name}: </span>
+            <strong>{typeof e.value === 'number' ? e.value.toFixed(1) : e.value}</strong>
             {chart.unit ? ' ' + chart.unit : ''}
           </div>
         ))}
@@ -120,24 +113,20 @@ function ChartBlock({ chart, t }: { chart: any; t: any }) {
 
   return (
     <div style={{ marginTop: 16, border: `1px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
-      <div style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${t.border}`, backgroundColor: t.surface }}>
+      <div style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${t.border}`, background: t.surface }}>
         <span style={{ fontSize: 13, fontWeight: 600, color: t.text }}>{chart.title}</span>
-        <button onClick={exportPDF} style={{ fontSize: 12, color: t.accent, background: 'none', border: `1px solid ${t.accent}44`, borderRadius: 6, cursor: 'pointer', fontWeight: 500, padding: '3px 10px' }}>
-          \u2193 Export PDF
+        <button onClick={exportPDF} style={{ fontSize: 12, color: t.accent, background: 'none', border: `1px solid ${t.accent}44`, borderRadius: 6, cursor: 'pointer', padding: '3px 10px' }}>
+          &#8595; Export PDF
         </button>
       </div>
-      <div ref={ref} style={{ padding: 16, backgroundColor: t.surface }}>
+      <div ref={ref} style={{ padding: 16, background: t.surface }}>
         <ResponsiveContainer width="100%" height={260}>
           {isDonut ? (
             <PieChart>
-              <Pie data={chart.data} cx="50%" cy="50%"
-                innerRadius={chartType === 'donut' ? 65 : 0} outerRadius={110}
-                dataKey={(chart.series as string[])?.[0] || 'value'} nameKey="name"
-                paddingAngle={2}
-              >
+              <Pie data={chart.data} cx="50%" cy="50%" innerRadius={chartType === 'donut' ? 65 : 0} outerRadius={110} dataKey={series[0]} nameKey="name" paddingAngle={2}>
                 {(chart.data as any[])?.map((_: any, idx: number) => <Cell key={idx} fill={COLORS[idx % COLORS.length]} />)}
               </Pie>
-              <Tooltip content={customTooltip} />
+              <Tooltip content={<Tip />} />
               <Legend formatter={(v: string) => <span style={{ fontSize: 12, color: t.textSub }}>{v}</span>} iconType="circle" iconSize={8} />
             </PieChart>
           ) : chartType === 'line' ? (
@@ -145,9 +134,9 @@ function ChartBlock({ chart, t }: { chart: any; t: any }) {
               <CartesianGrid strokeDasharray="3 3" stroke={t.border} vertical={false} />
               <XAxis dataKey="name" tick={{ fontSize: 12, fill: t.textSub }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: t.textSub }} axisLine={false} tickLine={false} width={55} tickFormatter={tickFmt} />
-              <Tooltip content={customTooltip} />
+              <Tooltip content={<Tip />} />
               <Legend formatter={(v: string) => <span style={{ fontSize: 12, color: t.textSub }}>{v}</span>} />
-              {((chart.series as string[]) || ['value']).map((s: string, i: number) => (
+              {series.map((s: string, i: number) => (
                 <Line key={s} type="monotone" dataKey={s} stroke={COLORS[i % COLORS.length]} strokeWidth={2.5} dot={{ r: 5, fill: COLORS[i % COLORS.length], strokeWidth: 0 }} activeDot={{ r: 7 }} />
               ))}
             </LineChart>
@@ -156,16 +145,16 @@ function ChartBlock({ chart, t }: { chart: any; t: any }) {
               <CartesianGrid strokeDasharray="3 3" stroke={t.border} vertical={false} />
               <XAxis dataKey="name" tick={{ fontSize: 12, fill: t.textSub }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: t.textSub }} axisLine={false} tickLine={false} width={55} tickFormatter={tickFmt} />
-              <Tooltip content={customTooltip} />
+              <Tooltip content={<Tip />} />
               <Legend formatter={(v: string) => <span style={{ fontSize: 12, color: t.textSub }}>{v}</span>} />
-              {((chart.series as string[]) || ['value']).map((s: string, i: number) => (
+              {series.map((s: string, i: number) => (
                 <Bar key={s} dataKey={s} fill={COLORS[i % COLORS.length]} radius={[6, 6, 0, 0]} maxBarSize={60} />
               ))}
             </BarChart>
           )}
         </ResponsiveContainer>
         {chart.insight && (
-          <div style={{ marginTop: 12, padding: '10px 14px', backgroundColor: t.accentSubtle, borderRadius: 8, fontSize: 13, color: t.accent, display: 'flex', gap: 8 }}>
+          <div style={{ marginTop: 12, padding: '10px 14px', background: t.accentSubtle, borderRadius: 8, fontSize: 13, color: t.accent, display: 'flex', gap: 8 }}>
             <span>&#128161;</span><span>{chart.insight}</span>
           </div>
         )}
@@ -174,37 +163,26 @@ function ChartBlock({ chart, t }: { chart: any; t: any }) {
   )
 }
 
-const SUGGESTED_ALL = [
+const SUGGESTED = [
   'Which bank had the highest profit in 2025?',
-  'Compare HBTF vs Capital Bank growth 2023\u20132025',
-  'Show me a donut chart of sector profit share',
+  'Compare HBTF vs Capital Bank profit growth 2023 to 2025 on a line chart',
+  'Show a donut chart of sector net profit share for 2025',
   'Which bank has the lowest home loan rate?',
-  'Compare credit card fees across all banks',
+  'Compare credit card annual fees across all banks',
   'Who are the top shareholders of Housing Bank?',
-  'Compare ROE across all banks \u2014 bar chart',
-  "What is JKB's profit trend 2023\u20132025?",
+  'Compare ROE across all banks for 2025 on a bar chart',
+  "What is JKB's net profit trend from 2023 to 2025?",
 ]
 
-function YearChips({ onSend, t }: { onSend: (q: string) => void; t: any }) {
-  return (
-    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' as const, marginBottom: 10 }}>
-      {[
-        { label: 'FY2025', q: 'Show all bank net profits for FY2025 ranked highest to lowest with a bar chart' },
-        { label: 'FY2024', q: 'Show all bank net profits for FY2024 ranked highest to lowest with a bar chart' },
-        { label: 'FY2023', q: 'Show all bank net profits for FY2023 ranked highest to lowest with a bar chart' },
-        { label: '3-year trend', q: 'Compare HBTF net profit trend 2023, 2024, 2025 on a line chart' },
-        { label: 'Profit ranking', q: 'Rank all 15 banks by 2025 net profit from highest to lowest' },
-        { label: 'Sector share', q: 'Show a donut chart of 2025 sector profit share across all banks' },
-        { label: 'ROE comparison', q: 'Compare ROE across all banks for FY2025 on a bar chart' },
-      ].map(c => (
-        <button key={c.label} onClick={() => onSend(c.q)} style={{ padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500, cursor: 'pointer', border: `1px solid ${t.border}`, backgroundColor: t.surface, color: t.textSub, transition: 'all 0.15s', whiteSpace: 'nowrap' as const }}
-          onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = t.accent; el.style.color = t.accent; el.style.backgroundColor = t.accentSubtle }}
-          onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = t.border; el.style.color = t.textSub; el.style.backgroundColor = t.surface }}
-        >{c.label}</button>
-      ))}
-    </div>
-  )
-}
+const YEAR_CHIPS = [
+  { label: 'FY2025 profits', q: 'Show all 15 bank net profits for FY2025 ranked highest to lowest with a bar chart' },
+  { label: 'FY2024 profits', q: 'Show all 15 bank net profits for FY2024 ranked highest to lowest with a bar chart' },
+  { label: 'FY2023 profits', q: 'Show all 15 bank net profits for FY2023 ranked highest to lowest with a bar chart' },
+  { label: '3-year trend', q: 'Show HBTF net profit for 2023, 2024, and 2025 on a line chart' },
+  { label: 'Profit ranking', q: 'Rank all 15 banks by 2025 net profit from highest to lowest' },
+  { label: 'Donut 2025', q: 'Show a donut chart of 2025 net profit market share across all 15 banks' },
+  { label: 'ROE compare', q: 'Compare ROE across all banks for 2025 on a bar chart' },
+]
 
 function ChatContent() {
   const searchParams = useSearchParams()
@@ -214,9 +192,9 @@ function ChatContent() {
 
   const [dark, setDark] = useState(false)
   useEffect(() => {
-    const stored = localStorage.getItem('hbtf-theme')
-    const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    setDark(stored === 'dark' || (!stored && sysDark))
+    const s = localStorage.getItem('hbtf-theme')
+    const sys = window.matchMedia('(prefers-color-scheme: dark)').matches
+    setDark(s === 'dark' || (!s && sys))
   }, [])
 
   const toggleTheme = () => {
@@ -238,10 +216,9 @@ function ChatContent() {
     userBubble: dark ? '#0071E3' : '#004D8F',
     aiBubble: dark ? '#1C1C1E' : '#FFFFFF',
     inputBg: dark ? '#1C1C1E' : '#FFFFFF',
-    codeBg: dark ? '#2C2C2E' : '#F0F4FA',
     pillBg: dark ? '#2C2C2E' : '#EEF2F7',
     shadow: dark ? 'none' : '0 1px 3px rgba(0,0,0,0.08)',
-    headerBg: dark ? 'rgba(13,13,13,0.92)' : 'rgba(242,244,247,0.92)',
+    hBg: dark ? 'rgba(13,13,13,0.92)' : 'rgba(242,244,247,0.92)',
   }
 
   const [messages, setMessages] = useState<Message[]>([])
@@ -266,7 +243,7 @@ function ChatContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: history.map(m => ({ role: m.role, content: m.content })), bankId }),
       })
-      if (!res.ok) throw new Error('Failed')
+      if (!res.ok) throw new Error('error')
       const reader = res.body!.getReader()
       const dec = new TextDecoder()
       let full = ''
@@ -286,13 +263,20 @@ function ChatContent() {
     }
   }
 
+  const btnStyle = (hovered?: boolean): React.CSSProperties => ({
+    padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500,
+    cursor: 'pointer', border: `1px solid ${t.border}`,
+    backgroundColor: t.surface, color: t.textSub,
+    transition: 'all 0.15s', whiteSpace: 'nowrap',
+  })
+
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: t.bg, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', color: t.text }}>
-      <header style={{ backgroundColor: t.headerBg, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: `1px solid ${t.border}`, padding: '0 20px', flexShrink: 0, position: 'sticky', top: 0, zIndex: 50 }}>
+      <header style={{ backgroundColor: t.hBg, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: `1px solid ${t.border}`, padding: '0 20px', flexShrink: 0, position: 'sticky', top: 0, zIndex: 50 }}>
         <div style={{ maxWidth: 860, margin: '0 auto', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', color: t.textSub, fontSize: 13, cursor: 'pointer', padding: '4px 8px', borderRadius: 6 }}>
-              \u2190 Dashboard
+            <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', color: t.textSub, fontSize: 13, cursor: 'pointer' }}>
+              &#8592; Dashboard
             </button>
             <div style={{ width: 1, height: 18, backgroundColor: t.border }} />
             {bank ? (
@@ -308,8 +292,8 @@ function ChatContent() {
             ) : <span style={{ fontWeight: 600, fontSize: 14, color: t.text }}>Jordan Banking Analyst</span>}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button onClick={toggleTheme} title={dark ? 'Light mode' : 'Dark mode'} style={{ width: 34, height: 34, borderRadius: 8, border: `1px solid ${t.border}`, background: t.surface, cursor: 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {dark ? '\u2600\uFE0F' : '\uD83C\uDF19'}
+            <button onClick={toggleTheme} style={{ width: 34, height: 34, borderRadius: 8, border: `1px solid ${t.border}`, background: t.surface, cursor: 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {dark ? '&#9728;&#65039;' : '&#127769;'}
             </button>
             <select onChange={e => { router.push(e.target.value === 'all' ? '/chat' : `/chat?bank=${e.target.value}`); setMessages([]) }} value={bankId ?? 'all'}
               style={{ backgroundColor: t.pillBg, border: `1px solid ${t.border}`, borderRadius: 8, padding: '6px 10px', fontSize: 12, color: t.text, cursor: 'pointer', outline: 'none' }}>
@@ -329,19 +313,19 @@ function ChatContent() {
                 {bank ? `Ask me about ${bank.shortName}` : 'Jordan Banking Analyst'}
               </h2>
               <p style={{ fontSize: 14, color: t.textSub, margin: '0 0 24px', maxWidth: 440, lineHeight: 1.6 }}>
-                {bank ? `Verified FY2023\u20132025 data on ${bank.name}.` : 'Verified FY2023\u20132025 data on all 15 Jordanian banks. Ask anything.'}
+                {bank ? `Verified FY2023-2025 data on ${bank.name}.` : 'Verified FY2023-2025 data on all 15 Jordanian banks.'}
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, width: '100%', maxWidth: 620 }}>
                 {(bank ? [
                   `What was ${bank.shortName}'s net profit in 2025?`,
-                  `Show ${bank.shortName} profit trend 2023\u20132025`,
+                  `Show ${bank.shortName} profit trend 2023-2025`,
                   `What loan rates does ${bank.shortName} offer?`,
                   `Compare ${bank.shortName} vs peers on ROE`,
                   `What credit card fees does ${bank.shortName} charge?`,
                   `Who are the top shareholders of ${bank.name}?`,
                   `Who is the CEO of ${bank.name}?`,
-                  `Show a donut chart of ${bank.shortName} vs sector`,
-                ] : SUGGESTED_ALL).map(s => (
+                  `Show a donut chart of ${bank.shortName} vs sector profit`,
+                ] : SUGGESTED).map(s => (
                   <button key={s} onClick={() => send(s)}
                     style={{ textAlign: 'left', padding: '12px 14px', borderRadius: 10, border: `1px solid ${t.border}`, backgroundColor: t.surface, color: t.textSub, fontSize: 13, cursor: 'pointer', lineHeight: 1.4, transition: 'all 0.15s', boxShadow: t.shadow }}
                     onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = t.accent; el.style.color = t.text }}
@@ -351,7 +335,6 @@ function ChatContent() {
               </div>
             </div>
           )}
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             {messages.map((msg, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', gap: 10, alignItems: 'flex-start' }}>
@@ -365,18 +348,14 @@ function ChatContent() {
                     <div style={{ backgroundColor: t.aiBubble, border: `1px solid ${t.border}`, borderRadius: '4px 18px 18px 18px', padding: '14px 18px', boxShadow: t.shadow }}>
                       {msg.content ? <RenderText content={msg.content} t={t} /> : (
                         <div style={{ display: 'flex', gap: 5, alignItems: 'center', height: 22 }}>
-                          {[0, 160, 320].map(delay => (
-                            <div key={delay} style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: t.accent, animation: 'bounce 1.2s infinite', animationDelay: `${delay}ms`, opacity: 0.6 }} />
-                          ))}
+                          {[0, 160, 320].map(d => <div key={d} style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: t.accent, animation: 'bounce 1.2s infinite', animationDelay: d + 'ms', opacity: 0.6 }} />)}
                         </div>
                       )}
                       {msg.chart && <ChartBlock chart={msg.chart} t={t} />}
                     </div>
                   )}
                 </div>
-                {msg.role === 'user' && (
-                  <div style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: t.pillBg, border: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2, fontSize: 11, fontWeight: 700, color: t.textSub }}>You</div>
-                )}
+                {msg.role === 'user' && <div style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: t.pillBg, border: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2, fontSize: 11, fontWeight: 700, color: t.textSub }}>You</div>}
               </div>
             ))}
           </div>
@@ -386,31 +365,35 @@ function ChatContent() {
 
       <div style={{ borderTop: `1px solid ${t.border}`, padding: '10px 20px 18px', backgroundColor: t.bg, flexShrink: 0 }}>
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
-          <YearChips onSend={send} t={t} />
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+            {YEAR_CHIPS.map(c => (
+              <button key={c.label} onClick={() => send(c.q)} style={btnStyle()}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = t.accent; el.style.color = t.accent; el.style.backgroundColor = t.accentSubtle }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = t.border; el.style.color = t.textSub; el.style.backgroundColor = t.surface }}
+              >{c.label}</button>
+            ))}
+          </div>
           <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', backgroundColor: t.inputBg, border: `1px solid ${t.border}`, borderRadius: 14, padding: '10px 10px 10px 16px', boxShadow: t.shadow }}>
             <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }}
-              placeholder={bank ? `Ask anything about ${bank.shortName}...` : 'Ask anything \u2014 profits, rates, fees, charts, comparisons...'}
+              placeholder={bank ? `Ask anything about ${bank.shortName}...` : 'Ask about profits, rates, fees, charts, comparisons...'}
               rows={1}
               style={{ flex: 1, background: 'none', border: 'none', outline: 'none', fontSize: 15, color: t.text, resize: 'none', maxHeight: 120, lineHeight: 1.5, fontFamily: 'inherit' }}
               onInput={e => { const el = e.currentTarget; el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px' }}
             />
             <button onClick={() => send(input)} disabled={!input.trim() || streaming}
-              style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: input.trim() && !streaming ? t.accent : t.pillBg, border: 'none', cursor: input.trim() && !streaming ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.15s' }}>
+              style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: input.trim() && !streaming ? t.accent : t.pillBg, border: 'none', cursor: input.trim() && !streaming ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={input.trim() && !streaming ? '#fff' : t.textMuted} strokeWidth="2.5">
                 <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" />
               </svg>
             </button>
           </div>
           <div style={{ textAlign: 'center', fontSize: 11, color: t.textMuted, marginTop: 7 }}>
-            Data from official bank sources &middot; FY2023\u20132025 &middot; Press Enter to send
+            Data from official bank sources &middot; FY2023-2025 &middot; Press Enter to send
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes bounce { 0%, 100% { transform: translateY(0); opacity: 0.4; } 50% { transform: translateY(-5px); opacity: 1; } }
-      `}</style>
+      <style>{`@keyframes bounce{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-5px);opacity:1}}`}</style>
     </div>
   )
 }
