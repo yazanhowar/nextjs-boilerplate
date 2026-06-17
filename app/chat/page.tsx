@@ -13,7 +13,7 @@ interface Message {
   chart?: any
 }
 
-// Parse chart block using indexOf â no regex needed
+// Extract chart JSON block using indexOf — avoids regex issues with backticks
 function extractChart(text: string): { text: string; chart: any | null } {
   const OPEN = '```chart'
   const CLOSE = '```'
@@ -22,53 +22,52 @@ function extractChart(text: string): { text: string; chart: any | null } {
   const js = text[si + OPEN.length] === '\n' ? si + OPEN.length + 1 : si + OPEN.length
   const ci = text.indexOf(CLOSE, js)
   if (ci === -1) return { text, chart: null }
-  const raw = text.slice(js, ci).trim()
   try {
-    const chart = JSON.parse(raw)
+    const chart = JSON.parse(text.slice(js, ci).trim())
     return { text: (text.slice(0, si) + text.slice(ci + CLOSE.length)).trim(), chart }
   } catch {
     return { text, chart: null }
   }
 }
 
-// Bold inline rendering â no regex, use split with delimiter
-function bold(text: string, t: any): React.ReactNode {
+// Bold spans — split on ** markers
+function bold(text: string, textColor: string): React.ReactNode {
   const parts = text.split('**')
-  return parts.map((p, i) => i % 2 === 1 ? <strong key={i} style={{ color: t.text }}>{p}</strong> : p) as React.ReactNode[]
+  return parts.map((p, i) =>
+    i % 2 === 1
+      ? <strong key={i} style={{ color: textColor, fontWeight: 700 }}>{p}</strong>
+      : <span key={i}>{p}</span>
+  )
 }
 
 function RenderText({ content, t }: { content: string; t: any }) {
-  const lines = content.split('\n')
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      {lines.map((line, i) => {
+      {content.split('\n').map((line, i) => {
         if (!line.trim()) return <div key={i} style={{ height: 6 }} />
         if (line.startsWith('### ')) return <div key={i} style={{ fontWeight: 700, fontSize: 13, color: t.accent, marginTop: 10, letterSpacing: '0.04em' }}>{line.slice(4)}</div>
-        if (line.startsWith('## ')) return <div key={i} style={{ fontWeight: 700, fontSize: 15, color: t.text, marginTop: 10 }}>{line.slice(3)}</div>
-        if (line.startsWith('# ')) return <div key={i} style={{ fontWeight: 700, fontSize: 17, color: t.text, marginTop: 10 }}>{line.slice(2)}</div>
-        if (line.startsWith('---')) return <hr key={i} style={{ border: 'none', borderTop: `1px solid ${t.border}`, margin: '8px 0' }} />
-        const isBullet = line.startsWith('- ') || line.startsWith('• ') || line.startsWith('• ')
-        if (isBullet) {
-          const raw = line.slice(2)
+        if (line.startsWith('## '))  return <div key={i} style={{ fontWeight: 700, fontSize: 15, color: t.text,  marginTop: 10 }}>{line.slice(3)}</div>
+        if (line.startsWith('# '))   return <div key={i} style={{ fontWeight: 700, fontSize: 17, color: t.text,  marginTop: 10 }}>{line.slice(2)}</div>
+        if (line.startsWith('---'))  return <hr  key={i} style={{ border: 'none', borderTop: `1px solid ${t.border}`, margin: '8px 0' }} />
+        // Bullet: dash or actual bullet char (• U+2022)
+        if (line.startsWith('- ') || line.startsWith('• ')) {
           return (
             <div key={i} style={{ display: 'flex', gap: 8, marginLeft: 4 }}>
               <span style={{ color: t.accent, flexShrink: 0, fontWeight: 700, marginTop: 2 }}>•</span>
-              <span style={{ fontSize: 14, color: t.textSub, lineHeight: 1.65 }}>{bold(raw, t)}</span>
+              <span style={{ fontSize: 14, color: t.textSub, lineHeight: 1.65 }}>{bold(line.slice(2), t.text)}</span>
             </div>
           )
         }
-        const numDot = line.indexOf('. ')
-        if (numDot > 0 && numDot < 3 && line.slice(0, numDot).match(/^[0-9]$/)) {
-          const num = line.slice(0, numDot)
-          const raw = line.slice(numDot + 2)
+        // Numbered list: single digit followed by '. '
+        if (line.length > 2 && line[1] === '.' && line[2] === ' ' && line[0] >= '1' && line[0] <= '9') {
           return (
             <div key={i} style={{ display: 'flex', gap: 8, marginLeft: 4 }}>
-              <span style={{ color: t.accent, flexShrink: 0, fontWeight: 600, minWidth: 18 }}>{num}.</span>
-              <span style={{ fontSize: 14, color: t.textSub, lineHeight: 1.65 }}>{bold(raw, t)}</span>
+              <span style={{ color: t.accent, flexShrink: 0, fontWeight: 600, minWidth: 18 }}>{line[0]}.</span>
+              <span style={{ fontSize: 14, color: t.textSub, lineHeight: 1.65 }}>{bold(line.slice(3), t.text)}</span>
             </div>
           )
         }
-        return <p key={i} style={{ fontSize: 14, color: t.textSub, lineHeight: 1.7, margin: 0 }}>{bold(line, t)}</p>
+        return <p key={i} style={{ fontSize: 14, color: t.textSub, lineHeight: 1.7, margin: 0 }}>{bold(line, t.text)}</p>
       })}
     </div>
   )
@@ -76,11 +75,11 @@ function RenderText({ content, t }: { content: string; t: any }) {
 
 function ChartBlock({ chart, t }: { chart: any; t: any }) {
   const ref = useRef<HTMLDivElement>(null)
-  const COLORS = ['#0071E3', '#FF9F0A', '#30D158', '#FF453A', '#BF5AF2', '#64D2FF', '#FF6B35', '#98989D']
-  const chartType = (chart.type || 'bar').toLowerCase()
-  const isDonut = chartType === 'donut' || chartType === 'pie'
-  const isPct = chart.unit === '%'
+  const COLORS = ['#0071E3','#FF9F0A','#30D158','#FF453A','#BF5AF2','#64D2FF','#FF6B35','#98989D','#34C759','#FF375F']
+  const type = (chart.type || 'bar').toLowerCase()
+  const isDonut = type === 'donut' || type === 'pie'
   const series: string[] = chart.series || ['value']
+  const isPct = chart.unit === '%'
 
   async function exportPDF() {
     if (!ref.current) return
@@ -109,7 +108,7 @@ function ChartBlock({ chart, t }: { chart: any; t: any }) {
     )
   }
 
-  const tickFmt = (v: number) => isPct ? v + '%' : v >= 1000 ? (v / 1000).toFixed(0) + 'K' : String(v)
+  const tickFmt = (v: number) => isPct ? v + '%' : v >= 1000 ? (v/1000).toFixed(0)+'K' : String(v)
 
   return (
     <div style={{ marginTop: 16, border: `1px solid ${t.border}`, borderRadius: 12, overflow: 'hidden' }}>
@@ -123,13 +122,15 @@ function ChartBlock({ chart, t }: { chart: any; t: any }) {
         <ResponsiveContainer width="100%" height={260}>
           {isDonut ? (
             <PieChart>
-              <Pie data={chart.data} cx="50%" cy="50%" innerRadius={chartType === 'donut' ? 65 : 0} outerRadius={110} dataKey={series[0]} nameKey="name" paddingAngle={2}>
+              <Pie data={chart.data} cx="50%" cy="50%"
+                innerRadius={type === 'donut' ? 65 : 0} outerRadius={110}
+                dataKey={series[0]} nameKey="name" paddingAngle={2}>
                 {(chart.data as any[])?.map((_: any, idx: number) => <Cell key={idx} fill={COLORS[idx % COLORS.length]} />)}
               </Pie>
               <Tooltip content={<Tip />} />
               <Legend formatter={(v: string) => <span style={{ fontSize: 12, color: t.textSub }}>{v}</span>} iconType="circle" iconSize={8} />
             </PieChart>
-          ) : chartType === 'line' ? (
+          ) : type === 'line' ? (
             <LineChart data={chart.data} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={t.border} vertical={false} />
               <XAxis dataKey="name" tick={{ fontSize: 12, fill: t.textSub }} axisLine={false} tickLine={false} />
@@ -137,7 +138,8 @@ function ChartBlock({ chart, t }: { chart: any; t: any }) {
               <Tooltip content={<Tip />} />
               <Legend formatter={(v: string) => <span style={{ fontSize: 12, color: t.textSub }}>{v}</span>} />
               {series.map((s: string, i: number) => (
-                <Line key={s} type="monotone" dataKey={s} stroke={COLORS[i % COLORS.length]} strokeWidth={2.5} dot={{ r: 5, fill: COLORS[i % COLORS.length], strokeWidth: 0 }} activeDot={{ r: 7 }} />
+                <Line key={s} type="monotone" dataKey={s} stroke={COLORS[i % COLORS.length]}
+                  strokeWidth={2.5} dot={{ r: 5, fill: COLORS[i % COLORS.length], strokeWidth: 0 }} activeDot={{ r: 7 }} />
               ))}
             </LineChart>
           ) : (
@@ -148,14 +150,14 @@ function ChartBlock({ chart, t }: { chart: any; t: any }) {
               <Tooltip content={<Tip />} />
               <Legend formatter={(v: string) => <span style={{ fontSize: 12, color: t.textSub }}>{v}</span>} />
               {series.map((s: string, i: number) => (
-                <Bar key={s} dataKey={s} fill={COLORS[i % COLORS.length]} radius={[6, 6, 0, 0]} maxBarSize={60} />
+                <Bar key={s} dataKey={s} fill={COLORS[i % COLORS.length]} radius={[6,6,0,0]} maxBarSize={60} />
               ))}
             </BarChart>
           )}
         </ResponsiveContainer>
         {chart.insight && (
           <div style={{ marginTop: 12, padding: '10px 14px', background: t.accentSubtle, borderRadius: 8, fontSize: 13, color: t.accent, display: 'flex', gap: 8 }}>
-            <span style={{fontSize: 14}}>💡</span><span>{chart.insight}</span>
+            <span>💡</span><span>{chart.insight}</span>
           </div>
         )}
       </div>
@@ -166,7 +168,7 @@ function ChartBlock({ chart, t }: { chart: any; t: any }) {
 const SUGGESTED = [
   'Which bank had the highest profit in 2025?',
   'Compare HBTF vs Capital Bank profit growth 2023 to 2025 on a line chart',
-  'Show a donut chart of sector net profit share for 2025',
+  'Show a donut chart of 2025 sector net profit share',
   'Which bank has the lowest home loan rate?',
   'Compare credit card annual fees across all banks',
   'Who are the top shareholders of Housing Bank?',
@@ -178,10 +180,10 @@ const YEAR_CHIPS = [
   { label: 'FY2025 profits', q: 'Show all 15 bank net profits for FY2025 ranked highest to lowest with a bar chart' },
   { label: 'FY2024 profits', q: 'Show all 15 bank net profits for FY2024 ranked highest to lowest with a bar chart' },
   { label: 'FY2023 profits', q: 'Show all 15 bank net profits for FY2023 ranked highest to lowest with a bar chart' },
-  { label: '3-year trend', q: 'Show HBTF net profit for 2023, 2024, and 2025 on a line chart' },
+  { label: '3-year trend',   q: 'Show HBTF net profit for 2023, 2024, and 2025 on a line chart' },
   { label: 'Profit ranking', q: 'Rank all 15 banks by 2025 net profit from highest to lowest' },
-  { label: 'Donut 2025', q: 'Show a donut chart of 2025 net profit market share across all 15 banks' },
-  { label: 'ROE compare', q: 'Compare ROE across all banks for 2025 on a bar chart' },
+  { label: 'Donut 2025',     q: 'Show a donut chart of 2025 net profit market share across all 15 banks' },
+  { label: 'ROE compare',    q: 'Compare ROE across all banks for 2025 on a bar chart' },
 ]
 
 function ChatContent() {
@@ -196,7 +198,6 @@ function ChatContent() {
     const sys = window.matchMedia('(prefers-color-scheme: dark)').matches
     setDark(s === 'dark' || (!s && sys))
   }, [])
-
   const toggleTheme = () => {
     const next = !dark
     setDark(next)
@@ -205,20 +206,20 @@ function ChatContent() {
   }
 
   const t = {
-    bg: dark ? '#0D0D0D' : '#F2F4F7',
-    surface: dark ? '#1C1C1E' : '#FFFFFF',
-    border: dark ? '#2C2C2E' : '#E2E8F0',
-    text: dark ? '#FFFFFF' : '#0F172A',
-    textSub: dark ? '#98989D' : '#4A5568',
-    textMuted: dark ? '#48484A' : '#94A3B8',
-    accent: dark ? '#3B82F6' : '#004D8F',
-    accentSubtle: dark ? 'rgba(59,130,246,0.12)' : 'rgba(0,77,143,0.08)',
-    userBubble: dark ? '#0071E3' : '#004D8F',
-    aiBubble: dark ? '#1C1C1E' : '#FFFFFF',
-    inputBg: dark ? '#1C1C1E' : '#FFFFFF',
-    pillBg: dark ? '#2C2C2E' : '#EEF2F7',
-    shadow: dark ? 'none' : '0 1px 3px rgba(0,0,0,0.08)',
-    hBg: dark ? 'rgba(13,13,13,0.92)' : 'rgba(242,244,247,0.92)',
+    bg:          dark ? '#0D0D0D' : '#F2F4F7',
+    surface:     dark ? '#1C1C1E' : '#FFFFFF',
+    border:      dark ? '#2C2C2E' : '#E2E8F0',
+    text:        dark ? '#FFFFFF' : '#0F172A',
+    textSub:     dark ? '#98989D' : '#4A5568',
+    textMuted:   dark ? '#48484A' : '#94A3B8',
+    accent:      dark ? '#3B82F6' : '#004D8F',
+    accentSubtle:dark ? 'rgba(59,130,246,0.12)' : 'rgba(0,77,143,0.08)',
+    userBubble:  dark ? '#0071E3' : '#004D8F',
+    aiBubble:    dark ? '#1C1C1E' : '#FFFFFF',
+    inputBg:     dark ? '#1C1C1E' : '#FFFFFF',
+    pillBg:      dark ? '#2C2C2E' : '#EEF2F7',
+    shadow:      dark ? 'none' : '0 1px 3px rgba(0,0,0,0.08)',
+    hBg:         dark ? 'rgba(13,13,13,0.92)' : 'rgba(242,244,247,0.92)',
   }
 
   const [messages, setMessages] = useState<Message[]>([])
@@ -226,7 +227,7 @@ function ChatContent() {
   const [streaming, setStreaming] = useState(false)
   const [logoErr, setLogoErr] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLTextAreaElement>(null)
+  const inputRef  = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
@@ -251,27 +252,21 @@ function ChatContent() {
         const { done, value } = await reader.read()
         if (done) break
         full += dec.decode(value)
-        setMessages(prev => { const u = [...prev]; u[u.length - 1] = { role: 'assistant', content: full }; return u })
+        setMessages(prev => { const u = [...prev]; u[u.length-1] = { role:'assistant', content:full }; return u })
       }
       const { text, chart } = extractChart(full)
-      setMessages(prev => { const u = [...prev]; u[u.length - 1] = { role: 'assistant', content: text, chart: chart || undefined }; return u })
+      setMessages(prev => { const u = [...prev]; u[u.length-1] = { role:'assistant', content:text, chart: chart||undefined }; return u })
     } catch {
-      setMessages(prev => { const u = [...prev]; u[u.length - 1] = { role: 'assistant', content: 'Something went wrong. Please try again.' }; return u })
+      setMessages(prev => { const u = [...prev]; u[u.length-1] = { role:'assistant', content:'Something went wrong. Please try again.' }; return u })
     } finally {
       setStreaming(false)
       inputRef.current?.focus()
     }
   }
 
-  const btnStyle = (hovered?: boolean): React.CSSProperties => ({
-    padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500,
-    cursor: 'pointer', border: `1px solid ${t.border}`,
-    backgroundColor: t.surface, color: t.textSub,
-    transition: 'all 0.15s', whiteSpace: 'nowrap',
-  })
-
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: t.bg, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', color: t.text }}>
+      {/* Header */}
       <header style={{ backgroundColor: t.hBg, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: `1px solid ${t.border}`, padding: '0 20px', flexShrink: 0, position: 'sticky', top: 0, zIndex: 50 }}>
         <div style={{ maxWidth: 860, margin: '0 auto', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -282,7 +277,9 @@ function ChatContent() {
             {bank ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ width: 30, height: 30, borderRadius: 8, backgroundColor: t.pillBg, border: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                  {!logoErr ? <img src={bank.logoUrl} width={22} height={22} style={{ objectFit: 'contain' }} onError={() => setLogoErr(true)} /> : <span style={{ fontSize: 9, fontWeight: 700, color: t.textSub }}>{bank.shortName.slice(0, 3)}</span>}
+                  {!logoErr
+                    ? <img src={bank.logoUrl} width={22} height={22} style={{ objectFit: 'contain' }} onError={() => setLogoErr(true)} />
+                    : <span style={{ fontSize: 9, fontWeight: 700, color: t.textSub }}>{bank.shortName.slice(0,3)}</span>}
                 </div>
                 <div>
                   <div style={{ fontWeight: 600, fontSize: 14, color: t.text }}>{bank.name}</div>
@@ -292,7 +289,7 @@ function ChatContent() {
             ) : <span style={{ fontWeight: 600, fontSize: 14, color: t.text }}>Jordan Banking Analyst</span>}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button onClick={toggleTheme} style={{ width: 34, height: 34, borderRadius: 8, border: `1px solid ${t.border}`, background: t.surface, cursor: 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <button onClick={toggleTheme} title={dark ? 'Light mode' : 'Dark mode'} style={{ width: 34, height: 34, borderRadius: 8, border: `1px solid ${t.border}`, background: t.surface, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {dark ? '☀️' : '🌙'}
             </button>
             <select onChange={e => { router.push(e.target.value === 'all' ? '/chat' : `/chat?bank=${e.target.value}`); setMessages([]) }} value={bankId ?? 'all'}
@@ -304,21 +301,24 @@ function ChatContent() {
         </div>
       </header>
 
+      {/* Messages */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px 20px' }}>
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
           {messages.length === 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '50vh', textAlign: 'center' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 18, backgroundColor: t.accentSubtle, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20, fontSize: 28 }}>🏦</div>
+              <div style={{ width: 60, height: 60, borderRadius: 18, backgroundColor: t.accentSubtle, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20, fontSize: 28 }}>
+                🏦
+              </div>
               <h2 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 8px', color: t.text }}>
                 {bank ? `Ask me about ${bank.shortName}` : 'Jordan Banking Analyst'}
               </h2>
               <p style={{ fontSize: 14, color: t.textSub, margin: '0 0 24px', maxWidth: 440, lineHeight: 1.6 }}>
-                {bank ? `Verified FY2023-2025 data on ${bank.name}.` : 'Verified FY2023-2025 data on all 15 Jordanian banks.'}
+                {bank ? `Verified FY2023–2025 data on ${bank.name}.` : 'Verified FY2023–2025 data on all 15 Jordanian banks.'}
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, width: '100%', maxWidth: 620 }}>
                 {(bank ? [
                   `What was ${bank.shortName}'s net profit in 2025?`,
-                  `Show ${bank.shortName} profit trend 2023-2025`,
+                  `Show ${bank.shortName} profit trend 2023–2025`,
                   `What loan rates does ${bank.shortName} offer?`,
                   `Compare ${bank.shortName} vs peers on ROE`,
                   `What credit card fees does ${bank.shortName} charge?`,
@@ -335,27 +335,33 @@ function ChatContent() {
               </div>
             </div>
           )}
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             {messages.map((msg, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', gap: 10, alignItems: 'flex-start' }}>
                 {msg.role === 'assistant' && (
-                  <div style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: t.accentSubtle, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2, fontSize: 16 }}>🏦</div>
+                  <div style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: t.accentSubtle, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2, fontSize: 16 }}>
+                    🏦
+                  </div>
                 )}
                 <div style={{ maxWidth: '88%' }}>
                   {msg.role === 'user' ? (
                     <div style={{ backgroundColor: t.userBubble, color: '#fff', borderRadius: '18px 18px 4px 18px', padding: '12px 16px', fontSize: 14, lineHeight: 1.55 }}>{msg.content}</div>
                   ) : (
                     <div style={{ backgroundColor: t.aiBubble, border: `1px solid ${t.border}`, borderRadius: '4px 18px 18px 18px', padding: '14px 18px', boxShadow: t.shadow }}>
-                      {msg.content ? <RenderText content={msg.content} t={t} /> : (
-                        <div style={{ display: 'flex', gap: 5, alignItems: 'center', height: 22 }}>
-                          {[0, 160, 320].map(d => <div key={d} style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: t.accent, animation: 'bounce 1.2s infinite', animationDelay: d + 'ms', opacity: 0.6 }} />)}
-                        </div>
-                      )}
+                      {msg.content
+                        ? <RenderText content={msg.content} t={t} />
+                        : <div style={{ display: 'flex', gap: 5, alignItems: 'center', height: 22 }}>
+                            {[0,160,320].map(d => <div key={d} style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: t.accent, animation: 'bounce 1.2s infinite', animationDelay: d+'ms', opacity: 0.6 }} />)}
+                          </div>
+                      }
                       {msg.chart && <ChartBlock chart={msg.chart} t={t} />}
                     </div>
                   )}
                 </div>
-                {msg.role === 'user' && <div style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: t.pillBg, border: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2, fontSize: 11, fontWeight: 700, color: t.textSub }}>You</div>}
+                {msg.role === 'user' && (
+                  <div style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: t.pillBg, border: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2, fontSize: 11, fontWeight: 700, color: t.textSub }}>You</div>
+                )}
               </div>
             ))}
           </div>
@@ -363,33 +369,37 @@ function ChatContent() {
         </div>
       </div>
 
+      {/* Input area */}
       <div style={{ borderTop: `1px solid ${t.border}`, padding: '10px 20px 18px', backgroundColor: t.bg, flexShrink: 0 }}>
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
+          {/* Year / quick-action chips */}
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
             {YEAR_CHIPS.map(c => (
-              <button key={c.label} onClick={() => send(c.q)} style={btnStyle()}
+              <button key={c.label} onClick={() => send(c.q)}
+                style={{ padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500, cursor: 'pointer', border: `1px solid ${t.border}`, backgroundColor: t.surface, color: t.textSub, transition: 'all 0.15s', whiteSpace: 'nowrap' }}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = t.accent; el.style.color = t.accent; el.style.backgroundColor = t.accentSubtle }}
                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = t.border; el.style.color = t.textSub; el.style.backgroundColor = t.surface }}
               >{c.label}</button>
             ))}
           </div>
+          {/* Text input */}
           <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', backgroundColor: t.inputBg, border: `1px solid ${t.border}`, borderRadius: 14, padding: '10px 10px 10px 16px', boxShadow: t.shadow }}>
             <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }}
-              placeholder={bank ? `Ask anything about ${bank.shortName}...` : 'Ask about profits, rates, fees, charts, comparisons...'}
+              placeholder={bank ? `Ask anything about ${bank.shortName}...` : 'Ask about profits, rates, fees, charts, comparisons…'}
               rows={1}
               style={{ flex: 1, background: 'none', border: 'none', outline: 'none', fontSize: 15, color: t.text, resize: 'none', maxHeight: 120, lineHeight: 1.5, fontFamily: 'inherit' }}
-              onInput={e => { const el = e.currentTarget; el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px' }}
+              onInput={e => { const el = e.currentTarget; el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120)+'px' }}
             />
             <button onClick={() => send(input)} disabled={!input.trim() || streaming}
-              style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: input.trim() && !streaming ? t.accent : t.pillBg, border: 'none', cursor: input.trim() && !streaming ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: input.trim() && !streaming ? t.accent : t.pillBg, border: 'none', cursor: input.trim() && !streaming ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.15s' }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={input.trim() && !streaming ? '#fff' : t.textMuted} strokeWidth="2.5">
                 <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" />
               </svg>
             </button>
           </div>
           <div style={{ textAlign: 'center', fontSize: 11, color: t.textMuted, marginTop: 7 }}>
-            Data from official bank sources &middot; FY2023-2025 &middot; Press Enter to send
+            Data from official bank sources &middot; FY2023–2025 &middot; Press Enter to send
           </div>
         </div>
       </div>
@@ -400,7 +410,7 @@ function ChatContent() {
 
 export default function ChatPage() {
   return (
-    <Suspense fallback={<div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>}>
+    <Suspense fallback={<div style={{ height:'100vh', display:'flex', alignItems:'center', justifyContent:'center' }}>Loading…</div>}>
       <ChatContent />
     </Suspense>
   )
