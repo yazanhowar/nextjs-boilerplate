@@ -33,24 +33,14 @@ function pctDelta(curr: number, prev: number): number | null {
 
 // BankLogo: shows favicon if available, otherwise a clean colored-initials branded box
 function BankLogo({ bank, dark, t }: { bank: any; dark: boolean; t?: any }) {
-  const [failed, setFailed] = useState(false)
   const MONO: Record<number, string> = { 1:'AB', 2:'HBTF', 3:'JKB', 4:'CB', 5:'BAE', 6:'CAB', 7:'AHLI', 8:'AJIB', 9:'JIB', 10:'SIB', 11:'IIAB', 12:'BOJ', 13:'IB', 14:'ABC', 15:'JCB' }
   const abbr = MONO[bank.id] || (bank.shortName || bank.name || '?').replace(/[^A-Za-z]/g, '').slice(0, 4).toUpperCase()
   const fontSize = abbr.length >= 4 ? 12 : abbr.length === 3 ? 14 : abbr.length === 2 ? 17 : 20
   const base = bank.primaryColor || (dark ? '#3B82F6' : '#004D8F')
-  // Subtle two-stop vertical gradient derived from the brand color for a crisp, intentional tile
-  const grad = `linear-gradient(150deg, ${base} 0%, ${base}E6 55%, ${base}C8 100%)`
-  if (!bank.logoUrl || failed) {
-    return (
-      <div style={{ width: '100%', height: '100%', borderRadius: 11, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18)' }}>
-        <span style={{ color: '#fff', fontSize, fontWeight: 800, letterSpacing: '0.02em', textAlign: 'center', lineHeight: 1, fontFamily: 'system-ui, -apple-system, sans-serif' }}>{abbr}</span>
-      </div>
-    )
-  }
+  const grad = `linear-gradient(145deg, ${base} 0%, ${base}E6 55%, ${base}C2 100%)`
   return (
-    <div style={{ width: '100%', height: '100%', borderRadius: 11, background: dark ? '#FFFFFF' : '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: 6 }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={bank.logoUrl} alt={bank.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} onError={() => setFailed(true)} />
+    <div style={{ width: '100%', height: '100%', borderRadius: 11, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.22), 0 1px 2px rgba(0,0,0,0.10)' }}>
+      <span style={{ color: '#fff', fontSize, fontWeight: 800, letterSpacing: '0.01em', textAlign: 'center', lineHeight: 1, fontFamily: 'system-ui, -apple-system, sans-serif' }}>{abbr}</span>
     </div>
   )
 }
