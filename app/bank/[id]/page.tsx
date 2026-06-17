@@ -19,11 +19,14 @@ const supabase = createClient(
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function fmtJOD(n: number | null | undefined, short = true): string {
   if (n == null) return '—'
+  // DB stores values in JOD thousands — multiply by 1000 to get actual JOD
+  const v = n * 1000
   if (short) {
-    if (Math.abs(n) >= 1_000_000_000) return `JOD ${(n / 1_000_000_000).toFixed(2)}B`
-    if (Math.abs(n) >= 1_000_000) return `JOD ${(n / 1_000_000).toFixed(0)}M`
+    if (Math.abs(v) >= 1_000_000_000) return `JOD ${(v / 1_000_000_000).toFixed(2)}B`
+    if (Math.abs(v) >= 1_000_000) return `JOD ${(v / 1_000_000).toFixed(1)}M`
+    if (Math.abs(v) >= 1_000) return `JOD ${(v / 1_000).toFixed(0)}K`
   }
-  return `JOD ${n.toLocaleString()}`
+  return `JOD ${v.toLocaleString()}`
 }
 
 function pct(n: number | null | undefined): string {
