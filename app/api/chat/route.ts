@@ -10,6 +10,10 @@ function getDB() {
 function detectBankIds(prompt: string): number[] {
   const lower = prompt.toLowerCase()
   const found: number[] = []
+  // Cross-sectional intent: user wants the whole sector, not a named bank. Return ALL 15 ids.
+  const crossSectional = /\b(all banks|all 15|every bank|each bank|whole sector|sector[- ]?wide|across the sector|all jordanian banks|rank(ing)?|ranked|compare all|league table|top \d+|highest|lowest|which bank|peers?|vs\.? (the )?sector|sector average)\b/i.test(prompt)
+  if (crossSectional) return new Set(BANKS.map(b => b.id))
+
   for (const bank of BANKS) {
     const terms = [bank.name, bank.shortName, bank.ticker, bank.nameAr ?? ''].map((s: string) => s.toLowerCase())
     if (terms.some((t: string) => t && lower.includes(t))) found.push(bank.id)
