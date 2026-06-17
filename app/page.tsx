@@ -49,6 +49,7 @@ function BankLogo({ bank, dark }: { bank: any; dark: boolean }) {
   }
   return (
     <div style={{ width: '100%', height: '100%', borderRadius: 11, background: dark ? '#FFFFFF' : '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: 6 }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={bank.logoUrl} alt={bank.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} onError={() => setFailed(true)} />
     </div>
   )
