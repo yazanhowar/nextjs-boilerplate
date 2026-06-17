@@ -17,9 +17,9 @@ function toJOD(n: number | null | undefined, bankId: number): number | null {
 }
 
 function fmtK(n: number | null | undefined, bankId?: number): string {
-  if (n == null) return '—'
+  if (n == null) return 'â'
   const v = bankId != null ? toJOD(n, bankId) : n
-  if (v == null) return '—'
+  if (v == null) return 'â'
   const abs = Math.abs(v)
   if (abs >= 1_000_000) return `JOD ${(v/1_000_000).toFixed(2)}B`
   if (abs >= 1_000) return `JOD ${(v/1_000).toFixed(1)}M`
@@ -31,15 +31,18 @@ function pctDelta(curr: number, prev: number): number | null {
   return ((curr - prev) / Math.abs(prev)) * 100
 }
 
-// BankLogo: shows favicon if available, otherwise a clean colored-initials branded box
-function BankLogo({ bank, dark, t }: { bank: any; dark: boolean; t?: any }) {
+// BankLogo: uses official logo from bank website, falls back to initials if image fails
+function BankLogo({ bank }: { bank: any }) {
+  const [imgFailed, setImgFailed] = useState(false)
   const MONO: Record<number, string> = { 1:'AB', 2:'HBTF', 3:'JKB', 4:'CB', 5:'BAE', 6:'CAB', 7:'AHLI', 8:'AJIB', 9:'JIB', 10:'SIB', 11:'IIAB', 12:'BOJ', 13:'IB', 14:'ABC', 15:'JCB' }
-  const abbr = MONO[bank.id] || (bank.shortName || bank.name || '?').replace(/[^A-Za-z]/g, '').slice(0, 4).toUpperCase()
-  const fontSize = abbr.length >= 4 ? 12 : abbr.length === 3 ? 14 : abbr.length === 2 ? 17 : 20
-  const base = bank.primaryColor || (dark ? '#3B82F6' : '#004D8F')
-  const grad = `linear-gradient(145deg, ${base} 0%, ${base}E6 55%, ${base}C2 100%)`
+  const abbr = MONO[bank.id] || bank.ticker || '?'
+  if (bank.logoUrl && !imgFailed) {
+    return <img src={bank.logoUrl} alt={bank.name} onError={() => setImgFailed(true)} style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 8, background: '#fff', padding: 4 }} />
+  }
+  const fontSize = abbr.length >= 4 ? 12 : abbr.length === 3 ? 14 : 17
+  const base = bank.primaryColor || '#004D8F'
   return (
-    <div style={{ width: '100%', height: '100%', borderRadius: 11, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.22), 0 1px 2px rgba(0,0,0,0.10)' }}>
+    <div style={{ width: '100%', height: '100%', borderRadius: 11, background: `linear-gradient(145deg, ${base} 0%, ${base}C2 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <span style={{ color: '#fff', fontSize, fontWeight: 800, letterSpacing: '0.01em', textAlign: 'center', lineHeight: 1, fontFamily: 'system-ui, -apple-system, sans-serif' }}>{abbr}</span>
     </div>
   )
@@ -133,7 +136,7 @@ export default function Dashboard() {
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
             <button onClick={toggleTheme} style={{ width:36, height:36, borderRadius:8, border:`1px solid ${t.border}`, background:t.surface, cursor:'pointer', fontSize:16, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              {dark ? '☀️' : '🌙'}
+              {dark ? 'âï¸' : 'ð'}
             </button>
             <button onClick={() => router.push('/chat')} style={{ backgroundColor:t.accent, color:'#fff', border:'none', borderRadius:8, padding:'7px 16px', fontSize:13, fontWeight:500, cursor:'pointer' }}>
               Open AI Analyst
@@ -159,8 +162,8 @@ export default function Dashboard() {
           {[
             { label:'Sector Total Assets', value:fmtK(grandAssets), sub:'All 15 banks combined' },
             { label:'Sector Net Profit', value:fmtK(grandProfit), sub:`FY${dataYear}` },
-            { label:'Avg ROE', value:avgROE!=null?`${avgROE.toFixed(1)}%`:'—', sub:'Return on equity' },
-            { label:'Avg CAR', value:avgCAR!=null?`${avgCAR.toFixed(1)}%`:'—', sub:'Capital adequacy' },
+            { label:'Avg ROE', value:avgROE!=null?`${avgROE.toFixed(1)}%`:'â', sub:'Return on equity' },
+            { label:'Avg CAR', value:avgCAR!=null?`${avgCAR.toFixed(1)}%`:'â', sub:'Capital adequacy' },
           ].map((kpi,i) => (
             <div key={i} style={{ backgroundColor:t.surface, borderRadius:12, padding:'16px 18px', border:`1px solid ${t.border}`, boxShadow:t.shadow }}>
               <div style={{ fontSize:11, color:t.textSub, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:6 }}>{kpi.label}</div>
@@ -208,7 +211,7 @@ function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMou
       )}
       <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:16 }}>
         <div style={{ width:44, height:44, borderRadius:10, backgroundColor:dark?'#1E3450':'#F0F4FA', border:`1px solid ${t.border}`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden' }}>
-          <BankLogo bank={bank} dark={dark} t={t} />
+          <BankLogo bank={bank} />
         </div>
         <div>
           <div style={{ fontWeight:600, fontSize:15, color:t.text }}>{bank.name}</div>
@@ -218,12 +221,12 @@ function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMou
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:16 }}>
         <div style={{ backgroundColor:dark?'#132240':'#F5F8FD', borderRadius:10, padding:'12px 14px' }}>
           <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>Net Profit</div>
-          <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.net_profit,bank.id):'—')}</div>
-          {delta!=null&&!loading&&<div style={{ fontSize:11, color:delta>=0?t.green:t.red, marginTop:3, fontWeight:500 }}>{delta>=0?'↑':'↓'} {Math.abs(delta).toFixed(1)}% vs {dataYear-1}</div>}
+          <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.net_profit,bank.id):'â')}</div>
+          {delta!=null&&!loading&&<div style={{ fontSize:11, color:delta>=0?t.green:t.red, marginTop:3, fontWeight:500 }}>{delta>=0?'â':'â'} {Math.abs(delta).toFixed(1)}% vs {dataYear-1}</div>}
         </div>
         <div style={{ backgroundColor:dark?'#132240':'#F5F8FD', borderRadius:10, padding:'12px 14px' }}>
           <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>Total Assets</div>
-          <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.total_assets,bank.id):'—')}</div>
+          <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.total_assets,bank.id):'â')}</div>
           {fin?.roe!=null&&!loading&&<div style={{ fontSize:11, color:t.textSub, marginTop:3 }}>ROE {fin.roe.toFixed(1)}%</div>}
         </div>
       </div>
