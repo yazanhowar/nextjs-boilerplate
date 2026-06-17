@@ -296,6 +296,7 @@ export async function POST(req: NextRequest) {
       max_tokens: 4096,
       system: systemPrompt,
       messages: (messages as any[]).filter(m => m.content).map(m => ({ role: m.role, content: m.content })),
+      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
       stream: true,
     }),
   })
