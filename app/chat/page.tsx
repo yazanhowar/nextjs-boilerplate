@@ -284,6 +284,14 @@ function ChatContent() {
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
+  // Auto-prompt: when arriving with a bank context, fire an opening brief immediately
+  useEffect(() => {
+    if (bank && messages.length === 0) {
+      send(`Give me a concise briefing on ${bank.name}: latest net profit, total assets, ROE, and one sharp competitive insight vs the sector.`)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bankId])
+
   async function send(content: string) {
     if (!content.trim() || streaming) return
     const userMsg: Message = { role: 'user', content: content.trim() }
