@@ -32,7 +32,7 @@ function pctDelta(curr: number, prev: number): number | null {
 }
 
 // BankLogo: shows favicon if available, otherwise a clean colored-initials branded box
-function BankLogo({ bank, dark }: { bank: any; dark: boolean }) {
+function BankLogo({ bank, dark, t }: { bank: any; dark: boolean; t?: any }) {
   const [failed, setFailed] = useState(false)
   const MONO: Record<number, string> = { 1:'AB', 2:'HBTF', 3:'JKB', 4:'CB', 5:'BAE', 6:'CAB', 7:'AHLI', 8:'AJIB', 9:'JIB', 10:'SIB', 11:'IIAB', 12:'BOJ', 13:'IB', 14:'ABC', 15:'JCB' }
   const abbr = MONO[bank.id] || (bank.shortName || bank.name || '?').replace(/[^A-Za-z]/g, '').slice(0, 4).toUpperCase()
