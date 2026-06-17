@@ -13,7 +13,7 @@ interface Message {
   chart?: any
 }
 
-// Parse chart block using indexOf — no regex needed
+// Parse chart block using indexOf â no regex needed
 function extractChart(text: string): { text: string; chart: any | null } {
   const OPEN = '```chart'
   const CLOSE = '```'
@@ -31,7 +31,7 @@ function extractChart(text: string): { text: string; chart: any | null } {
   }
 }
 
-// Bold inline rendering — no regex, use split with delimiter
+// Bold inline rendering â no regex, use split with delimiter
 function bold(text: string, t: any): React.ReactNode {
   const parts = text.split('**')
   return parts.map((p, i) => i % 2 === 1 ? <strong key={i} style={{ color: t.text }}>{p}</strong> : p) as React.ReactNode[]
@@ -47,12 +47,12 @@ function RenderText({ content, t }: { content: string; t: any }) {
         if (line.startsWith('## ')) return <div key={i} style={{ fontWeight: 700, fontSize: 15, color: t.text, marginTop: 10 }}>{line.slice(3)}</div>
         if (line.startsWith('# ')) return <div key={i} style={{ fontWeight: 700, fontSize: 17, color: t.text, marginTop: 10 }}>{line.slice(2)}</div>
         if (line.startsWith('---')) return <hr key={i} style={{ border: 'none', borderTop: `1px solid ${t.border}`, margin: '8px 0' }} />
-        const isBullet = line.startsWith('- ') || line.startsWith('\u2022 ')
+        const isBullet = line.startsWith('- ') || line.startsWith('• ') || line.startsWith('• ')
         if (isBullet) {
           const raw = line.slice(2)
           return (
             <div key={i} style={{ display: 'flex', gap: 8, marginLeft: 4 }}>
-              <span style={{ color: t.accent, flexShrink: 0, fontWeight: 700, marginTop: 2 }}>\u2022</span>
+              <span style={{ color: t.accent, flexShrink: 0, fontWeight: 700, marginTop: 2 }}>•</span>
               <span style={{ fontSize: 14, color: t.textSub, lineHeight: 1.65 }}>{bold(raw, t)}</span>
             </div>
           )
@@ -116,7 +116,7 @@ function ChartBlock({ chart, t }: { chart: any; t: any }) {
       <div style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${t.border}`, background: t.surface }}>
         <span style={{ fontSize: 13, fontWeight: 600, color: t.text }}>{chart.title}</span>
         <button onClick={exportPDF} style={{ fontSize: 12, color: t.accent, background: 'none', border: `1px solid ${t.accent}44`, borderRadius: 6, cursor: 'pointer', padding: '3px 10px' }}>
-          &#8595; Export PDF
+          ↓ Export PDF
         </button>
       </div>
       <div ref={ref} style={{ padding: 16, background: t.surface }}>
@@ -155,7 +155,7 @@ function ChartBlock({ chart, t }: { chart: any; t: any }) {
         </ResponsiveContainer>
         {chart.insight && (
           <div style={{ marginTop: 12, padding: '10px 14px', background: t.accentSubtle, borderRadius: 8, fontSize: 13, color: t.accent, display: 'flex', gap: 8 }}>
-            <span>&#128161;</span><span>{chart.insight}</span>
+            <span style={{fontSize: 14}}>💡</span><span>{chart.insight}</span>
           </div>
         )}
       </div>
@@ -276,7 +276,7 @@ function ChatContent() {
         <div style={{ maxWidth: 860, margin: '0 auto', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', color: t.textSub, fontSize: 13, cursor: 'pointer' }}>
-              &#8592; Dashboard
+              ← Dashboard
             </button>
             <div style={{ width: 1, height: 18, backgroundColor: t.border }} />
             {bank ? (
@@ -293,7 +293,7 @@ function ChatContent() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <button onClick={toggleTheme} style={{ width: 34, height: 34, borderRadius: 8, border: `1px solid ${t.border}`, background: t.surface, cursor: 'pointer', fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {dark ? '&#9728;&#65039;' : '&#127769;'}
+              {dark ? '☀️' : '🌙'}
             </button>
             <select onChange={e => { router.push(e.target.value === 'all' ? '/chat' : `/chat?bank=${e.target.value}`); setMessages([]) }} value={bankId ?? 'all'}
               style={{ backgroundColor: t.pillBg, border: `1px solid ${t.border}`, borderRadius: 8, padding: '6px 10px', fontSize: 12, color: t.text, cursor: 'pointer', outline: 'none' }}>
@@ -308,7 +308,7 @@ function ChatContent() {
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
           {messages.length === 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '50vh', textAlign: 'center' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 18, backgroundColor: t.accentSubtle, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20, fontSize: 28 }}>&#127970;</div>
+              <div style={{ width: 60, height: 60, borderRadius: 18, backgroundColor: t.accentSubtle, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20, fontSize: 28 }}>🏦</div>
               <h2 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 8px', color: t.text }}>
                 {bank ? `Ask me about ${bank.shortName}` : 'Jordan Banking Analyst'}
               </h2>
@@ -339,7 +339,7 @@ function ChatContent() {
             {messages.map((msg, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', gap: 10, alignItems: 'flex-start' }}>
                 {msg.role === 'assistant' && (
-                  <div style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: t.accentSubtle, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2, fontSize: 16 }}>&#127970;</div>
+                  <div style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: t.accentSubtle, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2, fontSize: 16 }}>🏦</div>
                 )}
                 <div style={{ maxWidth: '88%' }}>
                   {msg.role === 'user' ? (
