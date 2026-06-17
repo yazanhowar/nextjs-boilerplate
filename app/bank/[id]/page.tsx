@@ -166,11 +166,11 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
             <ResponsiveContainer width="100%" height={300}>
               {chartData.type === 'bar' ? (
                 <BarChart data={chartData.data}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1E3450" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#383838" />
                   <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
                   <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#242424', border: '1px solid #1E3450', borderRadius: 8 }}
+                    contentStyle={{ backgroundColor: '#242424', border: '1px solid #383838', borderRadius: 8 }}
                     labelStyle={{ color: '#CEBA95' }}
                     itemStyle={{ color: '#fff' }}
                   />
@@ -181,11 +181,11 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
                 </BarChart>
               ) : (
                 <LineChart data={chartData.data}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1E3450" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#383838" />
                   <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
                   <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#242424', border: '1px solid #1E3450', borderRadius: 8 }}
+                    contentStyle={{ backgroundColor: '#242424', border: '1px solid #383838', borderRadius: 8 }}
                     labelStyle={{ color: '#CEBA95' }}
                     itemStyle={{ color: '#fff' }}
                   />
@@ -437,11 +437,11 @@ export default function BankPage() {
                 </div>
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart data={profitTrend}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1E3450" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#383838" />
                     <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
                     <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#242424', border: '1px solid #1E3450', borderRadius: 8 }}
+                      contentStyle={{ backgroundColor: '#242424', border: '1px solid #383838', borderRadius: 8 }}
                       labelStyle={{ color: '#CEBA95' }}
                       itemStyle={{ color: '#fff' }}
                       formatter={(v: any) => [`JOD ${v}M`, 'Net Profit']}
@@ -544,11 +544,11 @@ export default function BankPage() {
                   'Customer Deposits': Math.round((f.customer_deposits || 0) / 1_000_000),
                   'Loans': Math.round((f.net_loans || 0) / 1_000_000),
                 }))}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1E3450" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#383838" />
                   <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
                   <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#242424', border: '1px solid #1E3450', borderRadius: 8 }}
+                    contentStyle={{ backgroundColor: '#242424', border: '1px solid #383838', borderRadius: 8 }}
                     labelStyle={{ color: '#CEBA95' }}
                     formatter={(v: any) => [`JOD ${v}M`]}
                   />
