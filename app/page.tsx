@@ -32,19 +32,25 @@ function pctDelta(curr: number, prev: number): number | null {
 }
 
 // BankLogo: shows favicon if available, otherwise a clean colored-initials branded box
-function BankLogo({ bank, dark, t }: { bank: any; dark: boolean; t: any }) {
+function BankLogo({ bank, dark }: { bank: any; dark: boolean }) {
   const [failed, setFailed] = useState(false)
-  const abbr = bank.shortName.slice(0, 4).toUpperCase()
-  const fontSize = abbr.length > 3 ? 9 : 11
-
+  const abbr = (bank.shortName || bank.name || '?').replace(/[^A-Za-z\u0600-\u06FF]/g, '').slice(0, 3).toUpperCase()
+  const fontSize = abbr.length >= 3 ? 13 : abbr.length === 2 ? 16 : 20
+  const base = bank.primaryColor || (dark ? '#3B82F6' : '#004D8F')
+  // Subtle two-stop vertical gradient derived from the brand color for a crisp, intentional tile
+  const grad = `linear-gradient(150deg, ${base} 0%, ${base}E6 55%, ${base}C8 100%)`
   if (!bank.logoUrl || failed) {
     return (
-      <div style={{ width: '100%', height: '100%', background: bank.primaryColor, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ color: '#fff', fontSize, fontWeight: 800, letterSpacing: '0.02em', textAlign: 'center' as const }}>{abbr}</span>
+      <div style={{ width: '100%', height: '100%', borderRadius: 11, background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18)' }}>
+        <span style={{ color: '#fff', fontSize, fontWeight: 800, letterSpacing: '0.02em', textAlign: 'center', lineHeight: 1, fontFamily: 'system-ui, -apple-system, sans-serif' }}>{abbr}</span>
       </div>
     )
   }
-  return <img src={bank.logoUrl} alt={bank.name} width={30} height={30} style={{ objectFit: 'contain' }} onError={() => setFailed(true)} />
+  return (
+    <div style={{ width: '100%', height: '100%', borderRadius: 11, background: dark ? '#FFFFFF' : '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: 6 }}>
+      <img src={bank.logoUrl} alt={bank.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} onError={() => setFailed(true)} />
+    </div>
+  )
 }
 
 export default function Dashboard() {
