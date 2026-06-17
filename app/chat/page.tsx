@@ -40,7 +40,60 @@ function bold(text: string, textColor: string): React.ReactNode {
   )
 }
 
+
+function MarkdownTable({ rows, t }: { rows: string[]; t: any }) {
+  const splitRow = (r: string) => r.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map(c => c.trim().replace(/\*\*/g, ''))
+  const header = splitRow(rows[0])
+  const bodyRows = rows.slice(2).map(splitRow)
+  const cellBase: any = { padding: '7px 12px', fontSize: 13, whiteSpace: 'nowrap' }
+  return (
+    <div style={{ overflowX: 'auto', margin: '10px 0', border: '1px solid ' + t.border, borderRadius: 10 }}>
+      <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+        <thead>
+          <tr>{header.map((h, i) => (
+            <th key={i} style={{ ...cellBase, textAlign: i === 0 ? 'left' : 'right', fontWeight: 700, color: t.textSub, borderBottom: '1px solid ' + t.border, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</th>
+          ))}</tr>
+        </thead>
+        <tbody>
+          {bodyRows.map((cells, ri) => (
+            <tr key={ri}>{cells.map((c, ci) => (
+              <td key={ci} style={{ ...cellBase, textAlign: ci === 0 ? 'left' : 'right', color: t.text, fontWeight: ci === 0 ? 600 : 500, borderBottom: ri === bodyRows.length - 1 ? 'none' : '1px solid ' + t.border }}>{c}</td>
+            ))}</tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+function isTableRow(l: string) { return /^\s*\|.*\|\s*$/.test(l) }
+function isTableSep(l: string) { return /^\s*\|?[\s:|-]*-[\s:|-]*\|?\s*$/.test(l) && l.includes('-') }
+
 function RenderText({ content, t }: { content: string; t: any }) {
+  const ls = content.split('\n')
+  const blocks: { type: 'text' | 'table'; lines: string[] }[] = []
+  let i = 0
+  while (i < ls.length) {
+    if (isTableRow(ls[i]) && i + 1 < ls.length && isTableSep(ls[i + 1])) {
+      const tbl: string[] = [ls[i], ls[i + 1]]
+      i += 2
+      while (i < ls.length && isTableRow(ls[i])) { tbl.push(ls[i]); i++ }
+      blocks.push({ type: 'table', lines: tbl })
+    } else {
+      const txt: string[] = []
+      while (i < ls.length && !(isTableRow(ls[i]) && i + 1 < ls.length && isTableSep(ls[i + 1]))) { txt.push(ls[i]); i++ }
+      blocks.push({ type: 'text', lines: txt })
+    }
+  }
+  return (
+    <>
+      {blocks.map((b, bi) => b.type === 'table'
+        ? <MarkdownTable key={bi} rows={b.lines} t={t} />
+        : <RenderTextInner key={bi} content={b.lines.join('\n')} t={t} />)}
+    </>
+  )
+}
+
+function RenderTextInner({ content, t }: { content: string; t: any }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       {content.split('\n').map((line, i) => {
