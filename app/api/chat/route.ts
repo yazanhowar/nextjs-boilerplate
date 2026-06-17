@@ -38,7 +38,7 @@ async function fetchContext(prompt: string, bankIds: number[]) {
   jobs.push(async () => {
     const { data, error } = await db
       .from('bank_financials')
-      .select('bank_id, fiscal_year, net_profit, total_assets, total_deposits, net_loans, total_equity, roe, roa, car, npl_ratio')
+      .select('bank_id, fiscal_year, net_profit, total_assets, customer_deposits, net_loans, total_equity, roe, roa, car, npl_ratio')
       .in('bank_id', targetIds)
       .order('fiscal_year', { ascending: false })
     if (error) console.error('[HBTF] financials error:', error.message)
@@ -105,12 +105,12 @@ CRITICAL RULES:
 3. Always cite actual numbers from the data.
 4. Use bullet points, bold for key numbers, markdown tables where useful.
 5. Always mention where HBTF (bank_id: 2) stands vs competitors.
-6. Executive-friendly — no fluff.
+6. Executive-friendly â no fluff.
 7. For charts, output at END of response:
 \`\`\`chart
 {"type":"bar","title":"Title","data":[{"name":"HBTF","value":150}],"series":["value"],"insight":"Takeaway"}
 \`\`\`
-8. CRITICAL SCALING — Financials are in THOUSANDS: value/1000="JOD XXXM", value/1000000="JOD X.XB". Arab Bank (bank_id:1) is USD thousands — ×0.71 for JOD.
+8. CRITICAL SCALING â Financials are in THOUSANDS: value/1000="JOD XXXM", value/1000000="JOD X.XB". Arab Bank (bank_id:1) is USD thousands â Ã0.71 for JOD.
 9. Rates are percentages. Fees are in JOD.
 10. Today: ${new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})}.
 
