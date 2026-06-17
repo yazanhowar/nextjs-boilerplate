@@ -5,7 +5,7 @@ export interface BankConfig {
   isHBTF: boolean; description: string
 }
 
-const gf = (domain: string) => 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=64'
+const gf = (domain: string) => 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=256'
 
 export const BANKS: BankConfig[] = [
   { id: 1,  ticker: 'ARBK',  name: 'Arab Bank',                      nameAr: '', shortName: 'Arab Bank',    domain: 'arabbank.jo',
@@ -25,7 +25,7 @@ export const BANKS: BankConfig[] = [
     primaryColor: '#E4002B', sector: 'conventional', isHBTF: false, description: "Jordan's third-largest bank with operations in Jordan and Iraq." },
 
   { id: 5,  ticker: 'ETHD',  name: 'Bank al Etihad',                 nameAr: '', shortName: 'Etihad',       domain: 'bankaletihad.com',
-    logoUrl: '',
+    logoUrl: gf('bankaletihad.com'),
     primaryColor: '#F26522', sector: 'conventional', isHBTF: false, description: 'Mid-size bank known for strong digital banking and SME lending.' },
 
   { id: 6,  ticker: 'CABK',  name: 'Cairo Amman Bank',               nameAr: '', shortName: 'CAB',          domain: 'cab.jo',
@@ -53,11 +53,11 @@ export const BANKS: BankConfig[] = [
     primaryColor: '#006C35', sector: 'islamic',      isHBTF: false, description: 'Wholly owned Islamic banking subsidiary of Arab Bank plc, 47 Jordan branches.' },
 
   { id: 12, ticker: 'BOJX',  name: 'Bank of Jordan',                 nameAr: '', shortName: 'BOJ',          domain: 'bankofjordan.com',
-    logoUrl: '',
+    logoUrl: gf('bankofjordan.com'),
     primaryColor: '#003DA5', sector: 'conventional', isHBTF: false, description: "Established in 1960, one of Jordan's oldest commercial banks." },
 
   { id: 13, ticker: 'INVB',  name: 'Invest Bank',                    nameAr: '', shortName: 'InvestBank',   domain: 'investbank.jo',
-    logoUrl: 'https://www.investbank.jo/media/2024/12/Inverstbank-Logo.png.webp',
+    logoUrl: gf('investbank.jo'),
     primaryColor: '#C8102E', sector: 'conventional', isHBTF: false, description: 'Smaller specialist bank with Palestinian and Gulf family ownership.' },
 
   { id: 14, ticker: 'ABCO',  name: 'Bank ABC Jordan',                nameAr: '', shortName: 'Bank ABC',     domain: 'bank-abc.com',
@@ -65,7 +65,7 @@ export const BANKS: BankConfig[] = [
     primaryColor: '#1D1D1B', sector: 'conventional', isHBTF: false, description: '87% owned by Arab Banking Corporation Bahrain.' },
 
   { id: 15, ticker: 'JCBK',  name: 'Jordan Commercial Bank',         nameAr: '', shortName: 'JCB',          domain: 'jcbank.com.jo',
-    logoUrl: 'https://www.jcbank.com.jo/images/logo.jpg',
+    logoUrl: gf('jcbank.com.jo'),
     primaryColor: '#8B1A1A', sector: 'conventional', isHBTF: false, description: 'Smallest listed Jordanian bank.' },
 ]
 
