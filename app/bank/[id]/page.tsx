@@ -303,15 +303,14 @@ export default function BankPage() {
             </button>
             <div className="w-px h-5 bg-[#383838]" />
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/10
-                              flex items-center justify-center overflow-hidden">
+              <div style={{ width:36, height:36, borderRadius:8, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden', flexShrink:0 }}>
                 {!imgError ? (
-                  <img src={bank.logoUrl} alt={bank.name} className="w-7 h-7 object-contain"
+                  <img src={bank.logoUrl} alt={bank.name} style={{ width:28, height:28, objectFit:'contain' }}
                     onError={() => setImgError(true)} />
                 ) : (
-                  <span className="text-[10px] font-bold text-[#9CA3AF]">{bank.shortName.slice(0, 3)}</span>
+                  <span style={{ fontSize:10, fontWeight:700, color:'#9CA3AF' }}>{bank.shortName.slice(0, 3)}</span>
                 )}
-              </div>
+                </div>
               <div>
                 <div className="font-bold text-white text-[16px]">{bank.name}</div>
                 <div className="text-[11px] text-[#9CA3AF]">
