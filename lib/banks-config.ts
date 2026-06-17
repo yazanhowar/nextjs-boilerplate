@@ -25,7 +25,7 @@ export const BANKS: BankConfig[] = [
     primaryColor: '#E4002B', sector: 'conventional', isHBTF: false, description: "Jordan's third-largest bank with operations in Jordan and Iraq." },
 
   { id: 5,  ticker: 'ETHD',  name: 'Bank al Etihad',                 nameAr: '', shortName: 'Etihad',       domain: 'bankaletihad.com',
-    logoUrl: gf('bankaletihad.com'),
+    logoUrl: '',
     primaryColor: '#F26522', sector: 'conventional', isHBTF: false, description: 'Mid-size bank known for strong digital banking and SME lending.' },
 
   { id: 6,  ticker: 'CABK',  name: 'Cairo Amman Bank',               nameAr: '', shortName: 'CAB',          domain: 'cab.jo',
@@ -57,7 +57,7 @@ export const BANKS: BankConfig[] = [
     primaryColor: '#003DA5', sector: 'conventional', isHBTF: false, description: "Established in 1960, one of Jordan's oldest commercial banks." },
 
   { id: 13, ticker: 'INVB',  name: 'Invest Bank',                    nameAr: '', shortName: 'InvestBank',   domain: 'investbank.jo',
-    logoUrl: gf('investbank.jo'),
+    logoUrl: 'https://www.investbank.jo/media/2024/12/Inverstbank-Logo.png.webp',
     primaryColor: '#C8102E', sector: 'conventional', isHBTF: false, description: 'Smaller specialist bank with Palestinian and Gulf family ownership.' },
 
   { id: 14, ticker: 'ABCO',  name: 'Bank ABC Jordan',                nameAr: '', shortName: 'Bank ABC',     domain: 'bank-abc.com',
