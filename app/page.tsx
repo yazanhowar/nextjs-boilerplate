@@ -225,7 +225,19 @@ export default function Dashboard() {
 }
 
 function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMouseEnter, onMouseLeave, onClick }: any) {
-  const [imgError, setImgError] = useState(false)
+  const [logoSrc, setLogoSrc] = useState(bank.logoUrl)
+  const [logoFailed, setLogoFailed] = useState(false)
+  
+  const tryNextLogo = () => {
+    // Fallback chain: Clearbit -> Google favicon -> initials
+    if (logoSrc === bank.logoUrl) {
+      // Try Google favicon as backup
+      setLogoSrc(`https://www.google.com/s2/favicons?domain=${bank.domain}&sz=64`)
+    } else {
+      setLogoFailed(true)
+    }
+  }
+
   return (
     <div onClick={onClick} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={{
       backgroundColor: hovered ? t.surfaceHover : t.surface,
@@ -241,9 +253,9 @@ function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMou
       )}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
         <div style={{ width: 44, height: 44, borderRadius: 10, backgroundColor: dark ? '#1E3450' : '#F0F4FA', border: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
-          {!imgError
-            ? <img src={bank.logoUrl} alt={bank.name} width={28} height={28} style={{ objectFit: 'contain' }} onError={() => setImgError(true)} />
-            : <span style={{ fontSize: 11, fontWeight: 700, color: t.textSub }}>{bank.shortName.slice(0,3).toUpperCase()}</span>}
+          {!logoFailed
+            ? <img src={logoSrc} alt={bank.name} width={28} height={28} style={{ objectFit: 'contain' }} onError={tryNextLogo} />
+            : <span style={{ fontSize: 12, fontWeight: 800, color: '#fff', background: bank.primaryColor, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8 }}>{bank.shortName.slice(0,2).toUpperCase()}</span>}
         </div>
         <div>
           <div style={{ fontWeight: 600, fontSize: 15, color: t.text }}>{bank.name}</div>
