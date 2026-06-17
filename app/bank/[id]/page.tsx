@@ -510,7 +510,7 @@ export default function BankPage() {
                     {[
                       { label: 'Net Profit', key: 'net_profit', format: fmtJOD },
                       { label: 'Total Assets', key: 'total_assets', format: fmtJOD },
-                      { label: 'Customer Deposits', key: 'total_deposits', format: fmtJOD },
+                      { label: 'Customer Deposits', key: 'customer_deposits', format: fmtJOD },
                       { label: 'Loans to Customers', key: 'net_loans', format: fmtJOD },
                       { label: 'Shareholders\' Equity', key: 'total_equity', format: fmtJOD },
                       { label: 'Return on Equity', key: 'roe', format: pct },
@@ -541,7 +541,7 @@ export default function BankPage() {
                 <BarChart data={financials.map(f => ({
                   name: `FY${f.fiscal_year}`,
                   'Total Assets': Math.round((f.total_assets || 0) / 1_000_000),
-                  'Customer Deposits': Math.round((f.total_deposits || 0) / 1_000_000),
+                  'Customer Deposits': Math.round((f.customer_deposits || 0) / 1_000_000),
                   'Loans': Math.round((f.net_loans || 0) / 1_000_000),
                 }))}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1E3450" />
