@@ -155,6 +155,24 @@ function buildSystemPrompt(context: Record<string, any>): string {
     if (!bank) continue
     const records = byBank[bankId]
     records.sort((a: any, b: any) => (b.fiscal_year as number) - (a.fiscal_year as number))
+    // --- multi-year history (all fetched years: FY2023-2025) so the model never guesses ---
+    const histLines = records
+      .slice()
+      .sort((a: any, b: any) => (a.fiscal_year as number) - (b.fiscal_year as number))
+      .map((r: any) => {
+        const parts: string[] = []
+        if (r.net_profit != null) parts.push(`net profit ${fmtVal(r.net_profit, bankId)}`)
+        if (r.total_assets != null) parts.push(`assets ${fmtVal(r.total_assets, bankId)}`)
+        if (r.customer_deposits != null) parts.push(`deposits ${fmtVal(r.customer_deposits, bankId)}`)
+        const eq = r.shareholders_equity ?? r.total_equity
+        if (eq != null) parts.push(`equity ${fmtVal(eq as number, bankId)}`)
+        if (r.roe != null) parts.push(`ROE ${(r.roe as number).toFixed(1)}%`)
+        if (r.car != null) parts.push(`CAR ${(r.car as number).toFixed(1)}%`)
+        if (r.eps_fils != null) parts.push(`EPS ${r.eps_fils} fils`)
+        return `    FY${r.fiscal_year}: ${parts.join(", ")}`
+      })
+      .join("\n")
+    if (histLines) finSection += `\n  ${bank.name} (${bank.ticker}) - VERIFIED multi-year history${bankId === ARAB_BANK_ID ? " (converted from USD at 0.71)" : ""}:\n${histLines}\n`
     const curr = records[0]
     const prev = records[1]
     const pct = (a: number, b: number) => b ? ((a - b) / Math.abs(b) * 100).toFixed(1) + '%' : 'N/A'
