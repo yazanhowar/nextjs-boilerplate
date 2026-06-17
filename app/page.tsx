@@ -99,12 +99,12 @@ export default function Dashboard() {
   }, [selectedYear])
 
   const t = {
-    bg: dark ? '#0A1628' : '#F2F4F7', surface: dark ? '#0F1E35' : '#FFFFFF',
-    surfaceHover: dark ? '#132240' : '#F0F4FA', border: dark ? '#1E3450' : '#DDE2EA',
-    text: dark ? '#FFFFFF' : '#0F172A', textSub: dark ? '#8B9AB0' : '#4A5568',
-    textMuted: dark ? '#4A5568' : '#94A3B8', accent: dark ? '#3B82F6' : '#004D8F',
+    bg: dark ? '#1a1a1a' : '#F2F4F7', surface: dark ? '#242424' : '#FFFFFF',
+    surfaceHover: dark ? '#2a2a2a' : '#F0F4FA', border: dark ? '#383838' : '#DDE2EA',
+    text: dark ? '#FFFFFF' : '#0F172A', textSub: dark ? '#9CA3AF' : '#4A5568',
+    textMuted: dark ? '#6B7280' : '#94A3B8', accent: dark ? '#3B82F6' : '#004D8F',
     green: dark ? '#2ECC71' : '#16A34A', red: dark ? '#E05252' : '#DC2626',
-    inputBg: dark ? '#0F1E35' : '#FFFFFF', pillBg: dark ? '#132240' : '#EEF2F7',
+    inputBg: dark ? '#242424' : '#FFFFFF', pillBg: dark ? '#2a2a2a' : '#EEF2F7',
     shadow: dark ? 'none' : '0 1px 4px rgba(0,0,0,0.07)',
   }
 
@@ -125,7 +125,7 @@ export default function Dashboard() {
 
   return (
     <div style={{ minHeight:'100vh', backgroundColor:t.bg, fontFamily:'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif', color:t.text }}>
-      <header style={{ backgroundColor:dark?'rgba(10,22,40,0.9)':'rgba(242,244,247,0.9)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderBottom:`1px solid ${t.border}`, position:'sticky', top:0, zIndex:100 }}>
+      <header style={{ backgroundColor:dark?'rgba(26,26,26,0.95)':'rgba(242,244,247,0.9)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderBottom:`1px solid ${t.border}`, position:'sticky', top:0, zIndex:100 }}>
         <div style={{ maxWidth:1200, margin:'0 auto', height:52, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 24px' }}>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
             <div style={{ width:28, height:28, borderRadius:8, backgroundColor:t.accent, display:'flex', alignItems:'center', justifyContent:'center' }}>
@@ -203,7 +203,7 @@ export default function Dashboard() {
 
 function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMouseEnter, onMouseLeave, onClick }: any) {
   return (
-    <div onClick={onClick} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={{ backgroundColor:hovered?t.surfaceHover:t.surface, border:`1px solid ${hovered?t.accent+'55':t.border}`, borderRadius:14, padding:20, cursor:'pointer', transition:'all 0.15s ease', transform:hovered?'translateY(-2px)':'none', boxShadow:hovered?`0 8px 24px ${dark?'rgba(0,0,0,0.4)':'rgba(0,0,0,0.1)'}`:t.shadow }}>
+    <div onClick={onClick} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={{ backgroundColor:hovered?t.surfaceHover:t.surface, border:`1px solid ${hovered?t.accent+'55':t.border}`, borderRadius:14, padding:20, cursor:'pointer', transition:'all 0.15s ease', transform:hovered?'translateY(-2px)':'none', boxShadow:hovered?`0 8px 24px ${dark?'rgba(0,0,0,0.5)':'rgba(0,0,0,0.1)'}`:t.shadow }}>
  <div style={{ minHeight:22, display:'flex', justifyContent:'flex-end', marginBottom:4 }}>
       {bank.isHBTF && <span style={{ fontSize:10, fontWeight:700, color:t.accent, backgroundColor:t.accent+'18', padding:'2px 8px', borderRadius:20, letterSpacing:'0.05em' }}>OUR BANK</span>}
       </div>
@@ -217,7 +217,7 @@ function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMou
         </div>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:16 }}>
-        <div style={{ backgroundColor:dark?'#132240':'#F5F8FD', borderRadius:10, padding:'12px 14px' }}>
+        <div style={{ backgroundColor:dark?'#2a2a2a':'#F5F8FD', borderRadius:10, padding:'12px 14px' }}>
           <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>Net Profit</div>
           <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.net_profit,bank.id):'â')}</div>
           {delta!=null&&!loading&&<div style={{ fontSize:11, color:delta>=0?t.green:t.red, marginTop:3, fontWeight:500 }}>{delta>=0?'â':'â'} {Math.abs(delta).toFixed(1)}% vs {dataYear-1}</div>}
