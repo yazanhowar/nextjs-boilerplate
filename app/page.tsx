@@ -17,9 +17,9 @@ function toJOD(n: number | null | undefined, bankId: number): number | null {
 }
 
 function fmtK(n: number | null | undefined, bankId?: number): string {
-  if (n == null) return 'Ã¢ÂÂ'
+  if (n == null) return 'ÃÂ¢ÃÂÃÂ'
   const v = bankId != null ? toJOD(n, bankId) : n
-  if (v == null) return 'Ã¢ÂÂ'
+  if (v == null) return 'ÃÂ¢ÃÂÃÂ'
   const abs = Math.abs(v)
   if (abs >= 1_000_000) return `JOD ${(v/1_000_000).toFixed(2)}B`
   if (abs >= 1_000) return `JOD ${(v/1_000).toFixed(1)}M`
@@ -136,7 +136,7 @@ export default function Dashboard() {
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
             <button onClick={toggleTheme} style={{ width:36, height:36, borderRadius:8, border:`1px solid ${t.border}`, background:t.surface, cursor:'pointer', fontSize:16, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              {dark ? 'Ã¢ÂÂÃ¯Â¸Â' : 'Ã°ÂÂÂ'}
+              {dark ? 'ÃÂ¢ÃÂÃÂÃÂ¯ÃÂ¸ÃÂ' : 'ÃÂ°ÃÂÃÂÃÂ'}
             </button>
             <button onClick={() => router.push('/chat')} style={{ backgroundColor:t.accent, color:'#fff', border:'none', borderRadius:8, padding:'7px 16px', fontSize:13, fontWeight:500, cursor:'pointer' }}>
               Open AI Analyst
@@ -162,8 +162,8 @@ export default function Dashboard() {
           {[
             { label:'Sector Total Assets', value:fmtK(grandAssets), sub:'All 15 banks combined' },
             { label:'Sector Net Profit', value:fmtK(grandProfit), sub:`FY${dataYear}` },
-            { label:'Avg ROE', value:avgROE!=null?`${avgROE.toFixed(1)}%`:'Ã¢ÂÂ', sub:'Return on equity' },
-            { label:'Avg CAR', value:avgCAR!=null?`${avgCAR.toFixed(1)}%`:'Ã¢ÂÂ', sub:'Capital adequacy' },
+            { label:'Avg ROE', value:avgROE!=null?`${avgROE.toFixed(1)}%`:'ÃÂ¢ÃÂÃÂ', sub:'Return on equity' },
+            { label:'Avg CAR', value:avgCAR!=null?`${avgCAR.toFixed(1)}%`:'ÃÂ¢ÃÂÃÂ', sub:'Capital adequacy' },
           ].map((kpi,i) => (
             <div key={i} style={{ backgroundColor:t.surface, borderRadius:12, padding:'16px 18px', border:`1px solid ${t.border}`, boxShadow:t.shadow }}>
               <div style={{ fontSize:11, color:t.textSub, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:6 }}>{kpi.label}</div>
@@ -221,12 +221,40 @@ function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMou
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:16 }}>
         <div style={{ backgroundColor:dark?'#132240':'#F5F8FD', borderRadius:10, padding:'12px 14px' }}>
           <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>Net Profit</div>
-          <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.net_profit,bank.id):'Ã¢ÂÂ')}</div>
-          {delta!=null&&!loading&&<div style={{ fontSize:11, color:delta>=0?t.green:t.red, marginTop:3, fontWeight:500 }}>{delta>=0?'Ã¢ÂÂ':'Ã¢ÂÂ'} {Math.abs(delta).toFixed(1)}% vs {dataYear-1}</div>}
+          <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.net_profit,bank.id):'ÃÂ¢ÃÂÃÂ')}</div>
+          {delta!=null&&!loading&&<div style={{ fontSize:11, color:delta>=0?t.green:t.red, marginTop:3, fontWeight:500 }}>{delta>=0?'ÃÂ¢ÃÂÃÂ':'ÃÂ¢ÃÂÃÂ'} {Math.abs(delta).toFixed(1)}% vs {dataYear-1}</div>}
         </div>
         <div style={{ backgroundColor:dark?'#132240':'#F5F8FD', borderRadius:10, padding:'12px 14px' }}>
           <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>Total Assets</div>
-          <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.total_assets,bank.id):'Ã¢ÂÂ')}</div>
+          <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.total_assets,bank.id):'ÃÂ¢ÃÂÃÂ')}</div>
+          {fin?.roe!=null&&!loading&&<div style={{ fontSize:11, color:t.textSub, marginTop:3 }}>ROE {fin.roe.toFixed(1)}%</div>}
+        </div>
+      </div>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+        <span style={{ fontSize:12, color:t.textSub }}>{bank.description.slice(0,52)}...</span>
+        <span style={{ backgroundColor:hovered?t.accent:(dark?'#132240':'#EEF2F7'), color:hovered?'#fff':t.textSub, borderRadius:8, padding:'5px 12px', fontSize:12, fontWeight:500, transition:'all 0.15s', whiteSpace:'nowrap', marginLeft:8 }}>Ask AI</span>
+      </div>
+    </div>
+  )
+}
+      <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:16 }}>
+        <div style={{ width:44, height:44, borderRadius:10, backgroundColor:dark?'#1E3450':'#F0F4FA', border:`1px solid ${t.border}`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden' }}>
+          <BankLogo bank={bank} />
+        </div>
+        <div>
+          <div style={{ fontWeight:600, fontSize:15, color:t.text }}>{bank.name}</div>
+          <div style={{ fontSize:12, color:t.textSub, marginTop:2 }}>{bank.sector==='islamic'?'Islamic':'Commercial'} &middot; {bank.ticker}</div>
+        </div>
+      </div>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:16 }}>
+        <div style={{ backgroundColor:dark?'#132240':'#F5F8FD', borderRadius:10, padding:'12px 14px' }}>
+          <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>Net Profit</div>
+          <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.net_profit,bank.id):'ÃÂ¢ÃÂÃÂ')}</div>
+          {delta!=null&&!loading&&<div style={{ fontSize:11, color:delta>=0?t.green:t.red, marginTop:3, fontWeight:500 }}>{delta>=0?'ÃÂ¢ÃÂÃÂ':'ÃÂ¢ÃÂÃÂ'} {Math.abs(delta).toFixed(1)}% vs {dataYear-1}</div>}
+        </div>
+        <div style={{ backgroundColor:dark?'#132240':'#F5F8FD', borderRadius:10, padding:'12px 14px' }}>
+          <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>Total Assets</div>
+          <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.total_assets,bank.id):'ÃÂ¢ÃÂÃÂ')}</div>
           {fin?.roe!=null&&!loading&&<div style={{ fontSize:11, color:t.textSub, marginTop:3 }}>ROE {fin.roe.toFixed(1)}%</div>}
         </div>
       </div>
