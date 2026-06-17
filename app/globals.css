@@ -3,10 +3,24 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Base ───────────────────────────────────────────────────────────────────── */
+/* ── Light mode (default) ───────────────────────────────────────────────── */
 :root {
   --hbtf-blue: #004D8F;
   --hbtf-gold: #CEBA95;
+  --bg-primary: #F2F4F7;
+  --bg-card: #FFFFFF;
+  --bg-hover: #E8EDF5;
+  --border: #DDE2EA;
+  --text-primary: #0F172A;
+  --text-secondary: #4A5568;
+  --text-muted: #94A3B8;
+  --accent: #004D8F;
+  --green: #16A34A;
+  --red: #DC2626;
+}
+
+/* ── Dark mode — toggled by .dark on <html> ─────────────────────────────── */
+html.dark {
   --bg-primary: #0A1628;
   --bg-card: #0F1E35;
   --bg-hover: #132240;
@@ -14,13 +28,12 @@
   --text-primary: #FFFFFF;
   --text-secondary: #8B9AB0;
   --text-muted: #4A5568;
+  --accent: #3B82F6;
   --green: #2ECC71;
   --red: #E05252;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -31,12 +44,14 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* ── Language toggle fix ────────────────────────────────────────────────────── */
-/* Fix: black background making text unreadable */
+/* ── Encoding fix — use Unicode middot not Latin-1 ──────────────────────── */
+.middot::before { content: "·"; }
+
+/* ── Language toggles ───────────────────────────────────────────────────── */
 .lang-toggle,
-[data-lang-toggle],
 button[aria-label*="lang"],
 button[aria-label*="عربي"],
 button[aria-label*="English"] {
@@ -49,7 +64,6 @@ button[aria-label*="English"] {
   font-weight: 500 !important;
   transition: all 0.15s !important;
 }
-
 .lang-toggle:hover,
 button[aria-label*="عربي"]:hover,
 button[aria-label*="English"]:hover {
@@ -57,55 +71,32 @@ button[aria-label*="English"]:hover {
   color: var(--hbtf-gold) !important;
 }
 
-/* ── RTL support ────────────────────────────────────────────────────────────── */
-[dir="rtl"] {
-  font-family: 'Cairo', 'Noto Sans Arabic', system-ui, sans-serif;
-}
-
+/* ── RTL ────────────────────────────────────────────────────────────────── */
+[dir="rtl"] { font-family: 'Cairo', 'Noto Sans Arabic', system-ui, sans-serif; }
 [dir="rtl"] .text-start { text-align: right; }
-[dir="rtl"] .text-end { text-align: left; }
+[dir="rtl"] .text-end   { text-align: left;  }
 
-/* ── Scrollbar ──────────────────────────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--hbtf-blue);
-}
+/* ── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--hbtf-blue); }
 
-/* ── Chart tooltips ─────────────────────────────────────────────────────────── */
-.recharts-tooltip-wrapper {
-  outline: none;
-}
+/* ── Charts ─────────────────────────────────────────────────────────────── */
+.recharts-tooltip-wrapper { outline: none; }
 
-/* ── Smooth transitions ─────────────────────────────────────────────────────── */
-a, button {
-  transition: color 0.15s, background-color 0.15s, border-color 0.15s, opacity 0.15s;
-}
+/* ── Transitions ────────────────────────────────────────────────────────── */
+a, button { transition: color 0.15s, background-color 0.15s, border-color 0.15s, opacity 0.15s; }
 
-/* ── Line clamp utility ─────────────────────────────────────────────────────── */
+/* ── Utilities ──────────────────────────────────────────────────────────── */
 .line-clamp-2 {
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
+:focus-visible { outline: 2px solid var(--hbtf-gold); outline-offset: 2px; }
 
-/* ── Focus visible ──────────────────────────────────────────────────────────── */
-:focus-visible {
-  outline: 2px solid var(--hbtf-gold);
-  outline-offset: 2px;
-}
-
-/* ── Print / PDF export ─────────────────────────────────────────────────────── */
 @media print {
   body { background: white; color: black; }
   .no-print { display: none !important; }
