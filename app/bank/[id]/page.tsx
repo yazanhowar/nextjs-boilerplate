@@ -32,7 +32,7 @@ function pct(n: number | null | undefined): string {
 }
 
 function deltaColor(n: number | null | undefined): string {
-  if (n == null) return 'text-[#8B9AB0]'
+  if (n == null) return 'text-[#9CA3AF]'
   return n >= 0 ? 'text-[#2ECC71]' : 'text-[#E05252]'
 }
 
@@ -41,7 +41,7 @@ function deltaSign(n: number | null | undefined): string {
   return n >= 0 ? '↑' : '↓'
 }
 
-const CHART_COLORS = ['#004D8F', '#CEBA95', '#2ECC71', '#E05252', '#8B9AB0', '#F39C12']
+const CHART_COLORS = ['#004D8F', '#CEBA95', '#2ECC71', '#E05252', '#9CA3AF', '#F39C12']
 
 // ─── Section tabs ─────────────────────────────────────────────────────────────
 const TABS = [
@@ -96,7 +96,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
     if (!chartRef.current) return
     const { default: html2canvas } = await import('html2canvas')
     const { jsPDF } = await import('jspdf')
-    const canvas = await html2canvas(chartRef.current, { backgroundColor: '#0A1628' })
+    const canvas = await html2canvas(chartRef.current, { backgroundColor: '#1a1a1a' })
     const imgData = canvas.toDataURL('image/png')
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] })
     pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height)
@@ -104,7 +104,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
   }
 
   return (
-    <div className="bg-[#0F1E35] border border-[#1E3450] rounded-xl p-6">
+    <div className="bg-[#242424] border border-[#383838] rounded-xl p-6">
       <div className="flex items-center gap-2 mb-4">
         <span className="text-[#CEBA95] text-[18px]">⚡</span>
         <span className="font-semibold text-white">Ask about {bankName}</span>
@@ -116,8 +116,8 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
           <button
             key={ex}
             onClick={() => setPrompt(ex)}
-            className="text-[11px] px-3 py-1.5 rounded-full border border-[#1E3450]
-                       text-[#8B9AB0] hover:border-[#CEBA95] hover:text-[#CEBA95]
+            className="text-[11px] px-3 py-1.5 rounded-full border border-[#383838]
+                       text-[#9CA3AF] hover:border-[#CEBA95] hover:text-[#CEBA95]
                        transition-colors"
           >
             {ex}
@@ -130,7 +130,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
           placeholder={`e.g. "Compare ${bankName} loan rates vs market average"`}
-          className="flex-1 bg-[#0A1628] border border-[#1E3450] rounded-lg px-4 py-3
+          className="flex-1 bg-[#1a1a1a] border border-[#383838] rounded-lg px-4 py-3
                      text-[13px] text-white placeholder-[#4A5568]
                      focus:outline-none focus:border-[#CEBA95] transition-colors"
         />
@@ -155,22 +155,22 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
             <div className="text-[14px] font-semibold text-white">{chartData.title}</div>
             <button
               onClick={exportPDF}
-              className="text-[11px] px-3 py-1.5 rounded-lg border border-[#1E3450]
-                         text-[#8B9AB0] hover:border-[#CEBA95] hover:text-[#CEBA95]
+              className="text-[11px] px-3 py-1.5 rounded-lg border border-[#383838]
+                         text-[#9CA3AF] hover:border-[#CEBA95] hover:text-[#CEBA95]
                          transition-colors flex items-center gap-1.5"
             >
               ↓ Export PDF
             </button>
           </div>
-          <div ref={chartRef} className="bg-[#0A1628] rounded-xl p-4">
+          <div ref={chartRef} className="bg-[#1a1a1a] rounded-xl p-4">
             <ResponsiveContainer width="100%" height={300}>
               {chartData.type === 'bar' ? (
                 <BarChart data={chartData.data}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1E3450" />
-                  <XAxis dataKey="name" stroke="#8B9AB0" tick={{ fontSize: 11 }} />
-                  <YAxis stroke="#8B9AB0" tick={{ fontSize: 11 }} />
+                  <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                  <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#0F1E35', border: '1px solid #1E3450', borderRadius: 8 }}
+                    contentStyle={{ backgroundColor: '#242424', border: '1px solid #1E3450', borderRadius: 8 }}
                     labelStyle={{ color: '#CEBA95' }}
                     itemStyle={{ color: '#fff' }}
                   />
@@ -182,10 +182,10 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
               ) : (
                 <LineChart data={chartData.data}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1E3450" />
-                  <XAxis dataKey="name" stroke="#8B9AB0" tick={{ fontSize: 11 }} />
-                  <YAxis stroke="#8B9AB0" tick={{ fontSize: 11 }} />
+                  <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                  <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#0F1E35', border: '1px solid #1E3450', borderRadius: 8 }}
+                    contentStyle={{ backgroundColor: '#242424', border: '1px solid #1E3450', borderRadius: 8 }}
                     labelStyle={{ color: '#CEBA95' }}
                     itemStyle={{ color: '#fff' }}
                   />
@@ -255,7 +255,7 @@ export default function BankPage() {
     load()
   }, [bankId])
 
-  if (!bank) return <div className="min-h-screen bg-[#0A1628] flex items-center justify-center text-white">Bank not found</div>
+  if (!bank) return <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center text-white">Bank not found</div>
 
   // Latest + previous financials for delta
   const latest = financials[financials.length - 1]
@@ -286,19 +286,19 @@ export default function BankPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A1628] text-white">
+    <div className="min-h-screen bg-[#1a1a1a] text-white">
 
       {/* ── Header ── */}
-      <header className="border-b border-[#1E3450] px-6 py-4">
+      <header className="border-b border-[#383838] px-6 py-4">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.push('/')}
-              className="text-[#8B9AB0] hover:text-white transition-colors text-[13px]"
+              className="text-[#9CA3AF] hover:text-white transition-colors text-[13px]"
             >
               ← All banks
             </button>
-            <div className="w-px h-5 bg-[#1E3450]" />
+            <div className="w-px h-5 bg-[#383838]" />
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/10
                               flex items-center justify-center overflow-hidden">
@@ -306,12 +306,12 @@ export default function BankPage() {
                   <img src={bank.logoUrl} alt={bank.name} className="w-7 h-7 object-contain"
                     onError={() => setImgError(true)} />
                 ) : (
-                  <span className="text-[10px] font-bold text-[#8B9AB0]">{bank.shortName.slice(0, 3)}</span>
+                  <span className="text-[10px] font-bold text-[#9CA3AF]">{bank.shortName.slice(0, 3)}</span>
                 )}
               </div>
               <div>
                 <div className="font-bold text-white text-[16px]">{bank.name}</div>
-                <div className="text-[11px] text-[#8B9AB0]">
+                <div className="text-[11px] text-[#9CA3AF]">
                   {bank.sector === 'islamic' ? 'Islamic Bank' : 'Commercial Bank'} · {bank.ticker} · ASE listed
                 </div>
               </div>
@@ -325,8 +325,8 @@ export default function BankPage() {
           </div>
           <button
             onClick={() => router.push(`/compare?bank=${bankId}`)}
-            className="text-[12px] px-4 py-2 rounded-lg border border-[#1E3450]
-                       text-[#8B9AB0] hover:border-[#CEBA95] hover:text-[#CEBA95] transition-colors"
+            className="text-[12px] px-4 py-2 rounded-lg border border-[#383838]
+                       text-[#9CA3AF] hover:border-[#CEBA95] hover:text-[#CEBA95] transition-colors"
           >
             Compare with another bank
           </button>
@@ -370,22 +370,22 @@ export default function BankPage() {
                 sub: 'FY2024 basic EPS',
               },
             ].map(kpi => (
-              <div key={kpi.label} className="bg-[#0F1E35] border border-[#1E3450] rounded-xl p-4">
-                <div className="text-[10px] uppercase tracking-wider text-[#8B9AB0] mb-2">{kpi.label}</div>
+              <div key={kpi.label} className="bg-[#242424] border border-[#383838] rounded-xl p-4">
+                <div className="text-[10px] uppercase tracking-wider text-[#9CA3AF] mb-2">{kpi.label}</div>
                 <div className="text-[20px] font-bold text-white">{loading ? '...' : kpi.value}</div>
                 {kpi.delta != null && (
                   <div className={`text-[11px] font-medium mt-1 ${deltaColor(kpi.delta)}`}>
                     {deltaSign(kpi.delta)} {Math.abs(kpi.delta).toFixed(1)}% vs prior year
                   </div>
                 )}
-                <div className="text-[10px] text-[#4A5568] mt-1">{kpi.sub}</div>
+                <div className="text-[10px] text-[#6B7280] mt-1">{kpi.sub}</div>
               </div>
             ))}
           </div>
         )}
 
         {/* ── Tab bar ── */}
-        <div className="flex gap-1 border-b border-[#1E3450] mb-6 overflow-x-auto">
+        <div className="flex gap-1 border-b border-[#383838] mb-6 overflow-x-auto">
           {TABS.map(tab => (
             <button
               key={tab.id}
@@ -393,7 +393,7 @@ export default function BankPage() {
               className={`px-4 py-2.5 text-[13px] font-medium whitespace-nowrap transition-colors border-b-2 -mb-px
                 ${activeTab === tab.id
                   ? 'text-white border-[#CEBA95]'
-                  : 'text-[#8B9AB0] border-transparent hover:text-white'
+                  : 'text-[#9CA3AF] border-transparent hover:text-white'
                 }`}
             >
               {tab.label}
@@ -408,20 +408,20 @@ export default function BankPage() {
           <div className="space-y-6">
             <div className="grid grid-cols-3 gap-6">
               {/* About */}
-              <div className="bg-[#0F1E35] border border-[#1E3450] rounded-xl p-5">
-                <div className="text-[12px] uppercase tracking-wider text-[#8B9AB0] mb-3">About</div>
+              <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
+                <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-3">About</div>
                 <p className="text-[13px] text-[#CBD5E0] leading-relaxed">{bank.description}</p>
-                <div className="mt-4 pt-4 border-t border-[#1E3450] space-y-2">
+                <div className="mt-4 pt-4 border-t border-[#383838] space-y-2">
                   <div className="flex justify-between text-[12px]">
-                    <span className="text-[#8B9AB0]">Sector</span>
+                    <span className="text-[#9CA3AF]">Sector</span>
                     <span className="text-white">{bank.sector === 'islamic' ? 'Islamic Banking' : 'Commercial Banking'}</span>
                   </div>
                   <div className="flex justify-between text-[12px]">
-                    <span className="text-[#8B9AB0]">Stock ticker</span>
+                    <span className="text-[#9CA3AF]">Stock ticker</span>
                     <span className="text-white">{bank.ticker}</span>
                   </div>
                   <div className="flex justify-between text-[12px]">
-                    <span className="text-[#8B9AB0]">Website</span>
+                    <span className="text-[#9CA3AF]">Website</span>
                     <a href={`https://${bank.domain}`} target="_blank" rel="noopener"
                        className="text-[#004D8F] hover:text-[#CEBA95] transition-colors">
                       {bank.domain}
@@ -431,17 +431,17 @@ export default function BankPage() {
               </div>
 
               {/* 3-year profit chart */}
-              <div className="col-span-2 bg-[#0F1E35] border border-[#1E3450] rounded-xl p-5">
-                <div className="text-[12px] uppercase tracking-wider text-[#8B9AB0] mb-4">
+              <div className="col-span-2 bg-[#242424] border border-[#383838] rounded-xl p-5">
+                <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">
                   Net Profit (JOD millions) — 3-year trend
                 </div>
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart data={profitTrend}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1E3450" />
-                    <XAxis dataKey="name" stroke="#8B9AB0" tick={{ fontSize: 11 }} />
-                    <YAxis stroke="#8B9AB0" tick={{ fontSize: 11 }} />
+                    <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                    <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#0F1E35', border: '1px solid #1E3450', borderRadius: 8 }}
+                      contentStyle={{ backgroundColor: '#242424', border: '1px solid #1E3450', borderRadius: 8 }}
                       labelStyle={{ color: '#CEBA95' }}
                       itemStyle={{ color: '#fff' }}
                       formatter={(v: any) => [`JOD ${v}M`, 'Net Profit']}
@@ -460,21 +460,21 @@ export default function BankPage() {
 
             {/* Recent news */}
             {announcements.length > 0 && (
-              <div className="bg-[#0F1E35] border border-[#1E3450] rounded-xl p-5">
-                <div className="text-[12px] uppercase tracking-wider text-[#8B9AB0] mb-4">Recent announcements</div>
+              <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
+                <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">Recent announcements</div>
                 <div className="space-y-3">
                   {announcements.slice(0, 5).map((a, i) => (
-                    <div key={i} className="flex items-start gap-3 py-2 border-b border-[#1E3450] last:border-0">
+                    <div key={i} className="flex items-start gap-3 py-2 border-b border-[#383838] last:border-0">
                       <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full mt-0.5 whitespace-nowrap
                         ${a.category === 'financial_results' ? 'bg-[#004D8F]/20 text-[#60A5FA]' :
                           a.category === 'dividend' ? 'bg-[#2ECC71]/20 text-[#2ECC71]' :
                           a.category === 'leadership_change' ? 'bg-[#CEBA95]/20 text-[#CEBA95]' :
-                          'bg-[#1E3450] text-[#8B9AB0]'}`}>
+                          'bg-[#383838] text-[#9CA3AF]'}`}>
                         {catLabel[a.category] || a.category}
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="text-[13px] text-white truncate">{a.headline_en}</div>
-                        <div className="text-[11px] text-[#8B9AB0] mt-0.5">
+                        <div className="text-[11px] text-[#9CA3AF] mt-0.5">
                           {new Date(a.announcement_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </div>
                       </div>
@@ -490,17 +490,17 @@ export default function BankPage() {
         {activeTab === 'financials' && (
           <div className="space-y-6">
             {/* Year-over-year table */}
-            <div className="bg-[#0F1E35] border border-[#1E3450] rounded-xl overflow-hidden">
-              <div className="px-5 py-4 border-b border-[#1E3450]">
-                <div className="text-[12px] uppercase tracking-wider text-[#8B9AB0]">Year-over-year comparison</div>
+            <div className="bg-[#242424] border border-[#383838] rounded-xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-[#383838]">
+                <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF]">Year-over-year comparison</div>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-[13px]">
                   <thead>
-                    <tr className="border-b border-[#1E3450]">
-                      <th className="text-start px-5 py-3 text-[#8B9AB0] font-medium">Metric</th>
+                    <tr className="border-b border-[#383838]">
+                      <th className="text-start px-5 py-3 text-[#9CA3AF] font-medium">Metric</th>
                       {financials.map(f => (
-                        <th key={f.fiscal_year} className="text-end px-5 py-3 text-[#8B9AB0] font-medium">
+                        <th key={f.fiscal_year} className="text-end px-5 py-3 text-[#9CA3AF] font-medium">
                           FY{f.fiscal_year}
                         </th>
                       ))}
@@ -518,8 +518,8 @@ export default function BankPage() {
                       { label: 'Capital Adequacy Ratio', key: 'car', format: pct },
                       { label: 'Bad Loan Ratio', key: 'npl_ratio', format: pct },
                     ].map(row => (
-                      <tr key={row.key} className="border-b border-[#1E3450] hover:bg-[#132240] transition-colors">
-                        <td className="px-5 py-3 text-[#8B9AB0]">{row.label}</td>
+                      <tr key={row.key} className="border-b border-[#383838] hover:bg-[#2a2a2a] transition-colors">
+                        <td className="px-5 py-3 text-[#9CA3AF]">{row.label}</td>
                         {financials.map(f => (
                           <td key={f.fiscal_year} className="px-5 py-3 text-end text-white font-medium">
                             {row.format(f[row.key])}
@@ -533,8 +533,8 @@ export default function BankPage() {
             </div>
 
             {/* Assets vs Deposits chart */}
-            <div className="bg-[#0F1E35] border border-[#1E3450] rounded-xl p-5">
-              <div className="text-[12px] uppercase tracking-wider text-[#8B9AB0] mb-4">
+            <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
+              <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">
                 Assets & Deposits Growth (JOD millions)
               </div>
               <ResponsiveContainer width="100%" height={250}>
@@ -545,10 +545,10 @@ export default function BankPage() {
                   'Loans': Math.round((f.net_loans || 0) / 1_000_000),
                 }))}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1E3450" />
-                  <XAxis dataKey="name" stroke="#8B9AB0" tick={{ fontSize: 11 }} />
-                  <YAxis stroke="#8B9AB0" tick={{ fontSize: 11 }} />
+                  <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                  <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#0F1E35', border: '1px solid #1E3450', borderRadius: 8 }}
+                    contentStyle={{ backgroundColor: '#242424', border: '1px solid #1E3450', borderRadius: 8 }}
                     labelStyle={{ color: '#CEBA95' }}
                     formatter={(v: any) => [`JOD ${v}M`]}
                   />
@@ -570,8 +570,8 @@ export default function BankPage() {
             {rates ? (
               <div className="grid grid-cols-2 gap-6">
                 {/* Lending rates */}
-                <div className="bg-[#0F1E35] border border-[#1E3450] rounded-xl p-5">
-                  <div className="text-[12px] uppercase tracking-wider text-[#8B9AB0] mb-4">Loan Interest Rates</div>
+                <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
+                  <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">Loan Interest Rates</div>
                   <div className="space-y-3">
                     {[
                       { label: 'Home Loans', min: rates.home_loan_min, max: rates.home_loan_max },
@@ -580,7 +580,7 @@ export default function BankPage() {
                       { label: 'Business Loans', min: rates.corporate_loan_min, max: rates.corporate_loan_max },
                     ].map(r => (
                       <div key={r.label} className="flex justify-between items-center py-2
-                                                      border-b border-[#1E3450] last:border-0">
+                                                      border-b border-[#383838] last:border-0">
                         <span className="text-[13px] text-[#CBD5E0]">{r.label}</span>
                         <span className="text-[13px] font-medium text-white">
                           {r.min && r.max ? `${r.min}% – ${r.max}%` :
@@ -592,8 +592,8 @@ export default function BankPage() {
                 </div>
 
                 {/* Savings rates */}
-                <div className="bg-[#0F1E35] border border-[#1E3450] rounded-xl p-5">
-                  <div className="text-[12px] uppercase tracking-wider text-[#8B9AB0] mb-4">Deposit Interest Rates</div>
+                <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
+                  <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">Deposit Interest Rates</div>
                   <div className="space-y-3">
                     {[
                       { label: 'Savings Account', val: rates.saving_rate },
@@ -603,7 +603,7 @@ export default function BankPage() {
                       { label: '12-Month Term Deposit', val: rates.td_12m },
                     ].map(r => (
                       <div key={r.label} className="flex justify-between items-center py-2
-                                                      border-b border-[#1E3450] last:border-0">
+                                                      border-b border-[#383838] last:border-0">
                         <span className="text-[13px] text-[#CBD5E0]">{r.label}</span>
                         <span className="text-[13px] font-medium text-white">
                           {r.val != null ? `${r.val}%` : '—'}
@@ -617,7 +617,7 @@ export default function BankPage() {
                 {/* tariffs would go here */}
               </div>
             ) : (
-              <div className="text-[#8B9AB0] text-center py-12">No rate data available</div>
+              <div className="text-[#9CA3AF] text-center py-12">No rate data available</div>
             )}
             <ChartPrompt bankId={bankId} bankName={bank.shortName} />
           </div>
@@ -627,14 +627,14 @@ export default function BankPage() {
         {activeTab === 'products' && (
           <div className="space-y-4">
             {productCategories.map(cat => (
-              <div key={cat} className="bg-[#0F1E35] border border-[#1E3450] rounded-xl p-5">
-                <div className="text-[12px] uppercase tracking-wider text-[#8B9AB0] mb-4">{cat}</div>
+              <div key={cat} className="bg-[#242424] border border-[#383838] rounded-xl p-5">
+                <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">{cat}</div>
                 <div className="grid grid-cols-2 gap-3">
                   {products.filter(p => p.category === cat).map((p, i) => (
-                    <div key={i} className="p-3 rounded-lg bg-[#0A1628] border border-[#1E3450]">
+                    <div key={i} className="p-3 rounded-lg bg-[#1a1a1a] border border-[#383838]">
                       <div className="text-[13px] font-medium text-white">{p.product_name_en}</div>
                       {p.description_en && (
-                        <div className="text-[11px] text-[#8B9AB0] mt-1 line-clamp-2">{p.description_en}</div>
+                        <div className="text-[11px] text-[#9CA3AF] mt-1 line-clamp-2">{p.description_en}</div>
                       )}
                       {p.is_islamic && (
                         <span className="mt-2 inline-block text-[10px] text-[#2ECC71] bg-[#2ECC71]/10
@@ -648,7 +648,7 @@ export default function BankPage() {
               </div>
             ))}
             {products.length === 0 && (
-              <div className="text-center py-12 text-[#8B9AB0]">No product data available</div>
+              <div className="text-center py-12 text-[#9CA3AF]">No product data available</div>
             )}
           </div>
         )}
@@ -656,8 +656,8 @@ export default function BankPage() {
         {/* OWNERSHIP */}
         {activeTab === 'ownership' && (
           <div className="space-y-6">
-            <div className="bg-[#0F1E35] border border-[#1E3450] rounded-xl p-5">
-              <div className="text-[12px] uppercase tracking-wider text-[#8B9AB0] mb-4">
+            <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
+              <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">
                 Who owns {bank.shortName}
               </div>
               {ownership.length > 0 ? (
@@ -667,14 +667,14 @@ export default function BankPage() {
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-[13px] text-white">{o.shareholder_name_en}</span>
                         <div className="flex items-center gap-3">
-                          <span className="text-[11px] text-[#8B9AB0]">{o.country || ''}</span>
+                          <span className="text-[11px] text-[#9CA3AF]">{o.country || ''}</span>
                           <span className="text-[14px] font-bold text-[#CEBA95]">
                             {o.ownership_pct != null ? `${o.ownership_pct.toFixed(2)}%` : 'Controlling'}
                           </span>
                         </div>
                       </div>
                       {o.ownership_pct != null && (
-                        <div className="h-1.5 bg-[#1E3450] rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-[#383838] rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-500"
                             style={{
@@ -688,7 +688,7 @@ export default function BankPage() {
                   ))}
                 </div>
               ) : (
-                <div className="text-[#8B9AB0] text-center py-8">No ownership data available</div>
+                <div className="text-[#9CA3AF] text-center py-8">No ownership data available</div>
               )}
             </div>
           </div>
@@ -698,11 +698,11 @@ export default function BankPage() {
         {activeTab === 'governance' && (
           <div className="grid grid-cols-2 gap-6">
             {/* Executives */}
-            <div className="bg-[#0F1E35] border border-[#1E3450] rounded-xl p-5">
-              <div className="text-[12px] uppercase tracking-wider text-[#8B9AB0] mb-4">Executive Management</div>
+            <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
+              <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">Executive Management</div>
               <div className="space-y-3">
                 {executives.slice(0, 8).map((e, i) => (
-                  <div key={i} className="flex items-start gap-3 py-2 border-b border-[#1E3450] last:border-0">
+                  <div key={i} className="flex items-start gap-3 py-2 border-b border-[#383838] last:border-0">
                     <div className="w-8 h-8 rounded-full bg-[#004D8F]/20 border border-[#004D8F]/30
                                     flex items-center justify-center flex-shrink-0">
                       <span className="text-[11px] font-bold text-[#004D8F]">
@@ -711,22 +711,22 @@ export default function BankPage() {
                     </div>
                     <div>
                       <div className="text-[13px] font-medium text-white">{e.full_name_en}</div>
-                      <div className="text-[11px] text-[#8B9AB0]">{e.title_en}</div>
+                      <div className="text-[11px] text-[#9CA3AF]">{e.title_en}</div>
                     </div>
                   </div>
                 ))}
                 {executives.length === 0 && (
-                  <div className="text-[#8B9AB0] text-center py-6">No data available</div>
+                  <div className="text-[#9CA3AF] text-center py-6">No data available</div>
                 )}
               </div>
             </div>
 
             {/* Board */}
-            <div className="bg-[#0F1E35] border border-[#1E3450] rounded-xl p-5">
-              <div className="text-[12px] uppercase tracking-wider text-[#8B9AB0] mb-4">Board of Directors</div>
+            <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
+              <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">Board of Directors</div>
               <div className="space-y-3">
                 {boardMembers.slice(0, 12).map((b, i) => (
-                  <div key={i} className="flex items-start gap-3 py-2 border-b border-[#1E3450] last:border-0">
+                  <div key={i} className="flex items-start gap-3 py-2 border-b border-[#383838] last:border-0">
                     <div className="w-8 h-8 rounded-full bg-[#CEBA95]/10 border border-[#CEBA95]/20
                                     flex items-center justify-center flex-shrink-0">
                       <span className="text-[11px] font-bold text-[#CEBA95]">
@@ -735,7 +735,7 @@ export default function BankPage() {
                     </div>
                     <div>
                       <div className="text-[13px] font-medium text-white">{b.full_name_en}</div>
-                      <div className="text-[11px] text-[#8B9AB0]">
+                      <div className="text-[11px] text-[#9CA3AF]">
                         {b.role}
                         {b.is_independent && (
                           <span className="ml-2 text-[10px] text-[#2ECC71] bg-[#2ECC71]/10
@@ -748,7 +748,7 @@ export default function BankPage() {
                   </div>
                 ))}
                 {boardMembers.length === 0 && (
-                  <div className="text-[#8B9AB0] text-center py-6">No data available</div>
+                  <div className="text-[#9CA3AF] text-center py-6">No data available</div>
                 )}
               </div>
             </div>
@@ -759,19 +759,19 @@ export default function BankPage() {
         {activeTab === 'news' && (
           <div className="space-y-3">
             {announcements.map((a, i) => (
-              <div key={i} className="bg-[#0F1E35] border border-[#1E3450] rounded-xl p-4 flex items-start gap-4">
+              <div key={i} className="bg-[#242424] border border-[#383838] rounded-xl p-4 flex items-start gap-4">
                 <div className="text-center flex-shrink-0 w-12">
                   <div className="text-[18px] font-bold text-white">
                     {new Date(a.announcement_date).getDate()}
                   </div>
-                  <div className="text-[10px] text-[#8B9AB0] uppercase">
+                  <div className="text-[10px] text-[#9CA3AF] uppercase">
                     {new Date(a.announcement_date).toLocaleDateString('en-GB', { month: 'short' })}
                   </div>
-                  <div className="text-[10px] text-[#4A5568]">
+                  <div className="text-[10px] text-[#6B7280]">
                     {new Date(a.announcement_date).getFullYear()}
                   </div>
                 </div>
-                <div className="w-px bg-[#1E3450] self-stretch flex-shrink-0" />
+                <div className="w-px bg-[#383838] self-stretch flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full
@@ -779,21 +779,21 @@ export default function BankPage() {
                         a.category === 'dividend' ? 'bg-[#2ECC71]/20 text-[#2ECC71]' :
                         a.category === 'agm' ? 'bg-[#CEBA95]/20 text-[#CEBA95]' :
                         a.category === 'leadership_change' ? 'bg-purple-500/20 text-purple-400' :
-                        'bg-[#1E3450] text-[#8B9AB0]'}`}>
+                        'bg-[#383838] text-[#9CA3AF]'}`}>
                       {catLabel[a.category] || a.category}
                     </span>
                     {a.fiscal_year && (
-                      <span className="text-[10px] text-[#4A5568]">FY{a.fiscal_year}</span>
+                      <span className="text-[10px] text-[#6B7280]">FY{a.fiscal_year}</span>
                     )}
                   </div>
                   <div className="text-[14px] font-medium text-white">{a.headline_en}</div>
                   {a.summary_en && (
-                    <div className="text-[12px] text-[#8B9AB0] mt-1.5 line-clamp-2">{a.summary_en}</div>
+                    <div className="text-[12px] text-[#9CA3AF] mt-1.5 line-clamp-2">{a.summary_en}</div>
                   )}
                 </div>
                 {a.source_url && (
                   <a href={a.source_url} target="_blank" rel="noopener"
-                     className="text-[11px] text-[#8B9AB0] hover:text-[#CEBA95] transition-colors
+                     className="text-[11px] text-[#9CA3AF] hover:text-[#CEBA95] transition-colors
                                 flex-shrink-0 mt-0.5">
                     Source →
                   </a>
@@ -801,7 +801,7 @@ export default function BankPage() {
               </div>
             ))}
             {announcements.length === 0 && (
-              <div className="text-center py-12 text-[#8B9AB0]">No announcements available</div>
+              <div className="text-center py-12 text-[#9CA3AF]">No announcements available</div>
             )}
           </div>
         )}
