@@ -332,27 +332,54 @@ function ChatContent() {
         </div>
       </header>
 
-      {/* Messages */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '24px 20px' }}>
-        <div style={{ maxWidth: 860, margin: '0 auto' }}>
-          {messages.length === 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '55vh', textAlign: 'center', padding: '0 20px' }}>
-            <div style={{ width: 56, height: 56, borderRadius: 16, backgroundColor: t.accentSubtle, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, fontSize: 26 }}>
-              🏦
-            </div>
-            <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 10px', color: t.text }}>
-              {bank ? `${bank.name} — AI Analyst` : 'Jordan Banking Analyst'}
-            </h2>
-            <p style={{ fontSize: 14, color: t.textSub, margin: 0, lineHeight: 1.65, maxWidth: 420 }}>
-              {bank
-                ? `Ask me anything about ${bank.shortName} — financials, rates, fees, ownership, leadership, or how it stacks up against the sector.`
-                : 'Ask me anything across all 15 Jordanian banks — profits, rates, fees, comparisons, charts, governance, strategy.'}
-            </p>
-          </div>
-        )}
+      {/* ── Layout: centered on empty, pinned bottom when active ── */}
+      {messages.length === 0 ? (
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {messages.map((msg, i) => (
+        /* EMPTY STATE: icon + title + centered input */
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 20px 60px' }}>
+          <div style={{ width: '100%', maxWidth: 720 }}>
+            <div style={{ textAlign: 'center', marginBottom: 28 }}>
+              <div style={{ width: 56, height: 56, borderRadius: 16, backgroundColor: t.accentSubtle, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 26 }}>
+                🏦
+              </div>
+              <h2 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 8px', color: t.text }}>
+                {bank ? `${bank.name} — AI Analyst` : 'Jordan Banking Analyst'}
+              </h2>
+              <p style={{ fontSize: 14, color: t.textSub, margin: 0, lineHeight: 1.65 }}>
+                {bank
+                  ? `Ask me anything about ${bank.shortName} — financials, rates, fees, ownership, leadership, or how it stacks up against the sector.`
+                  : 'Ask me anything across all 15 Jordanian banks — profits, rates, fees, comparisons, charts, governance, strategy.'}
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', backgroundColor: t.inputBg, border: `1.5px solid ${t.border}`, borderRadius: 16, padding: '12px 12px 12px 18px', boxShadow: `0 2px 16px ${t.shadow === 'none' ? 'rgba(0,0,0,0.18)' : 'rgba(0,0,0,0.07)'}` }}>
+              <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }}
+              placeholder={bank ? `Ask anything about ${bank.shortName}...` : 'Ask about profits, rates, fees, charts, comparisons…'}
+              rows={1}
+              style={{ flex: 1, background: 'none', border: 'none', outline: 'none', fontSize: 15, color: t.text, resize: 'none', maxHeight: 120, lineHeight: 1.5, fontFamily: 'inherit' }}
+              onInput={e => { const el = e.currentTarget; el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120)+'px' }}
+            />
+            <button onClick={() => send(input)} disabled={!input.trim() || streaming}
+              style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: input.trim() && !streaming ? t.accent : t.pillBg, border: 'none', cursor: input.trim() && !streaming ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.15s' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={input.trim() && !streaming ? '#fff' : t.textMuted} strokeWidth="2.5">
+                <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" />
+              </svg>
+            </button>
+            </div>
+            <div style={{ textAlign: 'center', fontSize: 11, color: t.textMuted, marginTop: 10 }}>
+              Data from official bank sources &middot; FY2023–2025 &middot; Press Enter to send
+            </div>
+          </div>
+        </div>
+
+      ) : (
+
+        /* ACTIVE STATE: scrollable messages + pinned input */
+        <>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '24px 20px' }}>
+            <div style={{ maxWidth: 860, margin: '0 auto' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                {messages.map((msg, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', gap: 10, alignItems: 'flex-start' }}>
                 {msg.role === 'assistant' && (
                   <div style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: t.accentSubtle, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2, fontSize: 16 }}>
@@ -381,16 +408,13 @@ function ChatContent() {
             ))}
           </div>
           <div ref={bottomRef} />
-        </div>
-      </div>
-
-      {/* Input area */}
-      <div style={{ borderTop: `1px solid ${t.border}`, padding: '10px 20px 18px', backgroundColor: t.bg, flexShrink: 0 }}>
-        <div style={{ maxWidth: 860, margin: '0 auto' }}>
-          
-          {/* Text input */}
-          <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', backgroundColor: t.inputBg, border: `1px solid ${t.border}`, borderRadius: 14, padding: '10px 10px 10px 16px', boxShadow: t.shadow }}>
-            <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
+              </div>
+            </div>
+          </div>
+          <div style={{ borderTop: `1px solid ${t.border}`, padding: '10px 20px 18px', backgroundColor: t.bg, flexShrink: 0 }}>
+            <div style={{ maxWidth: 860, margin: '0 auto' }}>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', backgroundColor: t.inputBg, border: `1px solid ${t.border}`, borderRadius: 14, padding: '10px 10px 10px 16px', boxShadow: t.shadow }}>
+                <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }}
               placeholder={bank ? `Ask anything about ${bank.shortName}...` : 'Ask about profits, rates, fees, charts, comparisons…'}
               rows={1}
@@ -403,21 +427,13 @@ function ChatContent() {
                 <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" />
               </svg>
             </button>
+              </div>
+              <div style={{ textAlign: 'center', fontSize: 11, color: t.textMuted, marginTop: 7 }}>
+                Data from official bank sources &middot; FY2023–2025 &middot; Press Enter to send
+              </div>
+            </div>
           </div>
-          <div style={{ textAlign: 'center', fontSize: 11, color: t.textMuted, marginTop: 7 }}>
-            Data from official bank sources &middot; FY2023–2025 &middot; Press Enter to send
-          </div>
-        </div>
-      </div>
-      <style>{`@keyframes bounce{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-5px);opacity:1}}`}</style>
-    </div>
-  )
-}
+        </>
 
-export default function ChatPage() {
-  return (
-    <Suspense fallback={<div style={{ height:'100vh', display:'flex', alignItems:'center', justifyContent:'center' }}>Loading…</div>}>
-      <ChatContent />
-    </Suspense>
-  )
-}
+      )}
+
