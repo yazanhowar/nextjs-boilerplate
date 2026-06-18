@@ -21,16 +21,16 @@
 
 /* ── Dark mode — toggled by .dark on <html> ─────────────────────────────── */
 html.dark {
-  --bg-primary: #0A1628;
-  --bg-card: #0F1E35;
-  --bg-hover: #132240;
-  --border: #1E3450;
+  --bg-primary: #1a1a1a;
+  --bg-card: #242424;
+  --bg-hover: #2a2a2a;
+  --border: #383838;
   --text-primary: #FFFFFF;
-  --text-secondary: #8B9AB0;
-  --text-muted: #4A5568;
+  --text-secondary: #9CA3AF;
+  --text-muted: #6B7280;
   --accent: #3B82F6;
-  --green: #2ECC71;
-  --red: #E05252;
+  --green: #22C55E;
+  --red: #EF4444;
 }
 
 * { box-sizing: border-box; }
