@@ -388,21 +388,10 @@ function ChatContent() {
         </div>
       )}
 
-      {/* ── Single input: centered when empty, pinned bottom when active ── */}
-      <div style={{
-        position: messages.length === 0 ? ('absolute' as const) : ('relative' as const),
-        left: messages.length === 0 ? '50%' : 'auto',
-        bottom: messages.length === 0 ? '50%' : 'auto',
-        transform: messages.length === 0 ? 'translate(-50%, 70px)' : 'none',
-        width: messages.length === 0 ? 'min(720px, calc(100vw - 40px))' : '100%',
-        zIndex: messages.length === 0 ? 10 : 'auto' as any,
-        borderTop: messages.length === 0 ? 'none' : `1px solid ${t.border}`,
-        padding: messages.length === 0 ? '0' : '10px 20px 18px',
-        backgroundColor: messages.length === 0 ? 'transparent' : t.bg,
-        flexShrink: 0,
-      }}>
-        <div style={{ maxWidth: messages.length === 0 ? '100%' : 860, margin: '0 auto' }}>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', backgroundColor: t.inputBg, border: `1.5px solid ${t.border}`, borderRadius: 16, padding: '12px 12px 12px 18px', boxShadow: messages.length === 0 ? '0 4px 24px rgba(0,0,0,0.10)' : t.shadow }}>
+      {/* ── Input: absolute center when empty, static bottom when active ── */}
+      {messages.length === 0 ? (
+        <div style={{ position: 'absolute' as const, left: '50%', bottom: '50%', transform: 'translate(-50%, 70px)', width: 'min(720px, calc(100vw - 40px))', zIndex: 10 }}>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', backgroundColor: t.inputBg, border: `1.5px solid ${t.border}`, borderRadius: 16, padding: '12px 12px 12px 18px', boxShadow: '0 4px 24px rgba(0,0,0,0.10)' }}>
             <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }}
               placeholder={bank ? `Ask anything about ${bank.shortName}...` : 'Ask about profits, rates, fees, charts, comparisons…'}
@@ -417,9 +406,28 @@ function ChatContent() {
               </svg>
             </button>
           </div>
-          <div style={{ textAlign: 'center', fontSize: 11, color: t.textMuted, marginTop: 8 }}>
-            Data from official bank sources &middot; FY2023–2025 &middot; Press Enter to send
+          <div style={{ textAlign: 'center', fontSize: 11, color: t.textMuted, marginTop: 8 }}>Data from official bank sources &middot; FY2023–2025 &middot; Press Enter to send</div>
+        </div>
+      ) : (
+        <div style={{ borderTop: `1px solid ${t.border}`, padding: '10px 20px 18px', backgroundColor: t.bg, flexShrink: 0 }}>
+          <div style={{ maxWidth: 860, margin: '0 auto' }}>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', backgroundColor: t.inputBg, border: `1px solid ${t.border}`, borderRadius: 14, padding: '10px 10px 10px 16px', boxShadow: t.shadow }}>
+              <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }}
+              placeholder={bank ? `Ask anything about ${bank.shortName}...` : 'Ask about profits, rates, fees, charts, comparisons…'}
+              rows={1}
+              style={{ flex: 1, background: 'none', border: 'none', outline: 'none', fontSize: 15, color: t.text, resize: 'none', maxHeight: 120, lineHeight: 1.5, fontFamily: 'inherit' }}
+              onInput={e => { const el = e.currentTarget; el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120)+'px' }}
+            />
+            <button onClick={() => send(input)} disabled={!input.trim() || streaming}
+              style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: input.trim() && !streaming ? t.accent : t.pillBg, border: 'none', cursor: input.trim() && !streaming ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.15s' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={input.trim() && !streaming ? '#fff' : t.textMuted} strokeWidth="2.5">
+                <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" />
+              </svg>
+            </button>
+            </div>
+            <div style={{ textAlign: 'center', fontSize: 11, color: t.textMuted, marginTop: 7 }}>Data from official bank sources &middot; FY2023–2025 &middot; Press Enter to send</div>
           </div>
         </div>
-      </div>
+      )}
 
