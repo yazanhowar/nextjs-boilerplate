@@ -370,6 +370,31 @@ function ChatContent() {
                 ? `Ask me anything about ${bank.shortName} — financials, rates, fees, ownership, leadership, or how it stacks up against the sector.`
                 : 'Ask me anything across all 15 Jordanian banks — profits, rates, fees, comparisons, charts, governance, strategy.'}
             </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', maxWidth: 680, marginTop: 22 }}>
+              {(bank ? [
+                'What are the latest announcements?',
+                'What is ' + bank.shortName + "'s competitive advantage today?",
+                'How does ' + bank.shortName + ' compare to the sector on profitability?',
+                'Which segment is growing fastest for ' + bank.shortName + '?',
+                'How healthy is ' + bank.shortName + "'s loan portfolio?",
+                'What are the trends in ' + bank.shortName + "'s net interest margin?",
+                'Who leads ' + bank.shortName + ' and how experienced is the team?',
+                'What are the biggest risks facing ' + bank.shortName + ' today?',
+              ] : [
+                'What are the latest announcements?',
+                'Which segment is growing fastest in Jordan?',
+                'Which bank has the healthiest loan portfolio?',
+                'What are the trends in net interest margins across the sector?',
+                'Which banking products are seeing the highest adoption?',
+                'How are customer expectations changing in Jordanian banking?',
+                'What percentage of banking transactions are now digital in Jordan?',
+                'What are the risks of not adopting AI in banking?',
+              ]).map((q, i) => (
+                <button key={i} onClick={() => send(q)} style={{ border: '1px solid ' + t.border, backgroundColor: t.inputBg, color: t.text, borderRadius: 20, padding: '8px 14px', fontSize: 13, cursor: 'pointer', lineHeight: 1.3, transition: 'all 0.15s', textAlign: 'left' }}>
+                  {q}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
