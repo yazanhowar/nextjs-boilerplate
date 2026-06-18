@@ -394,7 +394,7 @@ function ChatContent() {
           <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', backgroundColor: t.inputBg, border: '1.5px solid ' + t.border, borderRadius: 16, padding: '12px 12px 12px 18px', boxShadow: '0 4px 24px rgba(0,0,0,0.10)' }}>
             <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }}
-              placeholder={bank ? `Ask anything about ${bank.shortName}...` : 'Ask about profits, rates, fees, charts, comparisons…'}
+              placeholder={bank ? 'Ask anything about ' + (bank ? bank.shortName : '') + '...' : 'Ask about profits, rates, fees, charts, comparisons…'}
               rows={1}
               style={{ flex: 1, background: 'none', border: 'none', outline: 'none', fontSize: 15, color: t.text, resize: 'none', maxHeight: 120, lineHeight: 1.5, fontFamily: 'inherit' }}
               onInput={e => { const el = e.currentTarget; el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120)+'px' }}
@@ -414,7 +414,7 @@ function ChatContent() {
             <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', backgroundColor: t.inputBg, border: '1px solid ' + t.border, borderRadius: 14, padding: '10px 10px 10px 16px', boxShadow: t.shadow }}>
               <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }}
-              placeholder={bank ? `Ask anything about ${bank.shortName}...` : 'Ask about profits, rates, fees, charts, comparisons…'}
+              placeholder={bank ? 'Ask anything about ' + (bank ? bank.shortName : '') + '...' : 'Ask about profits, rates, fees, charts, comparisons…'}
               rows={1}
               style={{ flex: 1, background: 'none', border: 'none', outline: 'none', fontSize: 15, color: t.text, resize: 'none', maxHeight: 120, lineHeight: 1.5, fontFamily: 'inherit' }}
               onInput={e => { const el = e.currentTarget; el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120)+'px' }}
