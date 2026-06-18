@@ -57,7 +57,7 @@ export const BANKS: BankConfig[] = [
     primaryColor: '#003DA5', sector: 'conventional', isHBTF: false, description: "Established in 1960, one of Jordan's oldest commercial banks." },
 
   { id: 13, ticker: 'INVB',  name: 'Invest Bank',                    nameAr: '', shortName: 'InvestBank',   domain: 'investbank.jo',
-    logoUrl: 'https://www.investbank.jo/media/2024/12/Inverstbank-Logo.png',
+    logoUrl: gf('investbank.jo'),
     primaryColor: '#C8102E', sector: 'conventional', isHBTF: false, description: 'Smaller specialist bank with Palestinian and Gulf family ownership.' },
 
   { id: 14, ticker: 'ABCO',  name: 'Bank ABC Jordan',                nameAr: '', shortName: 'Bank ABC',     domain: 'bank-abc.com',
