@@ -218,27 +218,6 @@ function ChartBlock({ chart, t }: { chart: any; t: any }) {
   )
 }
 
-const SUGGESTED = [
-  'Which bank had the highest profit in 2025?',
-  'Compare HBTF vs Capital Bank profit growth 2023 to 2025 on a line chart',
-  'Show a donut chart of 2025 sector net profit share',
-  'Which bank has the lowest home loan rate?',
-  'Compare credit card annual fees across all banks',
-  'Who are the top shareholders of Housing Bank?',
-  'Compare ROE across all banks for 2025 on a bar chart',
-  "What is JKB's net profit trend from 2023 to 2025?",
-]
-
-const YEAR_CHIPS = [
-  { label: 'FY2025 profits', q: 'Show all 15 bank net profits for FY2025 ranked highest to lowest with a bar chart' },
-  { label: 'FY2024 profits', q: 'Show all 15 bank net profits for FY2024 ranked highest to lowest with a bar chart' },
-  { label: 'FY2023 profits', q: 'Show all 15 bank net profits for FY2023 ranked highest to lowest with a bar chart' },
-  { label: '3-year trend',   q: 'Show HBTF net profit for 2023, 2024, and 2025 on a line chart' },
-  { label: 'Profit ranking', q: 'Rank all 15 banks by 2025 net profit from highest to lowest' },
-  { label: 'Donut 2025',     q: 'Show a donut chart of 2025 net profit market share across all 15 banks' },
-  { label: 'ROE compare',    q: 'Compare ROE across all banks for 2025 on a bar chart' },
-]
-
 function ChatContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -283,15 +262,6 @@ function ChatContent() {
   const inputRef  = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
-
-  // Auto-prompt: when arriving with a bank context, fire an opening brief immediately
-  useEffect(() => {
-    if (bank && messages.length === 0) {
-      send(`Give me a concise briefing on ${bank.name}: latest net profit, total assets, ROE, and one sharp competitive insight vs the sector.`)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bankId])
-
   async function send(content: string) {
     if (!content.trim() || streaming) return
     const userMsg: Message = { role: 'user', content: content.trim() }
@@ -366,36 +336,20 @@ function ChatContent() {
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px 20px' }}>
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
           {messages.length === 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '50vh', textAlign: 'center' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 18, backgroundColor: t.accentSubtle, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20, fontSize: 28 }}>
-                🏦
-              </div>
-              <h2 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 8px', color: t.text }}>
-                {bank ? `Ask me about ${bank.shortName}` : 'Jordan Banking Analyst'}
-              </h2>
-              <p style={{ fontSize: 14, color: t.textSub, margin: '0 0 24px', maxWidth: 440, lineHeight: 1.6 }}>
-                {bank ? `Verified FY2023–2025 data on ${bank.name}.` : 'Verified FY2023–2025 data on all 15 Jordanian banks.'}
-              </p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, width: '100%', maxWidth: 620 }}>
-                {(bank ? [
-                  `What was ${bank.shortName}'s net profit in 2025?`,
-                  `Show ${bank.shortName} profit trend 2023–2025`,
-                  `What loan rates does ${bank.shortName} offer?`,
-                  `Compare ${bank.shortName} vs peers on ROE`,
-                  `What credit card fees does ${bank.shortName} charge?`,
-                  `Who are the top shareholders of ${bank.name}?`,
-                  `Who is the CEO of ${bank.name}?`,
-                  `Show a donut chart of ${bank.shortName} vs sector profit`,
-                ] : SUGGESTED).map(s => (
-                  <button key={s} onClick={() => send(s)}
-                    style={{ textAlign: 'left', padding: '12px 14px', borderRadius: 10, border: `1px solid ${t.border}`, backgroundColor: t.surface, color: t.textSub, fontSize: 13, cursor: 'pointer', lineHeight: 1.4, transition: 'all 0.15s', boxShadow: t.shadow }}
-                    onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = t.accent; el.style.color = t.text }}
-                    onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = t.border; el.style.color = t.textSub }}
-                  >{s}</button>
-                ))}
-              </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '55vh', textAlign: 'center', padding: '0 20px' }}>
+            <div style={{ width: 56, height: 56, borderRadius: 16, backgroundColor: t.accentSubtle, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, fontSize: 26 }}>
+              🏦
             </div>
-          )}
+            <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 10px', color: t.text }}>
+              {bank ? `${bank.name} — AI Analyst` : 'Jordan Banking Analyst'}
+            </h2>
+            <p style={{ fontSize: 14, color: t.textSub, margin: 0, lineHeight: 1.65, maxWidth: 420 }}>
+              {bank
+                ? `Ask me anything about ${bank.shortName} — financials, rates, fees, ownership, leadership, or how it stacks up against the sector.`
+                : 'Ask me anything across all 15 Jordanian banks — profits, rates, fees, comparisons, charts, governance, strategy.'}
+            </p>
+          </div>
+        )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             {messages.map((msg, i) => (
@@ -433,16 +387,7 @@ function ChatContent() {
       {/* Input area */}
       <div style={{ borderTop: `1px solid ${t.border}`, padding: '10px 20px 18px', backgroundColor: t.bg, flexShrink: 0 }}>
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
-          {/* Year / quick-action chips */}
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
-            {YEAR_CHIPS.map(c => (
-              <button key={c.label} onClick={() => send(c.q)}
-                style={{ padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500, cursor: 'pointer', border: `1px solid ${t.border}`, backgroundColor: t.surface, color: t.textSub, transition: 'all 0.15s', whiteSpace: 'nowrap' }}
-                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = t.accent; el.style.color = t.accent; el.style.backgroundColor = t.accentSubtle }}
-                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = t.border; el.style.color = t.textSub; el.style.backgroundColor = t.surface }}
-              >{c.label}</button>
-            ))}
-          </div>
+          
           {/* Text input */}
           <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', backgroundColor: t.inputBg, border: `1px solid ${t.border}`, borderRadius: 14, padding: '10px 10px 10px 16px', boxShadow: t.shadow }}>
             <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
