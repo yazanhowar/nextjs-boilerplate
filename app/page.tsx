@@ -132,7 +132,7 @@ export default function Dashboard() {
             <div style={{ width:28, height:28, borderRadius:8, backgroundColor:t.accent, display:'flex', alignItems:'center', justifyContent:'center' }}>
               <span style={{ color:'#fff', fontSize:11, fontWeight:700 }}>HB</span>
             </div>
-            <span style={{ fontWeight:600, fontSize:15, color:t.text }}>HBTF Intelligence</span>
+            <span style={{ fontWeight:600, fontSize:15, color:t.text }}>convo.finance</span>
             <span style={{ fontSize:12, color:t.textMuted, marginLeft:4 }}>Jordan Banking Sector</span>
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
