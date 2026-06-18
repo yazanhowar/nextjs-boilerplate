@@ -296,7 +296,7 @@ function ChatContent() {
   }
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: t.bg, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', color: t.text }}>
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', backgroundColor: t.bg, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', color: t.text }}>
       {/* Header */}
       <header style={{ backgroundColor: t.hBg, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: `1px solid ${t.border}`, padding: '0 20px', flexShrink: 0, position: 'sticky', top: 0, zIndex: 50 }}>
         <div style={{ maxWidth: 860, margin: '0 auto', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
