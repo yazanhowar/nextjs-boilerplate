@@ -2,6 +2,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import PasswordGate from '@/components/PasswordGate'
 
 const inter = Inter({ subsets: ['latin'], weight: ['400','500','600','700'], display: 'swap' })
 
@@ -21,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           __html: `(function(){try{var s=localStorage.getItem('hbtf-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;if(s==='dark'||((!s)&&d)){document.documentElement.classList.add('dark');}}catch(e){}})();`
         }} />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}><PasswordGate>{children}</PasswordGate></body>
     </html>
   )
 }
