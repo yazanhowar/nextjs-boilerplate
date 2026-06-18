@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { BANKS } from '@/lib/banks-config'
+import SettingsPanel from '@/components/SettingsPanel'
 import { createClient } from '@supabase/supabase-js'
 
 function getSupabase() {
@@ -156,6 +157,7 @@ export default function Dashboard() {
                   )}
                 </span>
               </button>
+            <SettingsPanel dark={dark} />
             <button onClick={() => router.push('/chat')} style={{ backgroundColor:t.accent, color:'#fff', border:'none', borderRadius:8, padding:'7px 16px', fontSize:13, fontWeight:500, cursor:'pointer' }}>
               Open AI Analyst
             </button>
