@@ -32,12 +32,24 @@ function extractChart(text: string): { text: string; chart: any | null } {
 }
 
 // Bold spans — split on ** markers
+function linkify(text: string, keyPrefix: string): React.ReactNode {
+  const urlRe = /(https?:\/\/[^\s)]+)/g
+  const segs = text.split(urlRe)
+  return segs.map((seg, j) => {
+    if (/^https?:\/\//.test(seg)) {
+      const clean = seg.replace(/[.,;]+$/, '')
+      return <a key={keyPrefix + '-' + j} href={clean} target="_blank" rel="noopener noreferrer" style={{ color: '#3B82F6', textDecoration: 'underline', wordBreak: 'break-all' }}>{clean}</a>
+    }
+    return <span key={keyPrefix + '-' + j}>{seg}</span>
+  })
+}
+
 function bold(text: string, textColor: string): React.ReactNode {
   const parts = text.split('**')
   return parts.map((p, i) =>
     i % 2 === 1
-      ? <strong key={i} style={{ color: textColor, fontWeight: 700 }}>{p}</strong>
-      : <span key={i}>{p}</span>
+      ? <strong key={i} style={{ color: textColor, fontWeight: 700 }}>{linkify(p, 'b' + i)}</strong>
+      : <span key={i}>{linkify(p, 's' + i)}</span>
   )
 }
 
