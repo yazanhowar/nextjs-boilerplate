@@ -29,32 +29,47 @@ export default function PasswordGate({ children }: { children: React.ReactNode }
   if (unlocked) return <>{children}</>
 
   return (
-    <div style={{ position: 'fixed', inset: 0, backgroundColor: '#0f0f0f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif', zIndex: 9999 }}>
-      <div style={{ width: 'min(380px, calc(100vw - 40px))', backgroundColor: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 16, padding: 32, boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 9, background: '#0A4A8F', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 14 }}>cf</div>
+    <div style={{ position: 'fixed', inset: 0, backgroundColor: '#0f1115', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif', zIndex: 9999, padding: 20, boxSizing: 'border-box' }}>
+      <div style={{ width: 'min(440px, 100%)', backgroundColor: '#16191f', border: '1px solid #262b34', borderRadius: 18, padding: 36, boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+          <div style={{ width: 42, height: 42, borderRadius: 11, background: '#0A4A8F', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 16, letterSpacing: '-0.02em' }}>cf</div>
           <div>
-            <div style={{ color: '#fff', fontWeight: 700, fontSize: 16 }}>convo.finance</div>
-            <div style={{ color: '#888', fontSize: 12 }}>Jordanian Banking Intelligence</div>
+            <div style={{ color: '#fff', fontWeight: 700, fontSize: 19, letterSpacing: '-0.01em' }}>convo.finance</div>
+            <div style={{ color: '#7d8694', fontSize: 12.5 }}>Jordanian Banking Intelligence</div>
           </div>
         </div>
-        <div style={{ color: '#bbb', fontSize: 13, marginBottom: 16, lineHeight: 1.5 }}>This is a private platform. Enter the access password to continue.</div>
+
+        <div style={{ height: 1, backgroundColor: '#262b34', margin: '20px 0' }} />
+
+        <h1 style={{ color: '#fff', fontSize: 16, fontWeight: 600, margin: '0 0 8px' }}>Sign in to your workspace</h1>
+        <p style={{ color: '#9aa3b0', fontSize: 13.5, lineHeight: 1.55, margin: '0 0 22px' }}>
+          convo.finance is a private competitive-intelligence dashboard for banking professionals. Access is limited to authorized team members. This tool does not collect personal information.
+        </p>
+
+        <label htmlFor="cf-access" style={{ display: 'block', color: '#9aa3b0', fontSize: 12.5, fontWeight: 500, marginBottom: 7 }}>Team access password</label>
         <input
+          id="cf-access"
           type="password"
           value={pw}
           onChange={e => { setPw(e.target.value); setError(false) }}
           onKeyDown={e => { if (e.key === 'Enter') submit() }}
-          placeholder="Access password"
+          placeholder="Enter your team password"
           autoFocus
-          style={{ width: '100%', boxSizing: 'border-box', padding: '12px 14px', borderRadius: 10, border: '1px solid ' + (error ? '#EF4444' : '#333'), backgroundColor: '#0f0f0f', color: '#fff', fontSize: 15, outline: 'none', marginBottom: error ? 8 : 16 }}
+          style={{ width: '100%', boxSizing: 'border-box', padding: '12px 14px', borderRadius: 10, border: '1px solid ' + (error ? '#EF4444' : '#2f3540'), backgroundColor: '#0f1115', color: '#fff', fontSize: 15, outline: 'none', marginBottom: error ? 8 : 18 }}
         />
-        {error && <div style={{ color: '#EF4444', fontSize: 13, marginBottom: 16 }}>Incorrect password. Please try again.</div>}
+        {error && <div style={{ color: '#EF4444', fontSize: 13, marginBottom: 18 }}>That password was not recognized. Please try again.</div>}
+
         <button
           onClick={submit}
-          style={{ width: '100%', padding: '12px 0', borderRadius: 10, border: 'none', backgroundColor: '#0A4A8F', color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
+          style={{ width: '100%', padding: '13px 0', borderRadius: 10, border: 'none', backgroundColor: '#0A4A8F', color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
         >
-          Enter
+          Sign in
         </button>
+
+        <p style={{ color: '#5b636f', fontSize: 11.5, lineHeight: 1.5, margin: '20px 0 0', textAlign: 'center' }}>
+          Internal analytics platform displaying publicly available banking data. For authorized use only.
+        </p>
       </div>
     </div>
   )
