@@ -283,8 +283,22 @@ function ChatContent() {
         const { done, value } = await reader.read()
         if (done) break
         full += dec.decode(value)
-        setMessages(prev => { const u = [...prev]; u[u.length-1] = { role:'assistant', content:full }; return u })
+        const display = full.split('__USAGE__')[0]
+        setMessages(prev => { const u = [...prev]; u[u.length-1] = { role:'assistant', content:display }; return u })
       }
+      // Extract token usage emitted at end of stream
+      const usageMatch = full.match(/__USAGE__(\{[^}]*\})/)
+      if (usageMatch) {
+        try {
+          const usage = JSON.parse(usageMatch[1])
+          const prevIn = parseInt(localStorage.getItem('hbtf-tokens-in') || '0', 10)
+          const prevOut = parseInt(localStorage.getItem('hbtf-tokens-out') || '0', 10)
+          localStorage.setItem('hbtf-tokens-in', String(prevIn + (usage.in || 0)))
+          localStorage.setItem('hbtf-tokens-out', String(prevOut + (usage.out || 0)))
+          window.dispatchEvent(new Event('hbtf-usage-updated'))
+        } catch {}
+      }
+      full = full.split('__USAGE__')[0]
       const { text, chart } = extractChart(full)
       setMessages(prev => { const u = [...prev]; u[u.length-1] = { role:'assistant', content:text, chart: chart||undefined }; return u })
     } catch {
