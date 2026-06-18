@@ -320,9 +320,15 @@ function ChatContent() {
             ) : <span style={{ fontWeight: 600, fontSize: 14, color: t.text }}>Jordan Banking Analyst</span>}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button onClick={toggleTheme} title={dark ? 'Light mode' : 'Dark mode'} style={{ width: 34, height: 34, borderRadius: 8, border: `1px solid ${t.border}`, background: t.surface, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {dark ? '☀️' : '🌙'}
-            </button>
+            <button onClick={toggleTheme} title={dark ? 'Switch to light' : 'Switch to dark'} style={{ position:'relative', width:48, height:26, borderRadius:13, border:'none', cursor:'pointer', padding:0, flexShrink:0, backgroundColor:dark?'#3B82F6':'#D1D5DB', transition:'background-color 0.25s ease', display:'flex', alignItems:'center' }}>
+            <span style={{ position:'absolute', left:dark?24:2, width:22, height:22, borderRadius:11, backgroundColor:'#fff', transition:'left 0.25s ease', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 3px rgba(0,0,0,0.2)' }}>
+              {dark ? (
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>
+              ) : (
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              )}
+            </span>
+          </button>
             <select onChange={e => { router.push(e.target.value === 'all' ? '/chat' : `/chat?bank=${e.target.value}`); setMessages([]) }} value={bankId ?? 'all'}
               style={{ backgroundColor: t.pillBg, border: `1px solid ${t.border}`, borderRadius: 8, padding: '6px 10px', fontSize: 12, color: t.text, cursor: 'pointer', outline: 'none' }}>
               <option value="all">All banks</option>
