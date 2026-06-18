@@ -18,9 +18,9 @@ function toJOD(n: number | null | undefined, bankId: number): number | null {
 }
 
 function fmtK(n: number | null | undefined, bankId?: number): string {
-  if (n == null) return 'â'
+  if (n == null) return '-'
   const v = bankId != null ? toJOD(n, bankId) : n
-  if (v == null) return 'â'
+  if (v == null) return '-'
   const abs = Math.abs(v)
   if (abs >= 1_000_000) return `JOD ${(v/1_000_000).toFixed(2)}B`
   if (abs >= 1_000) return `JOD ${(v/1_000).toFixed(1)}M`
@@ -182,8 +182,8 @@ export default function Dashboard() {
           {[
             { label:'Sector Total Assets', value:fmtK(grandAssets), sub:'All 15 banks combined' },
             { label:'Sector Net Profit', value:fmtK(grandProfit), sub:`FY${dataYear}` },
-            { label:'Avg ROE', value:avgROE!=null?`${avgROE.toFixed(1)}%`:'â', sub:'Return on equity' },
-            { label:'Avg CAR', value:avgCAR!=null?`${avgCAR.toFixed(1)}%`:'â', sub:'Capital adequacy' },
+            { label:'Avg ROE', value:avgROE!=null?`${avgROE.toFixed(1)}%`:'-', sub:'Return on equity' },
+            { label:'Avg CAR', value:avgCAR!=null?`${avgCAR.toFixed(1)}%`:'-', sub:'Capital adequacy' },
           ].map((kpi,i) => (
             <div key={i} style={{ backgroundColor:t.surface, borderRadius:12, padding:'16px 18px', border:`1px solid ${t.border}`, boxShadow:t.shadow }}>
               <div style={{ fontSize:11, color:t.textSub, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:6 }}>{kpi.label}</div>
@@ -239,12 +239,12 @@ function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMou
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:16 }}>
         <div style={{ backgroundColor:dark?'#2a2a2a':'#F5F8FD', borderRadius:10, padding:'12px 14px' }}>
           <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>Net Profit</div>
-          <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.net_profit,bank.id):'â')}</div>
-          {delta!=null&&!loading&&<div style={{ fontSize:11, color:delta>=0?t.green:t.red, marginTop:3, fontWeight:500 }}>{delta>=0?'â':'â'} {Math.abs(delta).toFixed(1)}% vs {dataYear-1}</div>}
+          <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.net_profit,bank.id):'-')}</div>
+          {delta!=null&&!loading&&<div style={{ fontSize:11, color:delta>=0?t.green:t.red, marginTop:3, fontWeight:500 }}>{delta>=0?String.fromCharCode(8593):String.fromCharCode(8595)} {Math.abs(delta).toFixed(1)}% vs {dataYear-1}</div>}
         </div>
         <div style={{ backgroundColor:dark?'#2a2a2a':'#F5F8FD', borderRadius:10, padding:'12px 14px' }}>
           <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>Total Assets</div>
-          <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.total_assets,bank.id):'â')}</div>
+          <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.total_assets,bank.id):'-')}</div>
           {fin?.roe!=null&&!loading&&<div style={{ fontSize:11, color:t.textSub, marginTop:3 }}>ROE {fin.roe.toFixed(1)}%</div>}
         </div>
       </div>
