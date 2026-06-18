@@ -6,7 +6,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'], weight: ['400','500','600','700'], display: 'swap' })
 
 export const metadata: Metadata = {
-  title: 'HBTF Intelligence | Jordanian Banking Sector',
+  title: 'convo.finance | Jordanian Banking Intelligence',
   description: 'Competitive intelligence platform covering all 15 Jordanian banks.',
 }
 
