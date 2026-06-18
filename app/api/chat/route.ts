@@ -25,7 +25,7 @@ function needsRates(p: string) { return /rate|interest|loan|saving|deposit|td |m
 function needsTariffs(p: string) { return /fee|charge|credit card|transfer|maintenance|commission|tariff|cost|card fee|safe box|atm/i.test(p) }
 function needsProducts(p: string) { return /product|service|offer|card|account|islamic|sharia|digital|mobile|what do|provide|portfolio/i.test(p) }
 function needsOwnership(p: string) { return /own|shareholder|stake|investor|who controls|ownership|majority|parent|holding/i.test(p) }
-function needsGovernance(p: string) { return /ceo|cfo|coo|cio|cto|chairman|chairwoman|board|director|executive|management|manager|leadership|leaders?|who (is|are|runs|leads?|heads?|manages)|head of|officer|general manager|deputy|vice president|senior management|governance|appointed|tenure/i.test(p) }
+function needsGovernance(p: string) { return /ceo|cfo|coo|cio|cto|chairman|chairwoman|board|director|executive|management|manager|leadership|leaders?|who (is|are|runs|leads?|heads?|manages)|head of|officer|general manager|deputy|vice president|senior management|governance|appointed|tenure|c-suite|c suite|csuite|senior staff|key people|top team|management team|how many.*member|member.*count|staff count|team size/i.test(p) }
 function needsAnnouncements(p: string) { return /news|announce|agm|latest|recent|dividend|rating|merger|acquisition/i.test(p) }
 
 function formatRates(r: Record<string, any>, bankName: string): string {
