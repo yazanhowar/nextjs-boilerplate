@@ -246,6 +246,7 @@ function buildSystemPrompt(context: Record<string, any>): string {
       const bank = (context.banks as any[])?.find(b => b.id === a.bank_id)
       annSection += '[' + bank?.shortName + ' ' + (a.announcement_date || '').slice(0, 10) + '] ' + a.headline_en + '\n'
       if (a.summary_en) annSection += '  ' + (a.summary_en as string).slice(0, 150) + '\n'
+      if (a.source_url) annSection += '  Source: ' + a.source_url + (a.source_type ? ' (' + a.source_type + ')' : '') + '\n'
     })
   }
 
