@@ -391,7 +391,7 @@ function ChatContent() {
       {/* ── Input: absolute center when empty, static bottom when active ── */}
       {messages.length === 0 ? (
         <div style={{ position: 'absolute' as const, left: '50%', bottom: '50%', transform: 'translate(-50%, 70px)', width: 'min(720px, calc(100vw - 40px))', zIndex: 10 }}>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', backgroundColor: t.inputBg, border: `1.5px solid ${t.border}`, borderRadius: 16, padding: '12px 12px 12px 18px', boxShadow: '0 4px 24px rgba(0,0,0,0.10)' }}>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', backgroundColor: t.inputBg, border: '1.5px solid ' + t.border, borderRadius: 16, padding: '12px 12px 12px 18px', boxShadow: '0 4px 24px rgba(0,0,0,0.10)' }}>
             <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }}
               placeholder={bank ? `Ask anything about ${bank.shortName}...` : 'Ask about profits, rates, fees, charts, comparisons…'}
@@ -409,9 +409,9 @@ function ChatContent() {
           <div style={{ textAlign: 'center', fontSize: 11, color: t.textMuted, marginTop: 8 }}>Data from official bank sources &middot; FY2023–2025 &middot; Press Enter to send</div>
         </div>
       ) : (
-        <div style={{ borderTop: `1px solid ${t.border}`, padding: '10px 20px 18px', backgroundColor: t.bg, flexShrink: 0 }}>
+        <div style={{ borderTop: '1px solid ' + t.border, padding: '10px 20px 18px', backgroundColor: t.bg, flexShrink: 0 }}>
           <div style={{ maxWidth: 860, margin: '0 auto' }}>
-            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', backgroundColor: t.inputBg, border: `1px solid ${t.border}`, borderRadius: 14, padding: '10px 10px 10px 16px', boxShadow: t.shadow }}>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', backgroundColor: t.inputBg, border: '1px solid ' + t.border, borderRadius: 14, padding: '10px 10px 10px 16px', boxShadow: t.shadow }}>
               <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }}
               placeholder={bank ? `Ask anything about ${bank.shortName}...` : 'Ask about profits, rates, fees, charts, comparisons…'}
