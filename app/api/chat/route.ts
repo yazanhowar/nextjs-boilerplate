@@ -310,6 +310,8 @@ export async function POST(req: NextRequest) {
     async start(controller) {
       const reader = response.body!.getReader()
       const decoder = new TextDecoder()
+      let usageIn = 0
+      let usageOut = 0
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
@@ -320,11 +322,18 @@ export async function POST(req: NextRequest) {
           if (data === '[DONE]') continue
           try {
             const parsed = JSON.parse(data)
+            if (parsed.type === 'message_start' && parsed.message?.usage?.input_tokens != null) {
+              usageIn = parsed.message.usage.input_tokens
+            }
+            if (parsed.usage?.output_tokens != null) {
+              usageOut = parsed.usage.output_tokens
+            }
             const text = parsed.delta?.text || parsed.content?.[0]?.text || ''
             if (text) controller.enqueue(new TextEncoder().encode(text))
           } catch {}
         }
       }
+      controller.enqueue(new TextEncoder().encode('\n__USAGE__' + JSON.stringify({ in: usageIn, out: usageOut })))
       controller.close()
     },
   })
