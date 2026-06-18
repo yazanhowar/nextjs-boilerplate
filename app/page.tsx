@@ -135,9 +135,27 @@ export default function Dashboard() {
             <span style={{ fontSize:12, color:t.textMuted, marginLeft:4 }}>Jordan Banking Sector</span>
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-            <button onClick={toggleTheme} style={{ width:36, height:36, borderRadius:8, border:`1px solid ${t.border}`, background:t.surface, cursor:'pointer', fontSize:16, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              {dark ? 'âï¸' : 'ð'}
-            </button>
+            <button onClick={toggleTheme} title={dark ? 'Switch to light' : 'Switch to dark'} style={{ position:'relative', width:52, height:28, borderRadius:14, border:'none', cursor:'pointer', padding:0, flexShrink:0, backgroundColor:dark?'#3B82F6':'#D1D5DB', transition:'background-color 0.25s ease', display:'flex', alignItems:'center' }}>
+                <span style={{ position:'absolute', left:dark?26:2, width:24, height:24, borderRadius:12, backgroundColor:'#fff', transition:'left 0.25s ease', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 4px rgba(0,0,0,0.2)' }}>
+                  {dark ? (
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round">
+                      <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/>
+                    </svg>
+                  ) : (
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round">
+                      <circle cx="12" cy="12" r="4"/>
+                      <line x1="12" y1="2" x2="12" y2="4"/>
+                      <line x1="12" y1="20" x2="12" y2="22"/>
+                      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                      <line x1="2" y1="12" x2="4" y2="12"/>
+                      <line x1="20" y1="12" x2="22" y2="12"/>
+                      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                  )}
+                </span>
+              </button>
             <button onClick={() => router.push('/chat')} style={{ backgroundColor:t.accent, color:'#fff', border:'none', borderRadius:8, padding:'7px 16px', fontSize:13, fontWeight:500, cursor:'pointer' }}>
               Open AI Analyst
             </button>
