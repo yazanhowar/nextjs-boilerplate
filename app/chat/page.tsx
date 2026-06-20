@@ -352,6 +352,11 @@ function ChatContent() {
             )}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <select onChange={e => { router.push(e.target.value === 'all' ? '/chat' : `/chat?bank=${e.target.value}`); setMessages([]) }} value={bankId ?? 'all'}
+              style={{ backgroundColor: t.pillBg, border: `1px solid ${t.border}`, borderRadius: 8, padding: '6px 10px', fontSize: 12, color: t.text, cursor: 'pointer', outline: 'none' }}>
+              <option value="all">All banks</option>
+              {BANKS.map(b => <option key={b.id} value={b.id}>{b.shortName}</option>)}
+            </select>
             <button onClick={toggleTheme} title={dark ? 'Switch to light' : 'Switch to dark'} style={{ position:'relative', width:48, height:26, borderRadius:13, border:'none', cursor:'pointer', padding:0, flexShrink:0, backgroundColor:dark?'#3B82F6':'#D1D5DB', transition:'background-color 0.25s ease', display:'flex', alignItems:'center' }}>
             <span style={{ position:'absolute', left:dark?24:2, width:22, height:22, borderRadius:11, backgroundColor:'#fff', transition:'left 0.25s ease', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 3px rgba(0,0,0,0.2)' }}>
               {dark ? (
@@ -362,11 +367,6 @@ function ChatContent() {
             </span>
           </button>
           <SettingsPanel dark={dark} />
-            <select onChange={e => { router.push(e.target.value === 'all' ? '/chat' : `/chat?bank=${e.target.value}`); setMessages([]) }} value={bankId ?? 'all'}
-              style={{ backgroundColor: t.pillBg, border: `1px solid ${t.border}`, borderRadius: 8, padding: '6px 10px', fontSize: 12, color: t.text, cursor: 'pointer', outline: 'none' }}>
-              <option value="all">All banks</option>
-              {BANKS.map(b => <option key={b.id} value={b.id}>{b.shortName}</option>)}
-            </select>
           </div>
         </div>
       </header>
