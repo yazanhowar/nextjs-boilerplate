@@ -375,12 +375,12 @@ function ChatContent() {
               🏦
             </div>
             <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 10px', color: t.text }}>
-              {bank ? `${bank.name} — AI Analyst` : 'Jordan Banking Analyst'}
+              {bank ? `${bank.name} — AI Analyst` : 'Hi, I\'m ZAD'}
             </h2>
             <p style={{ fontSize: 14, color: t.textSub, margin: 0, lineHeight: 1.65, maxWidth: 420 }}>
               {bank
                 ? `Ask me anything about ${bank.shortName} — financials, rates, fees, ownership, leadership, or how it stacks up against the sector.`
-                : 'Ask me anything across all 15 Jordanian banks — profits, rates, fees, comparisons, charts, governance, strategy.'}
+                : <><span style={{ display: 'block' }}>Hi, I\'m ZAD, your financial convo advisor. Here to leave you more informed than before. Ask me anything about the Jordanian banking sector.</span><span style={{ display: 'block', marginTop: 10, direction: 'rtl' }}>مرحبا، أنا زاد، مستشارك التفاعلي. اسألني لأزيدك معرفة بالقطاع المصرفي الأردني</span></>}
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', maxWidth: 680, marginTop: 22 }}>
               {(bank ? [
