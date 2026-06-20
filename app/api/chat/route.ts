@@ -296,7 +296,7 @@ export async function POST(req: NextRequest) {
     body: JSON.stringify({
       model: 'claude-opus-4-6',
       max_tokens: 4096,
-      system: systemPrompt,
+      system: systemPrompt + "\n\n=== CRITICAL OUTPUT RULES (these override anything above that conflicts) ===\n1) Never open with filler or flattery. Do not begin a reply with phrases such as \"That's an interesting question\", \"That's a question I'd love to give you a sharp answer on\", \"I have to be straight with you\", \"Interesting question\", or \"Great question\". Start immediately with the substantive answer.\n2) Your dataset is broad. For all 15 banks you DO have: product catalogs; the full set of financial metrics including net interest margin, net interest income, cost-to-income ratio, loan-to-deposit ratio, NPL coverage, EPS and book value per share; governance (board members, executives, ownership); announcements; interest rates; and tariffs. Never tell the user you lack any of these metrics. Use them to answer.\n3) For legitimate banking questions that fall outside your verified dataset, USE the web_search tool to find a current, sourced answer instead of refusing or deflecting. Only say you cannot answer if web_search also returns nothing useful.\n4) When the answer compares banks, or shows values across categories or over time, render it as a chart in addition to a table.\n5) The chat interface does not render markdown bold, so do not wrap words in double asterisks. Write plainly.",
       messages: (messages as any[]).filter(m => m.content).map(m => ({ role: m.role, content: m.content })),
       tools: [{ type: 'web_search_20250305', name: 'web_search' }],
       stream: true,
