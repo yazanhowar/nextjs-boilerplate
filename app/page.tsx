@@ -133,6 +133,9 @@ export default function Dashboard() {
             <img src="/convo-wordmark.svg" alt="convo.finance" style={{ height:30, filter: dark ? 'brightness(0) invert(1)' : 'none' }} />
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+            <button onClick={() => router.push('/chat')} style={{ backgroundColor:t.accent, color:'#fff', border:'none', borderRadius:8, padding:'7px 16px', fontSize:13, fontWeight:500, cursor:'pointer' }}>
+              Open AI Analyst
+            </button>
             <button onClick={toggleTheme} title={dark ? 'Switch to light' : 'Switch to dark'} style={{ position:'relative', width:52, height:28, borderRadius:14, border:'none', cursor:'pointer', padding:0, flexShrink:0, backgroundColor:dark?'#3B82F6':'#D1D5DB', transition:'background-color 0.25s ease', display:'flex', alignItems:'center' }}>
                 <span style={{ position:'absolute', left:dark?26:2, width:24, height:24, borderRadius:12, backgroundColor:'#fff', transition:'left 0.25s ease', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 1px 4px rgba(0,0,0,0.2)' }}>
                   {dark ? (
@@ -155,9 +158,6 @@ export default function Dashboard() {
                 </span>
               </button>
             <SettingsPanel dark={dark} />
-            <button onClick={() => router.push('/chat')} style={{ backgroundColor:t.accent, color:'#fff', border:'none', borderRadius:8, padding:'7px 16px', fontSize:13, fontWeight:500, cursor:'pointer' }}>
-              Open AI Analyst
-            </button>
           </div>
         </div>
       </header>
