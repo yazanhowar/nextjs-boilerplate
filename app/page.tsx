@@ -129,11 +129,8 @@ export default function Dashboard() {
       <header style={{ backgroundColor:dark?'rgba(26,26,26,0.95)':'rgba(242,244,247,0.9)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderBottom:`1px solid ${t.border}`, position:'sticky', top:0, zIndex:100 }}>
         <div style={{ maxWidth:1200, margin:'0 auto', height:52, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 24px' }}>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-            <div style={{ width:28, height:28, borderRadius:8, backgroundColor:t.accent, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <span style={{ color:'#fff', fontSize:11, fontWeight:700 }}>HB</span>
-            </div>
-            <span style={{ fontWeight:600, fontSize:15, color:t.text }}>convo.finance</span>
-            <span style={{ fontSize:12, color:t.textMuted, marginLeft:4 }}>Jordan Banking Sector</span>
+            <img src="/convo-icon.svg" alt="" style={{ width:30, height:30 }} />
+            <img src="/convo-wordmark.svg" alt="convo.finance" style={{ height:30, filter: dark ? 'brightness(0) invert(1)' : 'none' }} />
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
             <button onClick={toggleTheme} title={dark ? 'Switch to light' : 'Switch to dark'} style={{ position:'relative', width:52, height:28, borderRadius:14, border:'none', cursor:'pointer', padding:0, flexShrink:0, backgroundColor:dark?'#3B82F6':'#D1D5DB', transition:'background-color 0.25s ease', display:'flex', alignItems:'center' }}>
