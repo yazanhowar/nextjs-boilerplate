@@ -344,7 +344,12 @@ function ChatContent() {
                   <div style={{ fontSize: 11, color: t.textSub }}>AI Analyst</div>
                 </div>
               </div>
-            ) : <span style={{ fontWeight: 600, fontSize: 14, color: t.text }}>Jordan Banking Analyst</span>}
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <img src="/convo-icon.svg" alt="" style={{ width: 30, height: 30 }} />
+                <span style={{ fontWeight: 600, fontSize: 14, color: t.text }}>Jordan Banking Analyst</span>
+              </div>
+            )}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <button onClick={toggleTheme} title={dark ? 'Switch to light' : 'Switch to dark'} style={{ position:'relative', width:48, height:26, borderRadius:13, border:'none', cursor:'pointer', padding:0, flexShrink:0, backgroundColor:dark?'#3B82F6':'#D1D5DB', transition:'background-color 0.25s ease', display:'flex', alignItems:'center' }}>
@@ -371,9 +376,7 @@ function ChatContent() {
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
           {messages.length === 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 160px)', textAlign: 'center', padding: '0 20px' }}>
-            <div style={{ width: 56, height: 56, borderRadius: 16, backgroundColor: t.accentSubtle, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, fontSize: 26 }}>
-              🏦
-            </div>
+            <img src="/convo-zad-en.svg" alt="Zad" style={{ width: 56, height: 56, marginBottom: 18 }} />
             <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 10px', color: t.text }}>
               {bank ? `${bank.name} — AI Analyst` : 'Jordan Banking Analyst'}
             </h2>
@@ -414,9 +417,7 @@ function ChatContent() {
             {messages.map((msg, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', gap: 10, alignItems: 'flex-start' }}>
                 {msg.role === 'assistant' && (
-                  <div style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: t.accentSubtle, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2, fontSize: 16 }}>
-                    🏦
-                  </div>
+                  <img src={/[\u0600-\u06FF]/.test((messages[i-1] && messages[i-1].content) || '') ? '/convo-zad-ar.svg' : '/convo-zad-en.svg'} alt="Zad" style={{ width: 34, height: 34, flexShrink: 0, marginTop: 2 }} />
                 )}
                 <div style={{ maxWidth: '88%' }}>
                   {msg.role === 'user' ? (
