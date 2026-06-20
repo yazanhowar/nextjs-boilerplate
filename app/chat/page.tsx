@@ -375,12 +375,12 @@ function ChatContent() {
               🏦
             </div>
             <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 10px', color: t.text }}>
-              {bank ? `${bank.name} — AI Analyst` : 'Hi, I\'m ZAD'}
+              {bank ? `${bank.name} — AI Analyst` : 'Jordan Banking Analyst'}
             </h2>
             <p style={{ fontSize: 14, color: t.textSub, margin: 0, lineHeight: 1.65, maxWidth: 420 }}>
               {bank
                 ? `Ask me anything about ${bank.shortName} — financials, rates, fees, ownership, leadership, or how it stacks up against the sector.`
-                : <><span style={{ display: 'block' }}>Hi, I\'m ZAD, your financial convo advisor. Here to leave you more informed than before. Ask me anything about the Jordanian banking sector.</span><span style={{ display: 'block', marginTop: 10, direction: 'rtl' }}>مرحبا، أنا زاد، مستشارك التفاعلي. اسألني لأزيدك معرفة بالقطاع المصرفي الأردني</span></>}
+                : 'Ask me anything across all 15 Jordanian banks — profits, rates, fees, comparisons, charts, governance, strategy.'}
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', maxWidth: 680, marginTop: 22 }}>
               {(bank ? [
@@ -465,6 +465,9 @@ function ChatContent() {
           </div>
           <div style={{ textAlign: 'center', fontSize: 11, color: t.textMuted, marginTop: 7 }}>
             Data from official bank sources &middot; FY2023–2025 &middot; Press Enter to send
+          </div>
+          <div style={{ fontSize: 10, color: t.textSub, opacity: 0.55, marginTop: 4, textAlign: 'center' }}>
+            A product by Yazan Howar &middot; Innovation &amp; Incubation Department &middot; Housing Bank
           </div>
         </div>
       </div>
