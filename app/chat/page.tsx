@@ -428,7 +428,7 @@ function ChatContent() {
                   {msg.role === 'user' ? (
                     <div style={{ backgroundColor: t.userBubble, color: '#fff', borderRadius: '18px 18px 4px 18px', padding: '12px 16px', fontSize: 14, lineHeight: 1.55 }}>{msg.content}</div>
                   ) : (
-                    <div ref={(el: HTMLDivElement | null) => { msgRefs[i] = el }} style={{ backgroundColor: t.aiBubble, border: `1px solid ${t.border}`, borderRadius: '4px 18px 18px 18px', padding: '14px 18px', boxShadow: t.shadow }}>
+                    <div data-msgid={i} style={{ backgroundColor: t.aiBubble, border: `1px solid ${t.border}`, borderRadius: '4px 18px 18px 18px', padding: '14px 18px', boxShadow: t.shadow }}>
                       {msg.content
                         ? <RenderText content={msg.content} t={t} />
                         : <div style={{ display: 'flex', gap: 5, alignItems: 'center', height: 22 }}>
@@ -440,7 +440,7 @@ function ChatContent() {
                         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
                           <button
                             onClick={async () => {
-                              const el = msgRefs[i]
+                              const el = document.querySelector(`[data-msgid="${i}"]`) as HTMLElement
                               if (!el) return
                               const { default: html2canvas } = await import('html2canvas')
                               const { jsPDF } = await import('jspdf')
@@ -503,8 +503,6 @@ function ChatContent() {
 }
 
 export default function ChatPage() {
-  const msgRefs: Record<number, HTMLDivElement | null> = {}
-
   return (
     <Suspense fallback={<div style={{ height:'100vh', display:'flex', alignItems:'center', justifyContent:'center' }}>Loading…</div>}>
       <ChatContent />
