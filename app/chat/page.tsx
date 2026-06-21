@@ -428,7 +428,7 @@ function ChatContent() {
                   {msg.role === 'user' ? (
                     <div style={{ backgroundColor: t.userBubble, color: '#fff', borderRadius: '18px 18px 4px 18px', padding: '12px 16px', fontSize: 14, lineHeight: 1.55 }}>{msg.content}</div>
                   ) : (
-                    <div style={{ backgroundColor: t.aiBubble, border: `1px solid ${t.border}`, borderRadius: '4px 18px 18px 18px', padding: '14px 18px', boxShadow: t.shadow }}>
+                    <div ref={(el: HTMLDivElement | null) => { msgRefs[i] = el }} style={{ backgroundColor: t.aiBubble, border: `1px solid ${t.border}`, borderRadius: '4px 18px 18px 18px', padding: '14px 18px', boxShadow: t.shadow }}>
                       {msg.content
                         ? <RenderText content={msg.content} t={t} />
                         : <div style={{ display: 'flex', gap: 5, alignItems: 'center', height: 22 }}>
@@ -436,6 +436,26 @@ function ChatContent() {
                           </div>
                       }
                       {msg.charts?.map((ch, ci) => <ChartBlock key={ci} chart={ch} t={t} />)}
+                      {msg.content && (
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
+                          <button
+                            onClick={async () => {
+                              const el = msgRefs[i]
+                              if (!el) return
+                              const { default: html2canvas } = await import('html2canvas')
+                              const { jsPDF } = await import('jspdf')
+                              const canvas = await html2canvas(el, { scale: 2, backgroundColor: t.surface, useCORS: true })
+                              const img = canvas.toDataURL('image/png')
+                              const pdf = new jsPDF({ orientation: canvas.width > canvas.height ? 'landscape' as const : 'portrait' as const, unit: 'px' as const, format: [canvas.width / 2, canvas.height / 2] })
+                              pdf.addImage(img, 'PNG', 0, 0, canvas.width / 2, canvas.height / 2)
+                              pdf.save('zad-response.pdf')
+                            }}
+                            style={{ fontSize: 12, color: t.accent, background: 'none', border: `1px solid ${t.accent}44`, borderRadius: 6, cursor: 'pointer', padding: '4px 12px', fontWeight: 600 }}
+                          >
+                            ↓ Export Response PDF
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -483,6 +503,8 @@ function ChatContent() {
 }
 
 export default function ChatPage() {
+  const msgRefs: Record<number, HTMLDivElement | null> = {}
+
   return (
     <Suspense fallback={<div style={{ height:'100vh', display:'flex', alignItems:'center', justifyContent:'center' }}>Loading…</div>}>
       <ChatContent />
