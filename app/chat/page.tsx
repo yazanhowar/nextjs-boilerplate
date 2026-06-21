@@ -444,10 +444,39 @@ function ChatContent() {
                               if (!el) return
                               const { default: html2canvas } = await import('html2canvas')
                               const { jsPDF } = await import('jspdf')
-                              const canvas = await html2canvas(el, { scale: 2, backgroundColor: t.surface, useCORS: true })
-                              const img = canvas.toDataURL('image/png')
-                              const pdf = new jsPDF({ orientation: canvas.width > canvas.height ? 'landscape' as const : 'portrait' as const, unit: 'px' as const, format: [canvas.width / 2, canvas.height / 2] })
-                              pdf.addImage(img, 'PNG', 0, 0, canvas.width / 2, canvas.height / 2)
+                              // Let charts finish animating/painting before capture
+                              await new Promise<void>(res => requestAnimationFrame(() => requestAnimationFrame(() => res())))
+                              await new Promise<void>(res => setTimeout(res, 500))
+                              const canvas = await html2canvas(el, { scale: 2, backgroundColor: t.surface, useCORS: true, logging: false, windowWidth: el.scrollWidth, windowHeight: el.scrollHeight })
+                              // A4 portrait in points: 595.28 x 841.89
+                              const A4W = 595.28
+                              const A4H = 841.89
+                              const margin = 24
+                              const usableW = A4W - margin * 2
+                              const usableH = A4H - margin * 2
+                              const pxPerPt = canvas.width / usableW
+                              const pageHpx = usableH * pxPerPt
+                              const pdf = new jsPDF({ orientation: 'portrait' as const, unit: 'pt' as const, format: 'a4' as const })
+                              let renderedHpx = 0
+                              let pageIndex = 0
+                              while (renderedHpx < canvas.height) {
+                                const sliceHpx = Math.min(pageHpx, canvas.height - renderedHpx)
+                                const pageCanvas = document.createElement('canvas')
+                                pageCanvas.width = canvas.width
+                                pageCanvas.height = sliceHpx
+                                const ctx = pageCanvas.getContext('2d')
+                                if (ctx) {
+                                  ctx.fillStyle = t.surface
+                                  ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height)
+                                  ctx.drawImage(canvas, 0, renderedHpx, canvas.width, sliceHpx, 0, 0, canvas.width, sliceHpx)
+                                }
+                                const pageImg = pageCanvas.toDataURL('image/png')
+                                const drawHpt = sliceHpx / pxPerPt
+                                if (pageIndex > 0) pdf.addPage()
+                                pdf.addImage(pageImg, 'PNG', margin, margin, usableW, drawHpt)
+                                renderedHpx += sliceHpx
+                                pageIndex++
+                              }
                               pdf.save('zad-response.pdf')
                             }}
                             style={{ fontSize: 12, color: t.accent, background: 'none', border: `1px solid ${t.accent}44`, borderRadius: 6, cursor: 'pointer', padding: '4px 12px', fontWeight: 600 }}
