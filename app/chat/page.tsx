@@ -11,27 +11,32 @@ import {
 interface Message {
   role: 'user' | 'assistant'
   content: string
-  chart?: any
+  charts?: any[]
 }
 
-// Extract chart JSON block using indexOf — avoids regex issues with backticks
-function extractChart(text: string): { text: string; chart: any | null } {
+// Extract chart JSON block using indexOf â avoids regex issues with backticks
+function extractCharts(text: string): { text: string; charts: any[] } {
   const OPEN = '```chart'
   const CLOSE = '```'
-  const si = text.indexOf(OPEN)
-  if (si === -1) return { text, chart: null }
-  const js = text[si + OPEN.length] === '\n' ? si + OPEN.length + 1 : si + OPEN.length
-  const ci = text.indexOf(CLOSE, js)
-  if (ci === -1) return { text, chart: null }
-  try {
-    const chart = JSON.parse(text.slice(js, ci).trim())
-    return { text: (text.slice(0, si) + text.slice(ci + CLOSE.length)).trim(), chart }
-  } catch {
-    return { text, chart: null }
+  const charts: any[] = []
+  let remaining = text
+  let safety = 0
+  while (safety++ < 10) {
+    const si = remaining.indexOf(OPEN)
+    if (si === -1) break
+    const js = remaining[si + OPEN.length] === '\n' ? si + OPEN.length + 1 : si + OPEN.length
+    const ci = remaining.indexOf(CLOSE, js)
+    if (ci === -1) break
+    try {
+      const chart = JSON.parse(remaining.slice(js, ci).trim())
+      charts.push(chart)
+    } catch {}
+    remaining = (remaining.slice(0, si) + remaining.slice(ci + CLOSE.length)).trim()
   }
+  return { text: remaining.trim(), charts }
 }
 
-// Bold spans — split on ** markers
+// Bold spans â split on ** markers
 function linkify(text: string, keyPrefix: string): React.ReactNode {
   const urlRe = /(https?:\/\/[^\s)]+)/g
   const segs = text.split(urlRe)
@@ -115,11 +120,11 @@ function RenderTextInner({ content, t }: { content: string; t: any }) {
         if (line.startsWith('## '))  return <div key={i} style={{ fontWeight: 700, fontSize: 15, color: t.text,  marginTop: 10 }}>{line.slice(3)}</div>
         if (line.startsWith('# '))   return <div key={i} style={{ fontWeight: 700, fontSize: 17, color: t.text,  marginTop: 10 }}>{line.slice(2)}</div>
         if (line.startsWith('---'))  return <hr  key={i} style={{ border: 'none', borderTop: `1px solid ${t.border}`, margin: '8px 0' }} />
-        // Bullet: dash or actual bullet char (• U+2022)
-        if (line.startsWith('- ') || line.startsWith('• ')) {
+        // Bullet: dash or actual bullet char (â¢ U+2022)
+        if (line.startsWith('- ') || line.startsWith('â¢ ')) {
           return (
             <div key={i} style={{ display: 'flex', gap: 8, marginLeft: 4 }}>
-              <span style={{ color: t.accent, flexShrink: 0, fontWeight: 700, marginTop: 2 }}>•</span>
+              <span style={{ color: t.accent, flexShrink: 0, fontWeight: 700, marginTop: 2 }}>â¢</span>
               <span style={{ fontSize: 14, color: t.textSub, lineHeight: 1.65 }}>{bold(line.slice(2), t.text)}</span>
             </div>
           )
@@ -181,7 +186,7 @@ function ChartBlock({ chart, t }: { chart: any; t: any }) {
       <div style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${t.border}`, background: t.surface }}>
         <span style={{ fontSize: 13, fontWeight: 600, color: t.text }}>{chart.title}</span>
         <button onClick={exportPDF} style={{ fontSize: 12, color: t.accent, background: 'none', border: `1px solid ${t.accent}44`, borderRadius: 6, cursor: 'pointer', padding: '3px 10px' }}>
-          ↓ Export PDF
+          â Export PDF
         </button>
       </div>
       <div ref={ref} style={{ padding: 16, background: t.surface }}>
@@ -223,7 +228,7 @@ function ChartBlock({ chart, t }: { chart: any; t: any }) {
         </ResponsiveContainer>
         {chart.insight && (
           <div style={{ marginTop: 12, padding: '10px 14px', background: t.accentSubtle, borderRadius: 8, fontSize: 13, color: t.accent, display: 'flex', gap: 8 }}>
-            <span>💡</span><span>{chart.insight}</span>
+            <span>ð¡</span><span>{chart.insight}</span>
           </div>
         )}
       </div>
@@ -312,8 +317,8 @@ function ChatContent() {
         } catch {}
       }
       full = full.split('__USAGE__')[0]
-      const { text, chart } = extractChart(full)
-      setMessages(prev => { const u = [...prev]; u[u.length-1] = { role:'assistant', content:text, chart: chart||undefined }; return u })
+      const { text, charts } = extractCharts(full)
+      setMessages(prev => { const u = [...prev]; u[u.length-1] = { role:'assistant', content:text, charts: charts.length ? charts : undefined }; return u })
     } catch {
       setMessages(prev => { const u = [...prev]; u[u.length-1] = { role:'assistant', content:'Something went wrong. Please try again.' }; return u })
     } finally {
@@ -329,7 +334,7 @@ function ChatContent() {
         <div style={{ maxWidth: 860, margin: '0 auto', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', color: t.textSub, fontSize: 13, cursor: 'pointer' }}>
-              ← Dashboard
+              â Dashboard
             </button>
             <div style={{ width: 1, height: 18, backgroundColor: t.border }} />
             {bank ? (
@@ -378,12 +383,12 @@ function ChatContent() {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 160px)', textAlign: 'center', padding: '0 20px' }}>
             <img src="/convo-zad-en.svg" alt="Zad" style={{ width: 56, height: 56, marginBottom: 18 }} />
             <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 10px', color: t.text }}>
-              {bank ? `${bank.name} — AI Analyst` : 'Jordan Banking Analyst'}
+              {bank ? `${bank.name} â AI Analyst` : 'Jordan Banking Analyst'}
             </h2>
             <p style={{ fontSize: 14, color: t.textSub, margin: 0, lineHeight: 1.65, maxWidth: 420 }}>
               {bank
-                ? `Ask me anything about ${bank.shortName} — financials, rates, fees, ownership, leadership, or how it stacks up against the sector.`
-                : 'Ask me anything across all 15 Jordanian banks — profits, rates, fees, comparisons, charts, governance, strategy.'}
+                ? `Ask me anything about ${bank.shortName} â financials, rates, fees, ownership, leadership, or how it stacks up against the sector.`
+                : 'Ask me anything across all 15 Jordanian banks â profits, rates, fees, comparisons, charts, governance, strategy.'}
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', maxWidth: 680, marginTop: 22 }}>
               {(bank ? [
@@ -430,7 +435,7 @@ function ChatContent() {
                             {[0,160,320].map(d => <div key={d} style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: t.accent, animation: 'bounce 1.2s infinite', animationDelay: d+'ms', opacity: 0.6 }} />)}
                           </div>
                       }
-                      {msg.chart && <ChartBlock chart={msg.chart} t={t} />}
+                      {msg.charts?.map((ch, ci) => <ChartBlock key={ci} chart={ch} t={t} />)}
                     </div>
                   )}
                 </div>
@@ -452,7 +457,7 @@ function ChatContent() {
           <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', backgroundColor: t.inputBg, border: `1px solid ${t.border}`, borderRadius: 14, padding: '10px 10px 10px 16px', boxShadow: t.shadow }}>
             <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }}
-              placeholder={bank ? `Ask anything about ${bank.shortName}...` : 'Ask about profits, rates, fees, charts, comparisons…'}
+              placeholder={bank ? `Ask anything about ${bank.shortName}...` : 'Ask about profits, rates, fees, charts, comparisonsâ¦'}
               rows={1}
               style={{ flex: 1, background: 'none', border: 'none', outline: 'none', fontSize: 15, color: t.text, resize: 'none', maxHeight: 120, lineHeight: 1.5, fontFamily: 'inherit' }}
               onInput={e => { const el = e.currentTarget; el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120)+'px' }}
@@ -465,7 +470,7 @@ function ChatContent() {
             </button>
           </div>
           <div style={{ textAlign: 'center', fontSize: 11, color: t.textMuted, marginTop: 7 }}>
-            Data from official bank sources &middot; FY2023–2025 &middot; Press Enter to send
+            Data from official bank sources &middot; FY2023â2025 &middot; Press Enter to send
           </div>
           <div style={{ fontSize: 10, color: t.textSub, opacity: 0.55, marginTop: 4, textAlign: 'center' }}>
             A product by Yazan Howar &middot; Innovation &amp; Incubation Department &middot; Housing Bank
@@ -479,7 +484,7 @@ function ChatContent() {
 
 export default function ChatPage() {
   return (
-    <Suspense fallback={<div style={{ height:'100vh', display:'flex', alignItems:'center', justifyContent:'center' }}>Loading…</div>}>
+    <Suspense fallback={<div style={{ height:'100vh', display:'flex', alignItems:'center', justifyContent:'center' }}>Loadingâ¦</div>}>
       <ChatContent />
     </Suspense>
   )
