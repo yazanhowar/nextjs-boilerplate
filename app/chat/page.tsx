@@ -60,7 +60,7 @@ function bold(text: string, textColor: string): React.ReactNode {
 
 
 function MarkdownTable({ rows, t }: { rows: string[]; t: any }) {
-  const splitRow = (r: string) => r.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map(c => c.trim().replace(/\*\*/g, ''))
+  const splitRow = (r: string) => r.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map(c => c.trim())
   const header = splitRow(rows[0])
   const bodyRows = rows.slice(2).map(splitRow)
   const cellBase: any = { padding: '7px 12px', fontSize: 13, whiteSpace: 'nowrap' }
@@ -75,7 +75,7 @@ function MarkdownTable({ rows, t }: { rows: string[]; t: any }) {
         <tbody>
           {bodyRows.map((cells, ri) => (
             <tr key={ri}>{cells.map((c, ci) => (
-              <td key={ci} style={{ ...cellBase, textAlign: ci === 0 ? 'left' : 'right', color: t.text, fontWeight: ci === 0 ? 600 : 500, borderBottom: ri === bodyRows.length - 1 ? 'none' : '1px solid ' + t.border }}>{c}</td>
+              <td key={ci} style={{ ...cellBase, textAlign: ci === 0 ? 'left' : 'right', color: t.text, fontWeight: ci === 0 ? 600 : 500, borderBottom: ri === bodyRows.length - 1 ? 'none' : '1px solid ' + t.border }}>{bold(c, t.text)}</td>
             ))}</tr>
           ))}
         </tbody>
