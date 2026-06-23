@@ -322,6 +322,24 @@ function ChatContent() {
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
   const [logoErr, setLogoErr] = useState(false)
+  const [updateReady, setUpdateReady] = useState(false)
+  useEffect(() => {
+    let mounted = true
+    let known: string | null = null
+    const check = async () => {
+      try {
+        const res = await fetch('/api/version', { cache: 'no-store' })
+        const data = await res.json()
+        if (!mounted) return
+        if (known === null) { known = data.v } else if (data.v && data.v !== known) { setUpdateReady(true) }
+      } catch {}
+    }
+    check()
+    const iv = setInterval(check, 60000)
+    const onFocus = () => { check() }
+    window.addEventListener('focus', onFocus)
+    return () => { mounted = false; clearInterval(iv); window.removeEventListener('focus', onFocus) }
+  }, [])
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef  = useRef<HTMLTextAreaElement>(null)
 
@@ -375,6 +393,12 @@ function ChatContent() {
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: t.bg, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', color: t.text }}>
+      {updateReady && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999, backgroundColor: '#1d4ed8', color: '#fff', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontSize: 14 }}>
+          <span>A new version is available.</span>
+          <button onClick={() => { window.location.reload() }} style={{ backgroundColor: '#fff', color: '#1d4ed8', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Refresh</button>
+        </div>
+      )}
       {/* Header */}
       <header style={{ backgroundColor: t.hBg, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: `1px solid ${t.border}`, padding: '0 20px', flexShrink: 0, position: 'sticky', top: 0, zIndex: 50 }}>
         <div style={{ maxWidth: 860, margin: '0 auto', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
