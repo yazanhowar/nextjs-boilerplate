@@ -174,6 +174,8 @@ function buildSystemPrompt(context: Record<string, any>): string {
         const parts: string[] = []
         if (r.npl_ratio != null) parts.push('NPL ' + (r.npl_ratio as number).toFixed(1) + '%')
         if (r.net_loans != null) parts.push('net loans ' + fmtVal(r.net_loans, bankId))
+        if (r.npl_ratio != null) parts.push('NPL ' + (r.npl_ratio as number).toFixed(1) + '%')
+        if (r.net_loans != null) parts.push('net loans ' + fmtVal(r.net_loans, bankId))
         if (r.net_profit != null) parts.push(`net profit ${fmtVal(r.net_profit, bankId)}`)
         if (r.total_assets != null) parts.push(`assets ${fmtVal(r.total_assets, bankId)}`)
         if (r.customer_deposits != null) parts.push(`deposits ${fmtVal(r.customer_deposits, bankId)}`)
@@ -196,7 +198,7 @@ function buildSystemPrompt(context: Record<string, any>): string {
     if (curr.customer_deposits != null) finSection += '  Deposits: ' + fmtVal(curr.customer_deposits, bankId) + '\n'
     const equity = curr.shareholders_equity ?? curr.total_equity
     if (equity != null) finSection += '  Equity: ' + fmtVal(equity as number, bankId) + '\n'
-    const ratios = [curr.roe != null ? 'ROE ' + (curr.roe as number).toFixed(1) + '%' : '', curr.roa != null ? 'ROA ' + (curr.roa as number).toFixed(2) + '%' : '', curr.car != null ? 'CAR ' + (curr.car as number).toFixed(1) + '%' : '', curr.npl_ratio != null ? 'NPL ' + (curr.npl_ratio as number).toFixed(1) + '%' : ''].filter(Boolean)
+    const ratios = [curr.roe != null ? 'ROE ' + (curr.roe as number).toFixed(1) + '%' : '', curr.roa != null ? 'ROA ' + (curr.roa as number).toFixed(2) + '%' : '', curr.car != null ? 'CAR ' + (curr.car as number).toFixed(1) + '%' : '', curr.npl_ratio != null ? 'NPL ' + (curr.npl_ratio as number).toFixed(1) + '%' : '', curr.npl_ratio != null ? 'NPL ' + (curr.npl_ratio as number).toFixed(1) + '%' : ''].filter(Boolean)
     if (ratios.length) finSection += '  ' + ratios.join(' | ') + '\n'
     const extras = [curr.eps_fils != null ? 'EPS ' + curr.eps_fils + ' fils' : '', curr.dividends_cash_pct != null ? 'Div ' + curr.dividends_cash_pct + '%' : ''].filter(Boolean)
     if (extras.length) finSection += '  ' + extras.join(' | ') + '\n'
