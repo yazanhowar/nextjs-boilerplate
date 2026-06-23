@@ -144,6 +144,52 @@ function RenderTextInner({ content, t }: { content: string; t: any }) {
   )
 }
 
+function parseLensBlock(content: string) {
+  const start = content.indexOf('```lens')
+  if (start === -1) return null
+  const rest = content.slice(start + 7)
+  const end = rest.indexOf('```')
+  if (end === -1) return null
+  const body = rest.slice(0, end)
+  const lines = body.split('\n').map(function (l) { return l.trim() }).filter(function (l) { return l.length > 0 })
+  const opts: string[] = []
+  let intro = ''
+  for (let i = 0; i < lines.length; i++) {
+    const ln = lines[i]
+    if (ln.indexOf('- ') === 0) opts.push(ln.slice(2).trim())
+    else if (!intro) intro = ln
+  }
+  if (opts.length < 2) return null
+  return { intro: intro, options: opts }
+}
+function stripLensBlock(content: string) {
+  const start = content.indexOf('```lens')
+  if (start === -1) return content.trim()
+  const rest = content.slice(start + 7)
+  const end = rest.indexOf('```')
+  if (end === -1) return content.slice(0, start).trim()
+  return (content.slice(0, start) + rest.slice(end + 3)).trim()
+}
+function LensChips(props: { content: string; onPick: (s: string) => void; t: any }) {
+  const lens = parseLensBlock(props.content)
+  if (!lens) return null
+  const t = props.t
+  return (
+    <div style={{ marginTop: 14, borderTop: '1px solid ' + t.border, paddingTop: 12 }}>
+      <div style={{ fontSize: 13, color: t.text, opacity: 0.85, marginBottom: 10, fontWeight: 600 }}>{lens.intro}</div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        {lens.options.map(function (opt, i) {
+          return (
+            <button key={i} onClick={function () { props.onPick(opt) }} style={{ border: '1px solid ' + t.border, backgroundColor: t.inputBg, color: t.text, borderRadius: 20, padding: '8px 14px', fontSize: 13, cursor: 'pointer', lineHeight: 1.3, textAlign: 'left' }}>
+              {opt}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function ChartBlock({ chart, t }: { chart: any; t: any }) {
   const ref = useRef<HTMLDivElement>(null)
   const COLORS = ['#0071E3','#FF9F0A','#30D158','#FF453A','#BF5AF2','#64D2FF','#FF6B35','#98989D','#34C759','#FF375F']
@@ -430,7 +476,7 @@ function ChatContent() {
                   ) : (
                     <div data-msgid={i} style={{ backgroundColor: t.aiBubble, border: `1px solid ${t.border}`, borderRadius: '4px 18px 18px 18px', padding: '14px 18px', boxShadow: t.shadow }}>
                       {msg.content
-                        ? <RenderText content={msg.content} t={t} />
+                        ? <><RenderText content={stripLensBlock(msg.content)} t={t} /><LensChips content={msg.content} onPick={send} t={t} /></>
                         : <div style={{ display: 'flex', gap: 5, alignItems: 'center', height: 22 }}>
                             {[0,160,320].map(d => <div key={d} style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: t.accent, animation: 'bounce 1.2s infinite', animationDelay: d+'ms', opacity: 0.6 }} />)}
                           </div>
