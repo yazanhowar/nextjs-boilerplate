@@ -172,6 +172,8 @@ function buildSystemPrompt(context: Record<string, any>): string {
       .sort((a: any, b: any) => (a.fiscal_year as number) - (b.fiscal_year as number))
       .map((r: any) => {
         const parts: string[] = []
+        if (r.npl_ratio != null) parts.push('NPL ' + (r.npl_ratio as number).toFixed(1) + '%')
+        if (r.net_loans != null) parts.push('net loans ' + fmtVal(r.net_loans, bankId))
         if (r.net_profit != null) parts.push(`net profit ${fmtVal(r.net_profit, bankId)}`)
         if (r.total_assets != null) parts.push(`assets ${fmtVal(r.total_assets, bankId)}`)
         if (r.customer_deposits != null) parts.push(`deposits ${fmtVal(r.customer_deposits, bankId)}`)
@@ -194,7 +196,7 @@ function buildSystemPrompt(context: Record<string, any>): string {
     if (curr.customer_deposits != null) finSection += '  Deposits: ' + fmtVal(curr.customer_deposits, bankId) + '\n'
     const equity = curr.shareholders_equity ?? curr.total_equity
     if (equity != null) finSection += '  Equity: ' + fmtVal(equity as number, bankId) + '\n'
-    const ratios = [curr.roe != null ? 'ROE ' + (curr.roe as number).toFixed(1) + '%' : '', curr.roa != null ? 'ROA ' + (curr.roa as number).toFixed(2) + '%' : '', curr.car != null ? 'CAR ' + (curr.car as number).toFixed(1) + '%' : ''].filter(Boolean)
+    const ratios = [curr.roe != null ? 'ROE ' + (curr.roe as number).toFixed(1) + '%' : '', curr.roa != null ? 'ROA ' + (curr.roa as number).toFixed(2) + '%' : '', curr.car != null ? 'CAR ' + (curr.car as number).toFixed(1) + '%' : '', curr.npl_ratio != null ? 'NPL ' + (curr.npl_ratio as number).toFixed(1) + '%' : ''].filter(Boolean)
     if (ratios.length) finSection += '  ' + ratios.join(' | ') + '\n'
     const extras = [curr.eps_fils != null ? 'EPS ' + curr.eps_fils + ' fils' : '', curr.dividends_cash_pct != null ? 'Div ' + curr.dividends_cash_pct + '%' : ''].filter(Boolean)
     if (extras.length) finSection += '  ' + extras.join(' | ') + '\n'
@@ -290,6 +292,7 @@ function buildSystemPrompt(context: Record<string, any>): string {
     '== DECISION LENS: CLARIFY BEFORE YOU ANSWER (only when it changes the answer) ==\n' +
     'You are a decision-support analyst, not a lookup tool. For a genuinely analytical question whose best answer would MATERIALLY CHANGE depending on why it is being asked, do not guess the angle -- offer the user a short choice of lenses first, then answer for the lens they pick. Working out the decision behind the question is what separates you from a generic model.\n' +
     'WHEN to offer lenses (ALL must hold): (1) the question is analytical or evaluative -- health, strength, growth, comparison, risk, outlook -- not a direct factual lookup; (2) the honest answer genuinely differs by lens, foregrounding different metrics and possibly reaching a different conclusion; (3) the lens is NOT already clear from how they asked. If the user already signalled the lens (for example as a potential acquirer, or from a risk standpoint), skip the menu and answer directly for that lens, noting the lens in one line. NEVER offer lenses for a simple factual question (a specific figure, a date, who leads a bank) -- just answer it.\n' +
+    'This includes broad strategic, regulatory, competitive, and market-outlook questions, not only single-bank evaluations. A regulatory-landscape question, for instance, reads differently for a compliance officer (AML and cyber burden), a digital-strategy lead (sandbox and open-banking opportunity), and someone weighing competitive positioning (which rules favour incumbents vs challengers). When a broad analytical question could serve different decision-makers and you would foreground different things for each, OFFER the lenses even if it is phrased as a comprehensive ask -- give a one-line framing plus the lens block, do not launch straight into a full essay.\n' +
     'HOW to offer them: write at most one short framing line, then emit a fenced block in EXACTLY this format and STOP (do not also write the full answer in the same turn):\n' +
     '```lens\n' +
     '<one short line naming what is driving the question or which lens to apply>\n' +
