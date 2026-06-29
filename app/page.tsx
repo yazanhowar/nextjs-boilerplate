@@ -46,13 +46,13 @@ export default function Page() {
             <p>{t.s1}</p>
             <div className="zwl-go"><span>{t.go}</span><span>{arrow}</span></div>
           </a>
-          <div className="zwl-card zwl-c2 zwl-soon">
-            <span className="zwl-badge">{t.soon}</span>
+          <a className="zwl-card zwl-c2" href="/sector">
+            
             <span className="zwl-ic" dangerouslySetInnerHTML={{ __html: IC.sector }} />
             <h3>{t.t2}</h3>
             <p>{t.s2}</p>
             <div className="zwl-go"><span>{t.go}</span><span>{arrow}</span></div>
-          </div>
+          </a>
           <a className="zwl-card zwl-c3" href="/cbj">
             <span className="zwl-ic" dangerouslySetInnerHTML={{ __html: IC.cbj }} />
             <h3>{t.t3}</h3>
