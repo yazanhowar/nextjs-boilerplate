@@ -89,7 +89,19 @@ async function callTool(name, args) {
     if (c.error) throw new Error(c.error.message);
     return c.data || [];
   }
-  if (name === 'sector_overview') {
+  if (name === 'abj_sector') {
+      var abjRes = await supabase.from('abj_sector_indicators').select('*').eq('category', 'balance_sheet');
+      if (abjRes.error) throw new Error(abjRes.error.message);
+      var arows = abjRes.data || [];
+      var metrics = {};
+      arows.forEach(function (r) { var k = r.metric; (metrics[k] = metrics[k] || []).push({ period: r.data_period, month: r.bulletin_month, value: Number(r.value), unit: r.unit, metric_ar: r.metric_ar }); });
+      Object.keys(metrics).forEach(function (k) { metrics[k].sort(function (a, b) { return String(a.month) < String(b.month) ? -1 : (String(a.month) > String(b.month) ? 1 : 0); }); });
+      var latest = {};
+      Object.keys(metrics).forEach(function (k) { var arr = metrics[k]; latest[k] = arr.length ? arr[arr.length - 1] : null; });
+      return { source: 'Association of Banks in Jordan', unit: 'JOD billion', latest: latest, series: metrics };
+    }
+
+    if (name === 'sector_overview') {
     var all = await supabase.from('bank_financials').select('*');
     if (all.error) throw new Error(all.error.message);
     var rows = all.data || [];
