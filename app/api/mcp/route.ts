@@ -131,7 +131,8 @@ export async function POST(req) {
   return NextResponse.json(rpcError(id, -32601, 'Method not found: ' + method));
 }
 
-export async function GET() {
+export async function GET(req) {
+  try { var du = new URL(req.url); if (du.searchParams.get('debug') === 'rest') { var dburl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''; var dbkey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''; var dbr = await fetch(dburl + '/rest/v1/banks?select=id&limit=1', { headers: { apikey: dbkey, Authorization: 'Bearer ' + dbkey } }); var dbt = await dbr.text(); return NextResponse.json({ debug: 'rest', status: dbr.status, body: dbt.slice(0, 180) }); } if (du.searchParams.get('debug') === 'keyrole') { var k2 = process.env.SUPABASE_SERVICE_ROLE_KEY || ''; var parts = k2.split('.'); var role = null; try { role = JSON.parse(atob(parts[1])).role; } catch (ee) {} return NextResponse.json({ debug: 'keyrole', role: role, parts: parts.length }); } } catch (de) { return NextResponse.json({ debug: 'err', err: String(de) }); }
   return NextResponse.json({ name: SERVER.name, version: SERVER.version, protocol: 'jsonrpc-2.0 / mcp', tools: TOOLS.map(function (t) { return t.name; }), env: { url: !!process.env.NEXT_PUBLIC_SUPABASE_URL, hasServiceKey: (process.env.SUPABASE_SERVICE_ROLE_KEY || '').length > 0, serviceKeyLen: (process.env.SUPABASE_SERVICE_ROLE_KEY || '').length, hasAnon: (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').length > 0, anonLen: (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').length } });
 }
 
