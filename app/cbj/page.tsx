@@ -1,76 +1,67 @@
 'use client';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { BANKS } from '@/lib/banks-config';
 
-const CSS = ".cbj-root{--navy:#0c3057;--blue:#3a6ea5;--gold:#b0883c;--bg:#f4f7fa;--card:#fff;--ink:#0f1f30;--sub:#5a6b7d;--faint:#9aa7b4;--line:#e7edf3;min-height:100vh;background:#f4f7fa;color:#0f1f30;font-family:'Inter','Segoe UI',sans-serif}.cbj-root[dir='rtl']{font-family:'Cairo','Segoe UI',Tahoma,sans-serif}.cbj-wrap{max-width:1120px;margin:0 auto;padding:20px 24px 60px}.cbj-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:8px}.cbj-brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:inherit;cursor:pointer}.cbj-mark{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#0c3057,#3a6ea5);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;box-shadow:0 5px 15px rgba(12,48,87,.26)}.cbj-wm b{font-size:16px;font-weight:800;display:block;line-height:1.1}.cbj-wm span{font-size:11.5px;color:#5a6b7d;font-weight:600}.cbj-lang{border:1px solid #e7edf3;background:#fff;color:#0f1f30;font:inherit;font-size:13px;font-weight:700;padding:8px 14px;border-radius:999px;cursor:pointer}.cbj-lang:hover{border-color:#3a6ea5;color:#3a6ea5}.cbj-title{margin:26px 0 4px;font-size:27px;font-weight:800;letter-spacing:-.5px}.cbj-sub{font-size:14px;color:#5a6b7d;margin-bottom:24px}.cbj-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}.cbj-kpi{background:#fff;border:1px solid #e7edf3;border-radius:16px;padding:18px 18px 16px;box-shadow:0 1px 2px rgba(15,31,48,.04)}.cbj-kpi .lab{font-size:11px;font-weight:700;letter-spacing:.5px;color:#9aa7b4;text-transform:uppercase}.cbj-kpi .val{font-size:26px;font-weight:800;margin:8px 0 3px;color:#0c3057;font-variant-numeric:tabular-nums}.cbj-kpi .ctx{font-size:12px;color:#5a6b7d}.cbj-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}.cbj-chips{display:flex;gap:8px;flex-wrap:wrap}.cbj-chip{border:1px solid #e7edf3;background:#fff;color:#5a6b7d;font:inherit;font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:999px;cursor:pointer;transition:.12s}.cbj-chip:hover{border-color:#6c9bc8}.cbj-chip.on{background:#0c3057;border-color:#0c3057;color:#fff}.cbj-upload{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(135deg,#0c3057,#0a2742);color:#fff;text-decoration:none;font-weight:700;font-size:14px;padding:11px 20px;border-radius:12px;box-shadow:0 6px 18px rgba(12,48,87,.24);cursor:pointer;border:none}.cbj-upload:hover{transform:translateY(-1px)}.cbj-tablewrap{background:#fff;border:1px solid #e7edf3;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(15,31,48,.04)}.cbj-table{width:100%;border-collapse:collapse;font-size:13.5px}.cbj-table thead th{text-align:start;font-size:11px;font-weight:700;letter-spacing:.4px;color:#9aa7b4;text-transform:uppercase;padding:13px 18px;background:#f8fafc;border-bottom:1px solid #e7edf3}.cbj-table tbody td{padding:13px 18px;border-bottom:1px solid #f0f4f8;color:#0f1f30}.cbj-table tbody tr:last-child td{border-bottom:none}.cbj-table tbody tr:hover{background:#f8fafc}.cbj-num{font-variant-numeric:tabular-nums;font-weight:700}.cbj-bank{font-weight:700}.cbj-badge{display:inline-block;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px}.cbj-badge.cur{background:#e7f4ee;color:#1f8f5a}.cbj-badge.due{background:#fbf3e6;color:#b0883c}.cbj-freq{display:inline-block;font-size:11.5px;font-weight:700;color:#3a6ea5;background:#e9f1fb;padding:3px 9px;border-radius:6px}.cbj-foot{text-align:center;color:#9aa7b4;font-size:12px;margin-top:30px}@media(max-width:860px){.cbj-kpis{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.cbj-kpis{grid-template-columns:1fr}}";
-const T = {"en":{"dir":"ltr","lang":"العربية","wm":"Banking Intelligence","title":"CBJ Regulatory Reports","sub":"Submission tracker across all licensed banks, by reporting period.","kBanks":"Banks Reporting","kBanksCtx":"of 15 licensed","kSubs":"Submissions (YTD)","kSubsCtx":"2026 to date","kPeriod":"Latest Period","kPeriodCtx":"most recent filing","kRate":"On-time Rate","kRateCtx":"trailing 12 months","fAll":"All","fM":"Monthly","fQ":"Quarterly","fA":"Annual","upload":"Upload Documents","cBank":"Bank","cFreq":"Frequency","cPeriod":"Latest Period","cReports":"Reports Filed","cStatus":"Status","stCur":"Current","stDue":"Due","mLabel":"Monthly","qLabel":"Quarterly","aLabel":"Annual","foot":"convo.finance · ZAD — CBJ regulatory intelligence"},"ar":{"dir":"rtl","lang":"EN","wm":"ذكاء مصرفي","title":"تقارير البنك المركزي الرقابية","sub":"متابعة التقارير المقدمة من جميع البنوك المرخّصة، حسب فترة الإبلاغ.","kBanks":"بنوك مُبلِّغة","kBanksCtx":"من أصل 15 مرخّصاً","kSubs":"التقارير المقدمة","kSubsCtx":"2026 حتى تاريخه","kPeriod":"آخر فترة","kPeriodCtx":"أحدث تقرير مقدّم","kRate":"نسبة الالتزام","kRateCtx":"آخر 12 شهراً","fAll":"الكل","fM":"شهري","fQ":"ربع سنوي","fA":"سنوي","upload":"رفع المستندات","cBank":"البنك","cFreq":"التكرار","cPeriod":"آخر فترة","cReports":"التقارير المقدمة","cStatus":"الحالة","stCur":"محدّث","stDue":"مستحق","mLabel":"شهري","qLabel":"ربع سنوي","aLabel":"سنوي","foot":"convo.finance · زاد — ذكاء رقابي للبنك المركزي"}};
-const DATA = [{"en":"Arab Bank","ar":"البنك العربي","freq":"M","pEn":"May 2026","pAr":"أيار 2026","reports":17,"status":"cur"},{"en":"Housing Bank","ar":"بنك الإسكان","freq":"M","pEn":"May 2026","pAr":"أيار 2026","reports":17,"status":"cur"},{"en":"Jordan Islamic Bank","ar":"البنك الإسلامي الأردني","freq":"M","pEn":"May 2026","pAr":"أيار 2026","reports":16,"status":"cur"},{"en":"Bank of Jordan","ar":"بنك الأردن","freq":"M","pEn":"Apr 2026","pAr":"نيسان 2026","reports":15,"status":"due"},{"en":"Cairo Amman Bank","ar":"بنك القاهرة عمّان","freq":"M","pEn":"May 2026","pAr":"أيار 2026","reports":16,"status":"cur"},{"en":"Jordan Ahli Bank","ar":"البنك الأهلي الأردني","freq":"M","pEn":"May 2026","pAr":"أيار 2026","reports":15,"status":"cur"},{"en":"Jordan Kuwait Bank","ar":"البنك الأردني الكويتي","freq":"Q","pEn":"Q1 2026","pAr":"الربع الأول 2026","reports":9,"status":"cur"},{"en":"Capital Bank","ar":"كابيتال بنك","freq":"Q","pEn":"Q1 2026","pAr":"الربع الأول 2026","reports":8,"status":"cur"},{"en":"Bank al Etihad","ar":"بنك الاتحاد","freq":"Q","pEn":"Q1 2026","pAr":"الربع الأول 2026","reports":8,"status":"cur"},{"en":"Invest Bank","ar":"بنك الاستثمار","freq":"Q","pEn":"Q4 2025","pAr":"الربع الرابع 2025","reports":7,"status":"due"},{"en":"Arab Jordan Investment Bank","ar":"البنك العربي الأردني للاستثمار","freq":"Q","pEn":"Q1 2026","pAr":"الربع الأول 2026","reports":8,"status":"cur"},{"en":"Jordan Commercial Bank","ar":"البنك التجاري الأردني","freq":"Q","pEn":"Q4 2025","pAr":"الربع الرابع 2025","reports":6,"status":"due"},{"en":"Safwa Islamic Bank","ar":"بنك صفوة الإسلامي","freq":"A","pEn":"FY 2025","pAr":"السنة المالية 2025","reports":3,"status":"cur"},{"en":"Islamic International Arab Bank","ar":"البنك الإسلامي العربي الدولي","freq":"A","pEn":"FY 2025","pAr":"السنة المالية 2025","reports":3,"status":"cur"},{"en":"Societe Generale Jordan","ar":"سوسيته جنرال الأردن","freq":"A","pEn":"FY 2025","pAr":"السنة المالية 2025","reports":2,"status":"due"}];
+const CSS = ".cbjx-wrap{min-height:100vh;background:#f4f7fa;color:#0c3057;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;padding:28px 32px 64px;box-sizing:border-box;}\nhtml.dark .cbjx-wrap{background:#0a1626;color:#e8eef5;}\n.cbjx-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:34px;}\n.cbjx-brand{display:flex;align-items:center;gap:10px;}\n.cbjx-logo{height:34px;width:auto;display:block;}\n.cbjx-controls{display:flex;align-items:center;gap:8px;}\n.cbjx-btn{border:1px solid #d6deea;background:#fff;color:#0c3057;border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;line-height:1;}\n.cbjx-btn:hover{border-color:#3a6ea5;}\nhtml.dark .cbjx-btn{background:#11233a;color:#e8eef5;border-color:#1f3a5a;}\n.cbjx-hero{margin-bottom:24px;}\n.cbjx-kicker{color:#b0883c;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}\n.cbjx-h1{font-size:30px;font-weight:800;margin:0 0 8px;letter-spacing:-.02em;}\n.cbjx-sub{color:#64748b;font-size:15px;margin:0;max-width:660px;line-height:1.5;}\nhtml.dark .cbjx-sub{color:#93a5bd;}\n.cbjx-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:40px;}\n.cbjx-action{background:#fff;border:1px solid #e2e8f0;border-top:3px solid #3a6ea5;border-radius:14px;padding:18px 18px 20px;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease;}\n.cbjx-action:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(12,48,87,.10);}\nhtml.dark .cbjx-action{background:#11233a;border-color:#1f3a5a;}\n.cbjx-action-title{font-size:16px;font-weight:700;margin-bottom:5px;}\n.cbjx-action-desc{font-size:13px;color:#64748b;line-height:1.45;}\nhtml.dark .cbjx-action-desc{color:#93a5bd;}\n.cbjx-section-h{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748b;margin:0 0 16px;}\nhtml.dark .cbjx-section-h{color:#93a5bd;}\n.cbjx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(252px,1fr));gap:12px;}\n.cbjx-bank{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:13px 14px;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease;}\n.cbjx-bank:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(12,48,87,.10);border-color:#3a6ea5;}\nhtml.dark .cbjx-bank{background:#11233a;border-color:#1f3a5a;}\n.cbjx-bank-logo{width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;border:1px solid #eef2f7;background:#fff;}\nhtml.dark .cbjx-bank-logo{border-color:#24405f;}\n.cbjx-bank-meta{flex:1;min-width:0;}\n.cbjx-bank-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}\n.cbjx-bank-ticker{font-size:12px;color:#64748b;margin-top:2px;}\nhtml.dark .cbjx-bank-ticker{color:#93a5bd;}\n.cbjx-bank-cta{color:#3a6ea5;font-size:20px;font-weight:700;flex-shrink:0;}\n.cbjx-foot{margin-top:40px;font-size:12px;color:#94a3b8;line-height:1.5;}\nhtml.dark .cbjx-foot{color:#6b7f97;}";
+const T = {"en":{"kicker":"Central Bank of Jordan","h1":"CBJ Regulatory Returns","sub":"View each bank's regulatory filing dashboard, explore the sector aggregate, or ask ZAD about any submission.","sectorTitle":"Sector Aggregate (ABJ)","sectorDesc":"Association of Banks in Jordan — total assets, deposits and credit facilities across all licensed banks.","askTitle":"Ask ZAD","askDesc":"Put a question to the analyst about CBJ returns, ratios or any bank's filings.","uploadTitle":"Upload a CBJ Return","uploadDesc":"Drop a regulatory return file to auto-detect the form and render its dashboard.","banksHeading":"Banks — regulatory dashboards","conventional":"Conventional","islamic":"Islamic","foot":"Per-bank dashboards render uploaded CBJ regulatory returns. Sector figures are published by the Association of Banks in Jordan."},"ar":{"kicker":"البنك المركزي الأردني","h1":"التقارير الرقابية للبنك المركزي","sub":"اطّلع على لوحة التقارير الرقابية لكل بنك، أو استكشف المؤشرات على مستوى القطاع، أو اسأل زاد عن أي تقرير.","sectorTitle":"إجمالي القطاع (جمعية البنوك)","sectorDesc":"جمعية البنوك في الأردن — إجمالي الموجودات والودائع والتسهيلات الائتمانية لكل البنوك المرخّصة.","askTitle":"اسأل زاد","askDesc":"اطرح سؤالاً على المحلّل حول التقارير الرقابية أو النِسب أو ملفات أي بنك.","uploadTitle":"رفع تقرير رقابي","uploadDesc":"أرفِق ملف التقرير الرقابي ليتم تحديد النموذج تلقائياً وعرض لوحته.","banksHeading":"البنوك — اللوحات الرقابية","conventional":"تقليدي","islamic":"إسلامي","foot":"تعرض لوحات البنوك التقارير الرقابية المرفوعة. وتصدر بيانات القطاع عن جمعية البنوك في الأردن."}};
 
-export default function Page() {
-  const [lang, setLang] = useState('en');
-  const [filter, setFilter] = useState('all');
-  useEffect(function () {
-    var saved = 'en';
-    try { saved = localStorage.getItem('cf_lang') || 'en'; } catch (e) {}
-    if (saved !== 'en' && saved !== 'ar') saved = 'en';
-    setLang(saved);
-  }, []);
-  useEffect(function () {
-    try { document.documentElement.setAttribute('dir', T[lang].dir); document.documentElement.setAttribute('lang', lang); } catch (e) {}
-  }, [lang]);
-  function toggle() {
-    var nx = lang === 'en' ? 'ar' : 'en';
-    setLang(nx);
-    try { localStorage.setItem('cf_lang', nx); } catch (e) {}
-  }
-  var t = T[lang];
-  var rows = DATA.filter(function (d) { return filter === 'all' || d.freq === filter; });
-  var totalReports = DATA.reduce(function (s, d) { return s + d.reports; }, 0);
-  var onTime = Math.round((DATA.filter(function (d) { return d.status === 'cur'; }).length / DATA.length) * 100);
-  function freqLabel(f) { return f === 'M' ? t.mLabel : (f === 'Q' ? t.qLabel : t.aLabel); }
-  var chips = [['all', t.fAll], ['M', t.fM], ['Q', t.fQ], ['A', t.fA]];
-  return (
-    <div className="cbj-root" dir={t.dir}>
-      <style dangerouslySetInnerHTML={{ __html: CSS }} />
-      <div className="cbj-wrap">
-        <div className="cbj-head">
-          <a className="cbj-brand" href="/">
-            <div className="cbj-mark">ZAD</div>
-            <div className="cbj-wm"><b>convo.finance</b><span>{t.wm}</span></div>
-          </a>
-          <button className="cbj-lang" onClick={toggle}>{t.lang}</button>
-        </div>
-        <h1 className="cbj-title">{t.title}</h1>
-        <div className="cbj-sub">{t.sub}</div>
-        <div className="cbj-kpis">
-          <div className="cbj-kpi"><div className="lab">{t.kBanks}</div><div className="val">{DATA.length}</div><div className="ctx">{t.kBanksCtx}</div></div>
-          <div className="cbj-kpi"><div className="lab">{t.kSubs}</div><div className="val">{totalReports}</div><div className="ctx">{t.kSubsCtx}</div></div>
-          <div className="cbj-kpi"><div className="lab">{t.kPeriod}</div><div className="val">{lang === 'ar' ? 'أيار 2026' : 'May 2026'}</div><div className="ctx">{t.kPeriodCtx}</div></div>
-          <div className="cbj-kpi"><div className="lab">{t.kRate}</div><div className="val">{onTime}%</div><div className="ctx">{t.kRateCtx}</div></div>
-        </div>
-        <div className="cbj-bar">
-          <div className="cbj-chips">
-            {chips.map(function (c) { return (<button key={c[0]} className={filter === c[0] ? 'cbj-chip on' : 'cbj-chip'} onClick={function () { setFilter(c[0]); }}>{c[1]}</button>); })}
-          </div>
-          <a className="cbj-upload" href="/upload"><span>{"↥"}</span><span>{t.upload}</span></a>
-        </div>
-        <div className="cbj-tablewrap">
-          <table className="cbj-table">
-            <thead><tr><th>{t.cBank}</th><th>{t.cFreq}</th><th>{t.cPeriod}</th><th>{t.cReports}</th><th>{t.cStatus}</th></tr></thead>
-            <tbody>
-              {rows.map(function (d, i) { return (
-                <tr key={i}>
-                  <td className="cbj-bank">{lang === 'ar' ? d.ar : d.en}</td>
-                  <td><span className="cbj-freq">{freqLabel(d.freq)}</span></td>
-                  <td>{lang === 'ar' ? d.pAr : d.pEn}</td>
-                  <td className="cbj-num">{d.reports}</td>
-                  <td><span className={d.status === 'cur' ? 'cbj-badge cur' : 'cbj-badge due'}>{d.status === 'cur' ? t.stCur : t.stDue}</span></td>
-                </tr>
-              ); })}
-            </tbody>
-          </table>
-        </div>
-        <div className="cbj-foot">{t.foot}</div>
-      </div>
-    </div>
+const h = React.createElement;
+export default function CbjPage(){
+  const [lang,setLang]=useState('en');
+  const [dark,setDark]=useState(false);
+  const router=useRouter();
+  useEffect(function(){
+    try{
+      var l=localStorage.getItem('cf_lang'); if(l==='ar'||l==='en'){ setLang(l); }
+      var t=localStorage.getItem('theme'); var d=(t==='dark'); setDark(d);
+      var de=document.documentElement; if(d){ de.classList.add('dark'); } else { de.classList.remove('dark'); }
+    }catch(e){}
+  },[]);
+  useEffect(function(){
+    try{ var de=document.documentElement; de.lang=lang; de.dir=(lang==='ar'?'rtl':'ltr'); }catch(e){}
+  },[lang]);
+  var tr=T[lang]; var isAr=(lang==='ar');
+  function toggleLang(){ var nl=(lang==='ar'?'en':'ar'); setLang(nl); try{ localStorage.setItem('cf_lang',nl); }catch(e){} }
+  function toggleTheme(){ var nd=!dark; setDark(nd); try{ localStorage.setItem('theme', nd?'dark':'light'); }catch(e){} var de=document.documentElement; if(nd){ de.classList.add('dark'); } else { de.classList.remove('dark'); } }
+  function go(u){ router.push(u); }
+  var logoSrc=(isAr?'/convo-zad-ar.svg':'/convo-zad-en.svg');
+  var actions=[
+    {t:tr.sectorTitle,d:tr.sectorDesc,u:'/sector',c:'#3a6ea5'},
+    {t:tr.askTitle,d:tr.askDesc,u:'/chat?focus=cbj',c:'#b0883c'},
+    {t:tr.uploadTitle,d:tr.uploadDesc,u:'/upload',c:'#0c3057'}
+  ];
+  return h('div',{className:'cbjx-wrap',dir:(isAr?'rtl':'ltr')},
+    h('style',{dangerouslySetInnerHTML:{__html:CSS}}),
+    h('div',{className:'cbjx-top'},
+      h('div',{className:'cbjx-brand'}, h('img',{className:'cbjx-logo',src:logoSrc,alt:'ZAD'})),
+      h('div',{className:'cbjx-controls'},
+        h('button',{className:'cbjx-btn',onClick:toggleLang}, isAr?'EN':'العربية'),
+        h('button',{className:'cbjx-btn',onClick:toggleTheme,'aria-label':'theme'}, dark?'☀':'☾')
+      )
+    ),
+    h('div',{className:'cbjx-hero'},
+      h('div',{className:'cbjx-kicker'}, tr.kicker),
+      h('h1',{className:'cbjx-h1'}, tr.h1),
+      h('p',{className:'cbjx-sub'}, tr.sub)
+    ),
+    h('div',{className:'cbjx-actions'},
+      actions.map(function(a,i){ return h('div',{key:i,className:'cbjx-action',onClick:function(){ go(a.u); },style:{borderTopColor:a.c}},
+        h('div',{className:'cbjx-action-title'}, a.t),
+        h('div',{className:'cbjx-action-desc'}, a.d)
+      ); })
+    ),
+    h('div',{className:'cbjx-section-h'}, tr.banksHeading),
+    h('div',{className:'cbjx-grid'},
+      BANKS.map(function(b){ return h('div',{key:b.ticker,className:'cbjx-bank',onClick:function(){ go('/upload?bank='+b.ticker); }},
+        h('div',{className:'cbjx-bank-logo'}, h('img',{src:b.logoUrl,alt:b.shortName,style:{maxWidth:'100%',maxHeight:'100%',objectFit:'contain'},onError:function(e){ e.target.style.display='none'; }})),
+        h('div',{className:'cbjx-bank-meta'},
+          h('div',{className:'cbjx-bank-name'}, isAr?(b.nameAr||b.name):b.name),
+          h('div',{className:'cbjx-bank-ticker'}, b.ticker+' · '+(b.sector==='islamic'?tr.islamic:tr.conventional))
+        ),
+        h('div',{className:'cbjx-bank-cta'}, isAr?'‹':'›')
+      ); })
+    ),
+    h('div',{className:'cbjx-foot'}, tr.foot)
   );
 }
