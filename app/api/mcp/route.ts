@@ -132,7 +132,7 @@ export async function POST(req) {
 }
 
 export async function GET() {
-  return NextResponse.json({ name: SERVER.name, version: SERVER.version, protocol: 'jsonrpc-2.0 / mcp', tools: TOOLS.map(function (t) { return t.name; }) });
+  return NextResponse.json({ name: SERVER.name, version: SERVER.version, protocol: 'jsonrpc-2.0 / mcp', tools: TOOLS.map(function (t) { return t.name; }), env: { url: !!process.env.NEXT_PUBLIC_SUPABASE_URL, hasServiceKey: (process.env.SUPABASE_SERVICE_ROLE_KEY || '').length > 0, serviceKeyLen: (process.env.SUPABASE_SERVICE_ROLE_KEY || '').length, hasAnon: (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').length > 0, anonLen: (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').length } });
 }
 
 export async function OPTIONS() {
