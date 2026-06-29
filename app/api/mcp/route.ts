@@ -96,7 +96,10 @@ async function callTool(name, args) {
     var year = args.fiscal_year;
     if (!year) { var ys = rows.map(function (r) { return r.fiscal_year; }).filter(function (x) { return typeof x === 'number'; }); year = ys.length ? Math.max.apply(null, ys) : null; }
     var yr = year ? rows.filter(function (r) { return r.fiscal_year === year; }) : rows;
-    return { fiscal_year: year, bank_count: yr.length, aggregates: numericAgg(yr), rows: yr };
+    var PEG = 0.710; var MON = { total_assets:1, net_loans:1, customer_deposits:1, shareholders_equity:1, total_equity:1, paid_up_capital:1, net_interest_income:1, net_fee_income:1, total_income:1, operating_expenses:1, provision_expense:1, net_profit:1 };
+    function toJod(v, cur) { return (cur === 'USD' && typeof v === 'number') ? v * PEG : v; }
+    var norm = yr.map(function (r) { var o = {}; for (var k in r) { o[k] = MON[k] ? toJod(r[k], r.currency) : r[k]; } return o; });
+    return { fiscal_year: year, bank_count: yr.length, currency: 'JOD thousands', fx_note: 'USD values converted at 1 USD = ' + PEG + ' JOD', aggregates: numericAgg(norm), rows: yr };
   }
   if (name === 'cbj_policy_rates') {
     var p = await supabase.from('cbj_policy_rates').select('*').order('id', { ascending: false });
