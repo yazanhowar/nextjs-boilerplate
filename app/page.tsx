@@ -53,7 +53,7 @@ export default function Page() {
             <p>{t.s2}</p>
             <div className="zwl-go"><span>{t.go}</span><span>{arrow}</span></div>
           </div>
-          <a className="zwl-card zwl-c3" href="/upload">
+          <a className="zwl-card zwl-c3" href="/cbj">
             <span className="zwl-ic" dangerouslySetInnerHTML={{ __html: IC.cbj }} />
             <h3>{t.t3}</h3>
             <p>{t.s3}</p>
