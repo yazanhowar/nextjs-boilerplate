@@ -237,9 +237,9 @@ a, button { transition: color 0.15s, background-color 0.15s, border-color 0.15s,
   --cf-negative:#C4504A;
   --cf-iris:#7A5AA4;
   --cf-grad:linear-gradient(105deg,#7A5AA4,#695CA1,#3E639B,#106B94);
-  --cf-font-sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
-  --cf-font-ar:'IBM Plex Sans Arabic','IBM Plex Sans',sans-serif;
-  --cf-font-mono:'IBM Plex Mono',ui-monospace,monospace;
+  --cf-font-sans:var(--font-ibm-sans),'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --cf-font-ar:var(--font-ibm-ar),'IBM Plex Sans Arabic','IBM Plex Sans',sans-serif;
+  --cf-font-mono:var(--font-ibm-mono),'IBM Plex Mono',ui-monospace,monospace;
 }
 .dark{
   --cf-bg:#0B1120;
