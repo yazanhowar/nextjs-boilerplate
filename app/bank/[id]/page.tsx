@@ -272,7 +272,7 @@ export default function BankPage() {
   if (!bank) return <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center text-white">Bank not found</div>
 
   // Latest + previous financials for delta
-  if (Number(bankId) === 1) { (financials || []).forEach(function (r) { if (r) { ['total_assets','net_profit','customer_deposits','net_loans','total_equity'].forEach(function (k) { if (r[k] != null) r[k] = r[k] * 0.709; }); } }); }
+  if (Number(bankId) === 1) { (financials || []).forEach(function (r) { if (r && !r.__cfJod) { ['total_assets','net_profit','customer_deposits','net_loans','total_equity'].forEach(function (k) { if (r[k] != null) r[k] = r[k] * 0.709; }); r.__cfJod = true; } }); }
   const latest = financials[financials.length - 1]
   const prev = financials[financials.length - 2]
 
