@@ -13,7 +13,7 @@ function fmtM(v, cur){ var j=jod(v,cur); if(j===null) return 'n/a'; return (Math
 async function buildKnowledge(){
   var sb = createClient(SUPA_URL, SUPA_KEY);
   var banksRes = await sb.from('banks').select('id,name_en,name_ar,ticker,bank_type').order('id');
-  var finRes = await sb.from('bank_financials').select('bank_id,fiscal_year,total_assets,customer_deposits,total_equity,net_profit,roe,car,npl_ratio,currency').eq('fiscal_year', 2025);
+  var finRes = await sb.from('bank_financials').select('bank_id,fiscal_year,total_assets,customer_deposits,net_loans,total_equity,net_profit,roe,roa,car,npl_ratio,loan_to_deposit,currency').eq('fiscal_year', 2025);
   var abjRes = await sb.from('abj_sector_indicators').select('metric,data_period,value,unit').eq('category', 'balance_sheet').order('data_period', { ascending: false });
   var banks = banksRes.data || [];
   var fins = finRes.data || [];
@@ -27,11 +27,14 @@ async function buildKnowledge(){
     var parts = [];
     parts.push('assets ' + fmtB(f.total_assets, f.currency));
     parts.push('deposits ' + fmtB(f.customer_deposits, f.currency));
+    if(f.net_loans!==null && f.net_loans!==undefined) parts.push('net loans ' + fmtB(f.net_loans, f.currency));
     parts.push('equity ' + fmtB(f.total_equity, f.currency));
     parts.push('net profit ' + fmtM(f.net_profit, f.currency));
     if(f.roe!==null && f.roe!==undefined) parts.push('ROE ' + f.roe + '%');
+    if(f.roa!==null && f.roa!==undefined) parts.push('ROA ' + f.roa + '%');
     if(f.car!==null && f.car!==undefined) parts.push('CAR ' + f.car + '%');
     if(f.npl_ratio!==null && f.npl_ratio!==undefined) parts.push('NPL ' + f.npl_ratio + '%');
+    if(f.loan_to_deposit!==null && f.loan_to_deposit!==undefined) parts.push('loan-to-deposit ' + f.loan_to_deposit + '%');
     var nm = b.name_en || ('Bank ' + f.bank_id);
     lines.push('- ' + nm + ' (' + (b.ticker||'') + ', ' + (b.bank_type||'') + '): ' + parts.join(', '));
   });
