@@ -13,7 +13,7 @@ function fmtM(v, cur){ var j=jod(v,cur); if(j===null) return 'n/a'; return (Math
 async function buildKnowledge(){
   var sb = createClient(SUPA_URL, SUPA_KEY);
   var banksRes = await sb.from('banks').select('id,name_en,name_ar,ticker,bank_type').order('id');
-  var finRes = await sb.from('bank_financials').select('bank_id,fiscal_year,total_assets,customer_deposits,net_loans,total_equity,net_profit,roe,roa,car,npl_ratio,loan_to_deposit,currency').eq('fiscal_year', 2025);
+  var finRes = await sb.from('bank_financials').select('bank_id,fiscal_year,total_assets,customer_deposits,net_loans,total_equity,net_profit,roe,roa,car,npl_ratio,loan_to_deposit,currency').order('bank_id', { ascending: true }).order('fiscal_year', { ascending: true });
   var abjRes = await sb.from('abj_sector_indicators').select('metric,data_period,value,unit').eq('category', 'balance_sheet').order('data_period', { ascending: false });
   var banks = banksRes.data || [];
   var fins = finRes.data || [];
