@@ -179,7 +179,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
                   />
                   <Legend />
                   {chartData.series.map((s: string, i: number) => (
-                    <Bar key={s} dataKey={s} fill={CHART_COLORS[i % CHART_COLORS.length]} radius={[4, 4, 0, 0]} />
+                    <Bar isAnimationActive={false} key={s} dataKey={s} fill={CHART_COLORS[i % CHART_COLORS.length]} radius={[4, 4, 0, 0]} />
                   ))}
                 </BarChart>
               ) : (
@@ -194,7 +194,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
                   />
                   <Legend />
                   {chartData.series.map((s: string, i: number) => (
-                    <Line key={s} type="monotone" dataKey={s}
+                    <Line isAnimationActive={false} key={s} type="monotone" dataKey={s}
                       stroke={CHART_COLORS[i % CHART_COLORS.length]}
                       strokeWidth={2} dot={{ r: 4 }} />
                   ))}
@@ -461,7 +461,7 @@ export default function BankPage() {
                       itemStyle={{ color: '#fff' }}
                       formatter={(v: any) => [`JOD ${v}M`, 'Net Profit']}
                     />
-                    <Line type="monotone" dataKey="Net Profit"
+                    <Line isAnimationActive={false} type="monotone" dataKey="Net Profit"
                       stroke="#CEBA95" strokeWidth={2.5}
                       dot={{ fill: '#CEBA95', r: 5 }}
                       activeDot={{ r: 7 }} />
@@ -568,9 +568,9 @@ export default function BankPage() {
                     formatter={(v: any) => [`JOD ${v}M`]}
                   />
                   <Legend />
-                  <Bar dataKey="Total Assets" fill="#004D8F" radius={[3, 3, 0, 0]} />
-                  <Bar dataKey="Customer Deposits" fill="#CEBA95" radius={[3, 3, 0, 0]} />
-                  <Bar dataKey="Loans" fill="#2ECC71" radius={[3, 3, 0, 0]} />
+                  <Bar isAnimationActive={false} dataKey="Total Assets" fill="#004D8F" radius={[3, 3, 0, 0]} />
+                  <Bar isAnimationActive={false} dataKey="Customer Deposits" fill="#CEBA95" radius={[3, 3, 0, 0]} />
+                  <Bar isAnimationActive={false} dataKey="Loans" fill="#2ECC71" radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
