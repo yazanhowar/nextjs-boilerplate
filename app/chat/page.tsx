@@ -81,8 +81,14 @@ function mdToHtml(md) {
   }
   return html
 }
+function stripChartBlock(text) {
+  var ci = text.indexOf(BT + 'chart'); if (ci < 0) return text;
+  var ns = text.indexOf(NL, ci); if (ns < 0) return text;
+  var je = text.indexOf(BT, ns); if (je < 0) return text;
+  return (text.slice(0, ci) + text.slice(je + 1)).trim();
+}
 function renderRich(text) {
-  return <div className="cf-md" dangerouslySetInnerHTML={{ __html: mdToHtml(text) }} />
+  return <div className="cf-md" dangerouslySetInnerHTML={{ __html: mdToHtml(stripChartBlock(text)) }} />
 }
 
 function parseChart(text) {
@@ -96,10 +102,41 @@ function parseChart(text) {
   return null;
 }
 
+function ZLineChart(c) {
+  var series = c.series.slice(0, 12);
+  var nums = series.map(function (s) { return Number(s.value) || 0; });
+  var maxV = Math.max.apply(null, nums);
+  var minV = Math.min.apply(null, nums);
+  var rng = (maxV - minV) || Math.abs(maxV) || 1;
+  var lo = minV - rng * 0.18, hi = maxV + rng * 0.18, span = (hi - lo) || 1;
+  var W = 520, H = 158, padL = 10, padR = 16, padT = 16, padB = 28;
+  var n = series.length, plotW = W - padL - padR, plotH = H - padT - padB;
+  function xAt(i) { return padL + (n <= 1 ? plotW / 2 : (plotW * i) / (n - 1)); }
+  function yAt(v) { return padT + plotH - ((v - lo) / span) * plotH; }
+  var ptsArr = series.map(function (s, i) { return xAt(i) + ',' + yAt(Number(s.value) || 0); });
+  var area = 'M ' + padL + ',' + (padT + plotH) + ' L ' + ptsArr.join(' L ') + ' L ' + (padL + plotW) + ',' + (padT + plotH) + ' Z';
+  var nodes = series.map(function (s, i) {
+    var vx = xAt(i), vy = yAt(Number(s.value) || 0);
+    return React.createElement('g', { key: i },
+      React.createElement('circle', { cx: vx, cy: vy, r: 3.6, fill: '#1f6feb', stroke: '#ffffff', strokeWidth: 1.5 }),
+      React.createElement('text', { x: vx, y: vy - 9, textAnchor: 'middle', fontSize: 11, fontWeight: 700, fill: '#0c3057' }, (Math.round((Number(s.value) || 0) * 100) / 100).toLocaleString()),
+      React.createElement('text', { x: vx, y: H - 9, textAnchor: 'middle', fontSize: 10, fill: '#6b7c93' }, String(s.label)));
+  });
+  var fillEl = React.createElement('path', { d: area, fill: 'rgba(31,111,235,0.10)', stroke: 'none' });
+  var lineEl = React.createElement('polyline', { points: ptsArr.join(' '), fill: 'none', stroke: '#1f6feb', strokeWidth: 2.5, strokeLinejoin: 'round', strokeLinecap: 'round' });
+  var svg = React.createElement('svg', { viewBox: '0 0 ' + W + ' ' + H, preserveAspectRatio: 'xMidYMid meet', style: { display: 'block', width: '100%', height: 'auto' } }, fillEl, lineEl, nodes);
+  return React.createElement('div', { className: 'zc-chart' },
+    c.title ? React.createElement('div', { className: 'zc-charttitle' }, c.title) : null,
+    c.unit ? React.createElement('div', { style: { fontSize: '11px', color: '#6b7c93', marginTop: '-2px', marginBottom: '6px' } }, c.unit) : null,
+    svg);
+}
 function ZChart(props) {
   var c = props.data;
   var vals = c.series.map(function (s) { return Math.abs(Number(s.value) || 0); });
   var max = Math.max.apply(null, vals) || 1;
+  function zcIsYr(L) { L = String(L).trim(); if (L.length !== 4) return false; for (var yi = 0; yi < 4; yi++) { var cc = L.charCodeAt(yi); if (cc < 48 || cc > 57) return false; } var yn = Number(L); return yn >= 1990 && yn <= 2099; }
+  var zcLine = (c.type === 'line') || (c.series.length >= 2 && c.series.every(function (s) { return zcIsYr(s.label); }));
+  if (zcLine) return ZLineChart(c);
   var rows = c.series.slice(0, 8).map(function (s, i) {
     var v = Number(s.value) || 0;
     var pct = Math.max(2, (Math.abs(v) / max) * 100);
