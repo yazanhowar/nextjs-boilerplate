@@ -192,6 +192,21 @@ export default function ReportStudio(){
 
   function pickFile(){ if(inp.current) inp.current.click() }
 
+  function loadSample(){
+    if(!window.XLSX){ setErr('Engine is still loading - try again in a moment.'); return }
+    var X = window.XLSX
+    var A = function(){ return String.fromCharCode.apply(null, arguments) }
+    var title = A(1603,1588,1601,32,1605,1589,1575,1583,1585,32,1575,1604,1575,1605,1608,1575,1604)
+    var sec1 = A(1575,1608,1604,1575,32,1575,1604,1608,1583,1575,1574,1593)
+    var it1 = A(1608,1583,1575,1574,1593,32,1575,1604,1593,1605,1604,1575,1569)
+    var it2 = A(1608,1583,1575,1574,1593,32,1575,1604,1576,1606,1608,1603)
+    var tot = A(1589,1575,1601,1609,32,1605,1589,1575,1583,1585)
+    var aoa = [ [title], [K_NOQ,K_ADAD], [sec1], [K_ARQAM,17.3,A(1571),it1,1031040207], [K_ARQAM,17.3,A(1576),it2,202584909], [K_ARQAM,17.3,tot,1414493204] ]
+    var ws = X.utils.aoa_to_sheet(aoa); var wb = X.utils.book_new(); X.utils.book_append_sheet(wb, ws, A(83,110,97,112,83,104,111,111,116))
+    setFileName('sample-report.xlsx'); setErr('')
+    setResult(parseCBJ(wb))
+  }
+
   var mid = String.fromCharCode(183)
 
   return (
@@ -215,6 +230,8 @@ export default function ReportStudio(){
           <div className='cf-muted' style={{ fontSize:'12.5px', marginTop:'6px' }}>{ xlsxReady ? ('Click to browse  ' + mid + '  .xls and .xlsx supported') : (loadErr ? 'Engine failed to load - refresh the page' : 'Loading engine...') }</div>
           <input ref={inp} type='file' accept='.xls,.xlsx' onChange={onFile} style={{ display:'none' }} />
         </div>
+
+        <div style={{ marginTop:'-12px', marginBottom:'26px', textAlign:'center' }}><button onClick={loadSample} style={{ background:'none', border:'none', cursor:'pointer', padding:'0', fontFamily:'inherit', fontSize:'13px', color:'var(--cf-primary)', fontWeight:'600' }}>Or load a sample report</button></div>
 
         { err!=='' ? (
           <div className='cf-card' style={{ borderColor:'var(--cf-negative)', color:'var(--cf-negative)', fontSize:'13.5px', marginBottom:'26px' }}>{ err }</div>
