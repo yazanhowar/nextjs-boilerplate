@@ -177,8 +177,8 @@ export default function Dashboard() {
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12, marginBottom:32 }}>
           {[
-            { label:'Sector Total Assets', value:fmtK(grandAssets), sub:'All 15 banks combined' },
-            { label:'Sector Net Profit', value:fmtK(grandProfit), sub:`FY${dataYear}` },
+            { label:'Combined Total Assets', value:fmtK(grandAssets), sub:'All 15 banks, group basis' },
+            { label:'Combined Net Profit', value:fmtK(grandProfit), sub:`FY${dataYear}` },
             { label:'Avg ROE', value:avgROE!=null?`${avgROE.toFixed(1)}%`:'-', sub:'Return on equity' },
             { label:'Avg CAR', value:avgCAR!=null?`${avgCAR.toFixed(1)}%`:'-', sub:'Capital adequacy' },
           ].map((kpi,i) => (
