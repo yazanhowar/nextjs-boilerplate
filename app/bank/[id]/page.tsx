@@ -216,6 +216,17 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
 
 // ─── Main bank page ───────────────────────────────────────────────────────────
 export default function BankPage() {
+  useEffect(function () {
+    try {
+      var ov = [['bg-[#1a1a1a]','background-color','#F5F7FA'],['bg-[#242424]','background-color','#FFFFFF'],['bg-[#383838]','background-color','#EEF1F5'],['border-[#383838]','border-color','#E2E8F0'],['text-[#9CA3AF]','color','#5B6B82'],['text-[#6B7280]','color','#64748B'],['text-[#CBD5E0]','color','#475569'],['text-[#CEBA95]','color','#9A7B45'],['text-[#2ECC71]','color','#15803D'],['text-[#60A5FA]','color','#2563EB'],['text-white','color','#16243B']];
+      var css = '';
+      for (var i = 0; i < ov.length; i++) { css += 'html:not(.dark) .' + CSS.escape(ov[i][0]) + '{' + ov[i][1] + ':' + ov[i][2] + ' !important}'; }
+      css += 'html:not(.dark) .' + CSS.escape('placeholder-[#4A5568]') + '::placeholder{color:#94A3B8 !important}';
+      css += 'html:not(.dark) .' + CSS.escape('hover:bg-[#2a2a2a]') + ':hover{background-color:#EEF1F5 !important}';
+      var st = document.createElement('style'); st.setAttribute('data-bid-light', '1'); st.textContent = css; document.head.appendChild(st);
+      return function () { if (st && st.parentNode) { st.parentNode.removeChild(st); } };
+    } catch (e) {}
+  }, []);
   const params = useParams()
   const router = useRouter()
   const bankId = parseInt(params.id as string)
