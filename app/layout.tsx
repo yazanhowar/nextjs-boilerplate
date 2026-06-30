@@ -1,10 +1,12 @@
 // app/layout.tsx
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic, IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
 import PasswordGate from '@/components/PasswordGate'
 
-const inter = Inter({ subsets: ['latin'], weight: ['400','500','600','700'], display: 'swap' })
+const ibmSans = IBM_Plex_Sans({ subsets: ['latin'], weight: ['400','500','600','700'], display: 'swap', variable: '--font-ibm-sans' })
+const ibmArabic = IBM_Plex_Sans_Arabic({ subsets: ['arabic'], weight: ['400','500','600','700'], display: 'swap', variable: '--font-ibm-ar' })
+const ibmMono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400','500','600'], display: 'swap', variable: '--font-ibm-mono' })
 
 export const metadata: Metadata = {
   title: 'convo.finance | Jordanian Banking Intelligence',
@@ -22,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           __html: `(function(){try{var s=localStorage.getItem('hbtf-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;if(s==='dark'||((!s)&&d)){document.documentElement.classList.add('dark');}}catch(e){}})();`
         }} />
       </head>
-      <body className={inter.className}><PasswordGate>{children}</PasswordGate></body>
+      <body className={ibmSans.variable + ' ' + ibmArabic.variable + ' ' + ibmMono.variable + ' ' + ibmSans.className}><PasswordGate>{children}</PasswordGate></body>
     </html>
   )
 }
