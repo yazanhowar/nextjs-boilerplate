@@ -304,3 +304,16 @@ body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 .cf-link:hover{text-decoration:underline}
 .cf-grad-text{background:var(--cf-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .cf-grad-bar{height:4px;border-radius:999px;background:var(--cf-grad)}
+
+/* ZAD markdown rendering */
+.cf-md { font-size: 14px; line-height: 1.6; color: var(--cf-ink); }
+.cf-md-p { margin: 0 0 10px; }
+.cf-md-p:last-child { margin-bottom: 0; }
+.cf-md-h { font-weight: 700; font-size: 14.5px; color: var(--cf-ink); margin: 14px 0 8px; }
+.cf-md-ul, .cf-md-ol { margin: 0 0 10px; padding-inline-start: 20px; }
+.cf-md-ul li, .cf-md-ol li { margin: 3px 0; }
+.cf-md code { background: var(--cf-surface2); padding: 1px 5px; border-radius: 4px; font-family: var(--cf-font-mono); font-size: 12.5px; }
+.cf-md-table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px; display: block; overflow-x: auto; }
+.cf-md-table th { background: var(--cf-surface2); color: var(--cf-ink); font-weight: 600; text-align: start; padding: 8px 12px; border: 1px solid var(--cf-line); white-space: nowrap; }
+.cf-md-table td { padding: 8px 12px; border: 1px solid var(--cf-line); color: var(--cf-ink2); }
+.cf-md-table tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--cf-surface2) 40%, transparent); }
