@@ -1,269 +1,92 @@
-// app/api/chart/route.ts
+import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { BANKS } from '@/lib/banks-config'
+export const dynamic = 'force-dynamic';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const PEG = 0.709;
 
-function detectBanks(prompt: string): number[] {
-  const lower = prompt.toLowerCase()
-  const found: number[] = []
-  for (const bank of BANKS) {
-    if (
-      lower.includes(bank.name.toLowerCase()) ||
-      lower.includes(bank.shortName.toLowerCase()) ||
-      lower.includes(bank.ticker.toLowerCase())
-    ) {
-      found.push(bank.id)
-    }
-  }
-  return found.length > 0 ? found : BANKS.map(b => b.id)
-}
+function num(v: any): number | null { if (v === null || v === undefined || v === '') return null; const n = Number(v); return isNaN(n) ? null : n; }
+function fy(y: any): string { return 'FY' + String(y); }
 
-function detectMetric(prompt: string): { column: string; label: string } {
-  const lower = prompt.toLowerCase()
-  if (lower.includes('profit') || lower.includes('income') || lower.includes('earnings'))
-    return { column: 'net_profit', label: 'Net Profit (JOD M)' }
-  if (lower.includes('asset'))
-    return { column: 'total_assets', label: 'Total Assets (JOD M)' }
-  if (lower.includes('deposit'))
-    return { column: 'total_deposits', label: 'Customer Deposits (JOD M)' }
-  if (lower.includes('loan'))
-    return { column: 'net_loans', label: 'Net Loans (JOD M)' }
-  if (lower.includes('roe') || lower.includes('return on equity'))
-    return { column: 'roe', label: 'Return on Equity (%)' }
-  if (lower.includes('roa') || lower.includes('return on asset'))
-    return { column: 'roa', label: 'Return on Assets (%)' }
-  if (lower.includes('capital') || lower.includes('car'))
-    return { column: 'car', label: 'Capital Adequacy Ratio (%)' }
-  if (lower.includes('equity'))
-    return { column: 'total_equity', label: "Shareholders Equity (JOD M)" }
-  if (lower.includes('revenue') || lower.includes('interest income'))
-    return { column: 'net_interest_income', label: 'Net Interest Income (JOD M)' }
-  return { column: 'net_profit', label: 'Net Profit (JOD M)' }
-}
+export async function POST(req: Request) {
+  try {
+    let body: any = {};
+    try { body = await req.json(); } catch (e) { return NextResponse.json({ error: 'Invalid request.' }, { status: 400 }); }
+    const prompt: string = (body && body.prompt ? String(body.prompt) : '').toLowerCase();
+    const bankId = (body && body.bankId !== undefined && body.bankId !== null) ? body.bankId : null;
+    if (bankId === null || bankId === '') return NextResponse.json({ error: 'No bank specified.' }, { status: 400 });
 
-function detectChartType(prompt: string): 'bar' | 'line' {
-  const lower = prompt.toLowerCase()
-  if (lower.includes('trend') || lower.includes('growth') || lower.includes('over time') || lower.includes('year'))
-    return 'line'
-  return 'bar'
-}
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) return NextResponse.json({ error: 'Data service is not configured.' }, { status: 500 });
+    const supabase = createClient(url, key);
 
-function detectYears(prompt: string): number[] {
-  const lower = prompt.toLowerCase()
-  if (lower.includes('3 year') || lower.includes('three year') || lower.includes('3-year'))
-    return [2022, 2023, 2024]
-  if (lower.includes('2 year') || lower.includes('two year'))
-    return [2023, 2024]
-  if (lower.includes('2025')) return [2023, 2024, 2025]
-  return [2023, 2024]
-}
+    const has = function (arr: string[]): boolean { for (let i = 0; i < arr.length; i++) { if (prompt.indexOf(arr[i]) !== -1) return true; } return false; };
 
-const RATIO_COLUMNS = ['roe', 'roa', 'car', 'npl_ratio']
-
-function isRatioColumn(col: string): boolean {
-  return RATIO_COLUMNS.includes(col)
-}
-
-function scaleValue(val: number, column: string): number {
-  if (isRatioColumn(column)) return Math.round(val * 10) / 10
-  return Math.round(val / 1_000_000)
-}
-
-async function handleRatesQuery(prompt: string, bankIds: number[]) {
-  const lower = prompt.toLowerCase()
-
-  if (lower.includes('credit card')) {
-    const { data } = await supabase
-      .from('bank_tariffs')
-      .select('bank_id, credit_card_annual_fee_classic, credit_card_annual_fee_gold, credit_card_annual_fee_platinum')
-      .in('bank_id', bankIds)
-
-    if (!data?.length) return null
-
-    const chartData = data.map((r: any) => {
-      const bank = BANKS.find(b => b.id === r.bank_id)
-      return {
-        name: bank?.shortName || `Bank ${r.bank_id}`,
-        'Classic Card (JOD/yr)': r.credit_card_annual_fee_classic || 0,
-        'Gold Card (JOD/yr)': r.credit_card_annual_fee_gold || 0,
-        'Platinum Card (JOD/yr)': r.credit_card_annual_fee_platinum || 0,
+    if (has(['rate', 'lending rate', 'deposit rate', 'term deposit', 'mortgage', 'interest rate'])) {
+      const r = await supabase.from('bank_rates').select('home_loan_min,home_loan_max,personal_loan_min,personal_loan_max,car_loan_min,car_loan_max,corporate_loan_min,corporate_loan_max,credit_card_rate,saving_rate,td_3m,td_6m,td_12m,effective_date').eq('bank_id', bankId).order('effective_date', { ascending: false }).limit(1);
+      if (r.error) return NextResponse.json({ error: 'Could not load rate data.' }, { status: 500 });
+      const row: any = (r.data && r.data.length) ? r.data[0] : null;
+      if (!row) return NextResponse.json({ error: 'No rate data available for this bank yet.' }, { status: 200 });
+      if (has(['deposit', 'saving', 'term'])) {
+        const d = [{ name: 'Savings', Rate: num(row.saving_rate) }, { name: '3M', Rate: num(row.td_3m) }, { name: '6M', Rate: num(row.td_6m) }, { name: '12M', Rate: num(row.td_12m) }].filter(function (x: any) { return x.Rate !== null; });
+        if (!d.length) return NextResponse.json({ error: 'No deposit rate data yet.' }, { status: 200 });
+        return NextResponse.json({ title: 'Deposit Rates (%)', type: 'bar', data: d, series: ['Rate'], insight: 'Current published deposit rates by tenor.' });
       }
-    })
-
-    const sorted = [...chartData].sort((a, b) => a['Classic Card (JOD/yr)'] - b['Classic Card (JOD/yr)'])
-    const cheapest = sorted[0]
-    const hbtf = chartData.find((d: any) => d.name === 'HBTF')
-
-    return {
-      title: 'Annual Credit Card Fees — Bank Comparison',
-      type: 'bar',
-      data: chartData,
-      series: ['Classic Card (JOD/yr)', 'Gold Card (JOD/yr)', 'Platinum Card (JOD/yr)'],
-      insight: hbtf
-        ? `HBTF classic card fee: JOD ${hbtf['Classic Card (JOD/yr)']}. ${cheapest.name !== 'HBTF' ? `${cheapest.name} has the lowest at JOD ${cheapest['Classic Card (JOD/yr)']}.` : 'HBTF has the lowest classic card fee.'}`
-        : `${cheapest.name} has the lowest classic card fee at JOD ${cheapest['Classic Card (JOD/yr)']}.`,
+      const mid = function (a: any, b: any) { const x = num(a), y = num(b); if (x === null && y === null) return null; if (x === null) return y; if (y === null) return x; return Math.round(((x + y) / 2) * 100) / 100; };
+      const d = [{ name: 'Home', Rate: mid(row.home_loan_min, row.home_loan_max) }, { name: 'Personal', Rate: mid(row.personal_loan_min, row.personal_loan_max) }, { name: 'Car', Rate: mid(row.car_loan_min, row.car_loan_max) }, { name: 'Corporate', Rate: mid(row.corporate_loan_min, row.corporate_loan_max) }, { name: 'Card', Rate: num(row.credit_card_rate) }].filter(function (x: any) { return x.Rate !== null; });
+      if (!d.length) return NextResponse.json({ error: 'No lending rate data yet.' }, { status: 200 });
+      return NextResponse.json({ title: 'Lending Rates (%)', type: 'bar', data: d, series: ['Rate'], insight: 'Indicative lending rates by product (mid-point of published ranges).' });
     }
-  }
 
-  if (lower.includes('home loan') || lower.includes('mortgage')) {
-    const { data } = await supabase
-      .from('bank_rates')
-      .select('bank_id, home_loan_min, home_loan_max')
-      .in('bank_id', bankIds)
+    const fin = await supabase.from('bank_financials').select('fiscal_year,currency,total_assets,net_loans,customer_deposits,shareholders_equity,net_profit,net_interest_income,net_fee_income,roe,roa,car,npl_ratio,loan_to_deposit,cost_to_income,net_interest_margin').eq('bank_id', bankId).order('fiscal_year', { ascending: true });
+    if (fin.error) return NextResponse.json({ error: 'Could not load financial data.' }, { status: 500 });
+    const rows: any[] = fin.data || [];
+    if (!rows.length) return NextResponse.json({ error: 'No financial data available for this bank yet.' }, { status: 200 });
 
-    if (!data?.length) return null
+    let isUSD = false;
+    for (let i = 0; i < rows.length; i++) { if (String(rows[i].currency).toUpperCase() === 'USD') isUSD = true; }
+    const fx = isUSD ? PEG : 1;
+    const money = function (v: any, scale: number) { const n = num(v); if (n === null) return null; return Math.round(((n * fx) / scale) * 100) / 100; };
+    const pct = function (v: any) { const n = num(v); if (n === null) return null; return Math.round(n * 100) / 100; };
+    const BIL = 1000000, MIL = 1000;
 
-    const chartData = data.map((r: any) => {
-      const bank = BANKS.find(b => b.id === r.bank_id)
-      return {
-        name: bank?.shortName || `Bank ${r.bank_id}`,
-        'Min Rate (%)': r.home_loan_min || 0,
-        'Max Rate (%)': r.home_loan_max || 0,
+    let spec: any;
+    if (has(['roe', 'return on equity'])) spec = { title: 'Return on Equity (%)', type: 'line', series: ['ROE'], cols: [['ROE', 'roe']], kind: 'pct' };
+    else if (has(['roa', 'return on asset'])) spec = { title: 'Return on Assets (%)', type: 'line', series: ['ROA'], cols: [['ROA', 'roa']], kind: 'pct' };
+    else if (has(['npl', 'non-performing', 'non performing', 'bad loan', 'asset quality'])) spec = { title: 'NPL Ratio (%)', type: 'line', series: ['NPL Ratio'], cols: [['NPL Ratio', 'npl_ratio']], kind: 'pct' };
+    else if (has(['cost to income', 'cost-to-income', 'efficiency'])) spec = { title: 'Cost-to-Income (%)', type: 'line', series: ['Cost to Income'], cols: [['Cost to Income', 'cost_to_income']], kind: 'pct' };
+    else if (has(['net interest margin', 'nim'])) spec = { title: 'Net Interest Margin (%)', type: 'line', series: ['NIM'], cols: [['NIM', 'net_interest_margin']], kind: 'pct' };
+    else if (has(['loan to deposit', 'loan-to-deposit', 'ldr'])) spec = { title: 'Loan-to-Deposit (%)', type: 'line', series: ['LDR'], cols: [['LDR', 'loan_to_deposit']], kind: 'pct' };
+    else if (has(['capital adequacy', 'solvency'])) spec = { title: 'Capital Adequacy Ratio (%)', type: 'line', series: ['CAR'], cols: [['CAR', 'car']], kind: 'pct' };
+    else if (has(['revenue', 'income breakdown'])) spec = { title: 'Revenue Breakdown (JOD millions)', type: 'bar', series: ['Interest Income', 'Fee Income'], cols: [['Interest Income', 'net_interest_income'], ['Fee Income', 'net_fee_income']], kind: 'mil' };
+    else if (has(['profit', 'earnings', 'net income', 'bottom line', 'profitability'])) spec = { title: 'Net Profit (JOD millions)', type: 'line', series: ['Net Profit'], cols: [['Net Profit', 'net_profit']], kind: 'mil' };
+    else if (has(['deposit']) && !has(['asset', 'loan', 'growth'])) spec = { title: 'Customer Deposits (JOD billions)', type: 'bar', series: ['Customer Deposits'], cols: [['Customer Deposits', 'customer_deposits']], kind: 'bil' };
+    else if (has(['loan', 'lending']) && !has(['asset', 'deposit', 'growth'])) spec = { title: 'Net Loans (JOD billions)', type: 'bar', series: ['Net Loans'], cols: [['Net Loans', 'net_loans']], kind: 'bil' };
+    else if (has(['equity']) && !has(['adequacy'])) spec = { title: 'Shareholders Equity (JOD billions)', type: 'bar', series: ['Equity'], cols: [['Equity', 'shareholders_equity']], kind: 'bil' };
+    else spec = { title: 'Assets, Deposits and Loans (JOD billions)', type: 'bar', series: ['Total Assets', 'Customer Deposits', 'Net Loans'], cols: [['Total Assets', 'total_assets'], ['Customer Deposits', 'customer_deposits'], ['Net Loans', 'net_loans']], kind: 'bil' };
+
+    const scale = (spec.kind === 'bil') ? BIL : MIL;
+    const data = rows.map(function (row: any) {
+      const p: any = { name: fy(row.fiscal_year) };
+      for (let i = 0; i < spec.cols.length; i++) { const nm = spec.cols[i][0]; const cl = spec.cols[i][1]; p[nm] = (spec.kind === 'pct') ? pct(row[cl]) : money(row[cl], scale); }
+      return p;
+    });
+
+    let insight = 'Figures shown by fiscal year.';
+    try {
+      const k = spec.series[0];
+      const a = data[0][k], b = data[data.length - 1][k];
+      const y0 = data[0].name, y1 = data[data.length - 1].name;
+      if (a !== null && b !== null && a !== undefined && b !== undefined) {
+        if (spec.kind === 'pct') { insight = k + ' moved from ' + a + '% in ' + y0 + ' to ' + b + '% in ' + y1 + '.'; }
+        else if (a !== 0) { const g = Math.round(((b - a) / Math.abs(a)) * 1000) / 10; insight = k + ' ' + (g >= 0 ? 'grew ' : 'declined ') + Math.abs(g) + '% from ' + y0 + ' (' + a + ') to ' + y1 + ' (' + b + ').'; }
+        else { insight = k + ' reached ' + b + ' by ' + y1 + '.'; }
       }
-    })
+    } catch (e) { }
 
-    return {
-      title: 'Home Loan Interest Rates — Bank Comparison',
-      type: 'bar',
-      data: chartData,
-      series: ['Min Rate (%)', 'Max Rate (%)'],
-      insight: 'Lower is better for borrowers.',
-    }
+    return NextResponse.json({ title: spec.title, type: spec.type, data: data, series: spec.series, insight: insight });
+  } catch (err) {
+    return NextResponse.json({ error: 'Unable to generate this chart right now. Please try another question.' }, { status: 200 });
   }
-
-  if (lower.includes('deposit') || lower.includes('saving')) {
-    const { data } = await supabase
-      .from('bank_rates')
-      .select('bank_id, saving_rate, td_3m, td_6m, td_12m')
-      .in('bank_id', bankIds)
-
-    if (!data?.length) return null
-
-    const chartData = data.map((r: any) => {
-      const bank = BANKS.find(b => b.id === r.bank_id)
-      return {
-        name: bank?.shortName || `Bank ${r.bank_id}`,
-        'Savings (%)': r.saving_rate || 0,
-        '3-Month TD (%)': r.td_3m || 0,
-        '6-Month TD (%)': r.td_6m || 0,
-        '12-Month TD (%)': r.td_12m || 0,
-      }
-    })
-
-    return {
-      title: 'Deposit Interest Rates — Bank Comparison',
-      type: 'bar',
-      data: chartData,
-      series: ['Savings (%)', '3-Month TD (%)', '6-Month TD (%)', '12-Month TD (%)'],
-      insight: 'Higher is better for depositors.',
-    }
-  }
-
-  return null
-}
-
-export async function POST(req: NextRequest) {
-  const { prompt, bankId } = await req.json()
-  if (!prompt) return NextResponse.json({ error: 'No prompt provided' }, { status: 400 })
-
-  let bankIds = detectBanks(prompt)
-  if (bankId && bankIds.length === BANKS.length) {
-    bankIds = [bankId]
-  }
-
-  const ratesResult = await handleRatesQuery(prompt, bankIds)
-  if (ratesResult) return NextResponse.json(ratesResult)
-
-  const metric = detectMetric(prompt)
-  const chartType = detectChartType(prompt)
-  const years = detectYears(prompt)
-
-  const { data } = await supabase
-    .from('bank_financials')
-    .select(`bank_id, fiscal_year, ${metric.column}`)
-    .in('bank_id', bankIds)
-    .in('fiscal_year', years)
-    .order('fiscal_year', { ascending: true })
-
-  if (!data?.length) {
-    return NextResponse.json(
-      { error: 'No data found. Try asking about profit, assets, deposits, or loans.' },
-      { status: 404 }
-    )
-  }
-
-  const rows = data as any[]
-  const bankNames = bankIds.map(id => BANKS.find(b => b.id === id)?.shortName || `Bank ${id}`)
-
-  let chartData: any[]
-  let series: string[]
-
-  if (chartType === 'line' && bankIds.length <= 4) {
-    chartData = years.map(year => {
-      const row: any = { name: `FY${year}` }
-      bankIds.forEach(id => {
-        const bankName = BANKS.find(b => b.id === id)?.shortName || `Bank ${id}`
-        const match = rows.find(d => d.bank_id === id && d.fiscal_year === year)
-        const val = match ? match[metric.column] : null
-        row[bankName] = val != null ? scaleValue(val, metric.column) : null
-      })
-      return row
-    })
-    series = bankNames
-  } else {
-    const bankRows: Record<number, any> = {}
-    rows.forEach(row => {
-      if (!bankRows[row.bank_id]) {
-        bankRows[row.bank_id] = {
-          name: BANKS.find(b => b.id === row.bank_id)?.shortName || `Bank ${row.bank_id}`
-        }
-      }
-      const val = row[metric.column]
-      bankRows[row.bank_id][`FY${row.fiscal_year}`] = val != null ? scaleValue(val, metric.column) : null
-    })
-    chartData = Object.values(bankRows)
-    series = years.map(y => `FY${y}`)
-  }
-
-  const latestYear = Math.max(...years)
-  const latestRows = rows.filter(d => d.fiscal_year === latestYear)
-  const sorted = [...latestRows].sort((a, b) => (b[metric.column] || 0) - (a[metric.column] || 0))
-  const leader = sorted[0]
-  const leaderBank = leader ? BANKS.find(b => b.id === leader.bank_id) : null
-  const hbtfEntry = rows.find(d => d.bank_id === 2 && d.fiscal_year === latestYear)
-
-  let insight = ''
-  if (leaderBank && leader) {
-    const leaderVal = leader[metric.column]
-    if (leaderVal != null) {
-      const formatted = isRatioColumn(metric.column)
-        ? `${leaderVal.toFixed(1)}%`
-        : `JOD ${Math.round(leaderVal / 1_000_000)}M`
-      insight = `${leaderBank.shortName} leads with ${formatted} in FY${latestYear}.`
-    }
-  }
-  if (hbtfEntry && leaderBank?.id !== 2) {
-    const hbtfVal = hbtfEntry[metric.column]
-    if (hbtfVal != null) {
-      const rank = sorted.findIndex(d => d.bank_id === 2) + 1
-      const formatted = isRatioColumn(metric.column)
-        ? `${hbtfVal.toFixed(1)}%`
-        : `JOD ${Math.round(hbtfVal / 1_000_000)}M`
-      insight += ` Housing Bank ranks #${rank} at ${formatted}.`
-    }
-  }
-
-  return NextResponse.json({
-    title: `${metric.label} — ${bankIds.length === BANKS.length ? 'All Banks' : bankNames.join(' vs ')}`,
-    type: chartType,
-    data: chartData,
-    series,
-    insight: insight || undefined,
-  })
 }
