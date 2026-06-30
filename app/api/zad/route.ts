@@ -42,7 +42,21 @@ async function buildKnowledge(){
   var aLatest = {};
   abj.forEach(function(r){ if(r.data_period===latestPeriod && aLatest[r.metric]===undefined) aLatest[r.metric]=r.value; });
   function av(m){ return (aLatest[m]!==null && aLatest[m]!==undefined) ? aLatest[m] : 'n/a'; }
-  var abjStr = 'OFFICIAL ABJ SECTOR AGGREGATE (source: Association of Banks in Jordan; authoritative basis for any whole-sector question; as of ' + (latestPeriod||'latest') + '): total assets JOD ' + av('total_assets') + 'B, total deposits JOD ' + av('total_deposits') + 'B, total credit facilities JOD ' + av('total_credit_facilities') + 'B. For any sector-wide or ABJ figure use THESE numbers. Do NOT sum the individual banks below for a sector total, because Arab Bank is stored at its global consolidated balance sheet (USD) and over-counts the Jordanian sector.';
+  var ewRes = await sb.from('abj_sector_indicators').select('metric,data_period,value,unit').eq('category', 'ewallet').order('data_period', { ascending: false });
+  var ewRows = (ewRes && ewRes.data) || [];
+  var ewLatestPeriod = null; if (ewRows.length) { ewLatestPeriod = ewRows[0].data_period; }
+  var ewMap = {};
+  for (var ewi = 0; ewi < ewRows.length; ewi++) { if (ewRows[ewi].data_period === ewLatestPeriod) { ewMap[ewRows[ewi].metric] = ewRows[ewi]; } }
+  function ewv(m){ var r = ewMap[m]; if (!r || r.value === null || r.value === undefined) { return null; } var u = ''; if (r.unit) { u = ' ' + r.unit; } return r.value + u; }
+  var ewSentence = '';
+  if (ewLatestPeriod) {
+    var ewParts = [];
+    var ewT = ewv('jomopay_transactions'); if (ewT) { ewParts.push(ewT + ' transactions'); }
+    var ewU = ewv('jomopay_users'); if (ewU) { ewParts.push(ewU + ' registered users'); }
+    var ewVal = ewv('jomopay_value'); if (ewVal) { ewParts.push('transaction value of ' + ewVal); }
+    if (ewParts.length) { ewSentence = ' DIGITAL PAYMENTS (JoMoPay national mobile-payment switch, sector-wide, as of ' + ewLatestPeriod + '): ' + ewParts.join(', ') + '.'; }
+  }
+  var abjStr = 'OFFICIAL ABJ SECTOR AGGREGATE (source: Association of Banks in Jordan; authoritative basis for any whole-sector question; as of ' + (latestPeriod||'latest') + '): total assets JOD ' + av('total_assets') + 'B, total deposits JOD ' + av('total_deposits') + 'B, total credit facilities JOD ' + av('total_credit_facilities') + 'B. For any sector-wide or ABJ figure use THESE numbers. Do NOT sum the individual banks below for a sector total, because Arab Bank is stored at its global consolidated balance sheet (USD) and over-counts the Jordanian sector.' + ewSentence + ';
   var perBank = 'PER-BANK FY2025 (group consolidated; normalized to JOD; Arab Bank converted from USD at ' + PEG + '):\n' + lines.join('\n');
   return perBank + '\n\n' + abjStr;
 }
