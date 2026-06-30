@@ -218,3 +218,42 @@ a, button { transition: color 0.15s, background-color 0.15s, border-color 0.15s,
   border-radius: 20px;
   margin-top: 2px;
 }
+
+
+/* ===== convo.finance design system tokens (chunk 1) ===== */
+:root{
+  --cf-bg:#F4F5FA;
+  --cf-surface:#FFFFFF;
+  --cf-surface2:#ECEEF6;
+  --cf-line:#E0E3EE;
+  --cf-ink:#1A2138;
+  --cf-ink2:#5C6478;
+  --cf-ink3:#8A91A3;
+  --cf-primary:#3E639B;
+  --cf-primary-strong:#2F5184;
+  --cf-primary-soft:#E9EEF7;
+  --cf-teal:#106B94;
+  --cf-positive:#1E8A5A;
+  --cf-negative:#C4504A;
+  --cf-iris:#7A5AA4;
+  --cf-grad:linear-gradient(105deg,#7A5AA4,#695CA1,#3E639B,#106B94);
+  --cf-font-sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --cf-font-ar:'IBM Plex Sans Arabic','IBM Plex Sans',sans-serif;
+  --cf-font-mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+.dark{
+  --cf-bg:#0B1120;
+  --cf-surface:#151C2E;
+  --cf-surface2:#1E2740;
+  --cf-line:#2A3450;
+  --cf-ink:#ECEFF6;
+  --cf-ink2:#97A3BC;
+  --cf-ink3:#6B7793;
+  --cf-primary:#6E8FC9;
+  --cf-primary-strong:#87A4D6;
+  --cf-primary-soft:#17233C;
+  --cf-teal:#3E9DC0;
+  --cf-positive:#34B97E;
+  --cf-negative:#E0675F;
+  --cf-iris:#9E81C4;
+}
