@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     }
 
     const fin = await supabase.from('bank_financials').select('fiscal_year,currency,total_assets,net_loans,customer_deposits,shareholders_equity,net_profit,net_interest_income,net_fee_income,roe,roa,car,npl_ratio,loan_to_deposit,cost_to_income,net_interest_margin').eq('bank_id', bankId).order('fiscal_year', { ascending: true });
-    if (fin.error) return NextResponse.json({ error: 'Could not load financial data.' }, { status: 500 });
+    if (fin.error) return NextResponse.json({ error: 'Could not load financial data.', detail: String(fin.error && fin.error.message ? fin.error.message : fin.error).slice(0,200), code: (fin.error && fin.error.code) ? fin.error.code : '' }, { status: 500 });
     const rows: any[] = fin.data || [];
     if (!rows.length) return NextResponse.json({ error: 'No financial data available for this bank yet.' }, { status: 200 });
 
