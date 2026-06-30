@@ -34,6 +34,18 @@ function fmtJOD(n: number | null | undefined, bankId?: number): string {
 }
 
 function CompareContent() {
+  useEffect(function () {
+    try {
+      var ov = [['bg-[#0A1628]','background-color','#F7F9FC'],['bg-[#0F1E35]','background-color','#FFFFFF'],['bg-[#1E3450]','background-color','#EEF2F8'],['border-[#1E3450]','border-color','#E2E8F0'],['text-[#8B9AB0]','color','#5B6B82'],['text-[#CEBA95]','color','#9A7B45'],['text-[#2ECC71]','color','#15803D'],['text-white','color','#16243B']];
+      var css = '';
+      for (var i = 0; i < ov.length; i++) { css += 'html:not(.dark) .' + CSS.escape(ov[i][0]) + '{' + ov[i][1] + ':' + ov[i][2] + ' !important}'; }
+      css += 'html:not(.dark) .' + CSS.escape('bg-[#004D8F]') + '.' + CSS.escape('text-white') + '{color:#FFFFFF !important}';
+      css += 'html:not(.dark) .' + CSS.escape('placeholder-[#4A5568]') + '::placeholder{color:#94A3B8 !important}';
+      css += 'html:not(.dark) .' + CSS.escape('hover:bg-[#132240]') + ':hover{background-color:#EEF2F8 !important}';
+      var st = document.createElement('style'); st.setAttribute('data-cmp-light', '1'); st.textContent = css; document.head.appendChild(st);
+      return function () { if (st && st.parentNode) { st.parentNode.removeChild(st); } };
+    } catch (e) {}
+  }, []);
   const searchParams = useSearchParams()
   const router = useRouter()
   const initialPrompt = searchParams.get('q') || ''
