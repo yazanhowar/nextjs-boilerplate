@@ -1,5 +1,5 @@
 'use client'
-// app/compare/page.tsx â Side-by-side bank comparison + AI chart generation
+// app/compare/page.tsx - Side-by-side bank comparison + AI chart generation
 
 import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
@@ -25,7 +25,7 @@ function toJOD(n: number | null | undefined, bankId: number): number | null {
   return bankId === ARAB_BANK_ID ? n * USD_TO_JOD : n
 }
 function fmtJOD(n: number | null | undefined, bankId?: number): string {
-  if (n == null) return '—'
+  if (n == null) return '\u2014'
   const v = bankId != null ? (toJOD(n, bankId) ?? n) : n
   const abs = Math.abs(v)
   if (abs >= 1_000_000) return `JOD ${(v / 1_000_000).toFixed(2)}B`
@@ -133,21 +133,21 @@ function CompareContent() {
 
   // Build comparison table rows
   const comparisonRows = [
-    { label: 'Net Profit', key: 'net_profit', format: (v: number) => `JOD ${fmtJOD(v)}` },
-    { label: 'Total Assets', key: 'total_assets', format: (v: number) => `JOD ${fmtJOD(v)}` },
-    { label: 'Customer Deposits', key: 'total_deposits', format: (v: number) => `JOD ${fmtJOD(v)}` },
-    { label: 'Net Loans', key: 'net_loans', format: (v: number) => `JOD ${fmtJOD(v)}` },
+    { label: 'Net Profit', key: 'net_profit', format: (v: number) => fmtJOD(v) },
+    { label: 'Total Assets', key: 'total_assets', format: (v: number) => fmtJOD(v) },
+    { label: 'Customer Deposits', key: 'total_deposits', format: (v: number) => fmtJOD(v) },
+    { label: 'Net Loans', key: 'net_loans', format: (v: number) => fmtJOD(v) },
     { label: 'Return on Equity', key: 'roe', format: (v: number) => `${v?.toFixed(1)}%` },
     { label: 'Capital Ratio', key: 'car', format: (v: number) => `${v?.toFixed(1)}%` },
     { label: 'Bad Loan Ratio', key: 'npl_ratio', format: (v: number) => `${v?.toFixed(2)}%` },
   ]
 
-  const latest2024 = (bankId: number) => financials[bankId]?.find(f => f.fiscal_year === 2024)
+  const latest2025 = (bankId: number) => financials[bankId]?.find(f => f.fiscal_year === 2025)
 
   return (
     <div className="min-h-screen bg-[#0A1628] text-white">
       <header className="border-b border-[#1E3450] px-6 py-4 flex items-center gap-4">
-        <button onClick={() => router.push('/')} className="text-[#8B9AB0] hover:text-white text-[13px]">â Dashboard</button>
+        <button onClick={() => router.push('/')} className="text-[#8B9AB0] hover:text-white text-[13px]">{'\u2190'} Dashboard</button>
         <div className="w-px h-5 bg-[#1E3450]" />
         <div className="font-bold text-white">Compare Banks</div>
       </header>
@@ -179,7 +179,7 @@ function CompareContent() {
         {/* AI Chart prompt */}
         <div className="bg-[#0F1E35] border border-[#1E3450] rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-[#CEBA95]">â¡</span>
+            <span className="text-[#CEBA95]">{'\u26A1'}</span>
             <span className="font-semibold text-white">Generate a chart</span>
           </div>
 
@@ -226,7 +226,7 @@ function CompareContent() {
                 <button onClick={exportPDF}
                   className="text-[11px] px-3 py-1.5 rounded-lg border border-[#1E3450]
                              text-[#8B9AB0] hover:border-[#CEBA95] hover:text-[#CEBA95] transition-colors">
-                  â Export PDF
+                  {'\u2193'} Export PDF
                 </button>
               </div>
               <div ref={chartRef} className="bg-[#0A1628] rounded-xl p-4">
@@ -261,7 +261,7 @@ function CompareContent() {
                 </ResponsiveContainer>
                 {chartData.insight && (
                   <div className="mt-4 p-3 bg-[#CEBA95]/10 border border-[#CEBA95]/20 rounded-lg text-[12px] text-[#CEBA95]">
-                    ð¡ {chartData.insight}
+                    {'\uD83D\uDCA1'} {chartData.insight}
                   </div>
                 )}
               </div>
@@ -273,7 +273,7 @@ function CompareContent() {
         <div className="bg-[#0F1E35] border border-[#1E3450] rounded-xl overflow-hidden">
           <div className="px-5 py-4 border-b border-[#1E3450]">
             <div className="text-[12px] uppercase tracking-wider text-[#8B9AB0]">
-              FY2024 Side-by-side Comparison
+              FY2025 Side-by-side Comparison
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -295,7 +295,7 @@ function CompareContent() {
               </thead>
               <tbody>
                 {comparisonRows.map(row => {
-                  const values = selectedBanks.map(id => latest2024(id)?.[row.key])
+                  const values = selectedBanks.map(id => latest2025(id)?.[row.key])
                   const maxVal = Math.max(...values.filter(v => v != null) as number[])
 
                   return (
@@ -307,7 +307,7 @@ function CompareContent() {
                         return (
                           <td key={id} className={`px-5 py-3 text-end font-medium
                             ${isMax ? 'text-[#2ECC71]' : 'text-white'}`}>
-                            {val != null ? row.format(val) : 'â'}
+                            {val != null ? row.format(val) : '\u2014'}
                           </td>
                         )
                       })}
