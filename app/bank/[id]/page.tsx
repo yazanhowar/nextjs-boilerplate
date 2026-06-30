@@ -550,7 +550,7 @@ export default function BankPage() {
             {/* Assets vs Deposits chart */}
             <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
               <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">
-                Assets & Deposits Growth (JOD millions)
+                Assets & Deposits Growth (JOD billions)
               </div>
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={financials.map(f => ({
@@ -643,7 +643,7 @@ export default function BankPage() {
           <div className="space-y-4">
             {productCategories.map(cat => (
               <div key={cat} className="bg-[#242424] border border-[#383838] rounded-xl p-5">
-                <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">{cat}</div>
+                <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">{cat.split('_').join(' ')}</div>
                 <div className="grid grid-cols-2 gap-3">
                   {products.filter(p => p.category === cat).map((p, i) => (
                     <div key={i} className="p-3 rounded-lg bg-[#1a1a1a] border border-[#383838]">
