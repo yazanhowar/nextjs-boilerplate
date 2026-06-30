@@ -20,22 +20,69 @@ function stripMarker(t) {
   return t;
 }
 
-function renderRich(text) {
-  var ci = text.indexOf(BT + 'chart');
-  var body = ci >= 0 ? text.slice(0, ci) : text;
-  var blocks = body.split(NL + NL);
-  var out = [];
-  blocks.forEach(function (blk, bi) {
-    var lines = blk.split(NL).filter(function (l) { return l.trim().length; });
-    if (!lines.length) return;
-    var isList = lines.every(function (l) { var x = l.trim(); return x.indexOf('- ') === 0 || x.indexOf('* ') === 0 || x.charAt(0) === BULLET; });
-    if (isList) {
-      out.push(React.createElement('ul', { key: bi }, lines.map(function (l, li) { return React.createElement('li', { key: li }, fmtInline(stripMarker(l.trim()))); })));
-    } else {
-      out.push(React.createElement('p', { key: bi }, fmtInline(lines.join(' '))));
+function cfEsc(s) {
+  return String(s).split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;')
+}
+function cfInline(s) {
+  s = cfEsc(s)
+  var p = s.split('**'); var o = ''; for (var i = 0; i < p.length; i++) { o += (i % 2 === 1) ? ('<strong>' + p[i] + '</strong>') : p[i] } s = o
+  var bt = String.fromCharCode(96)
+  p = s.split(bt); o = ''; for (var k = 0; k < p.length; k++) { o += (k % 2 === 1) ? ('<code>' + p[k] + '</code>') : p[k] } s = o
+  return s
+}
+function cfIsSep(line) {
+  var t = line.split('|').join('').split('-').join('').split(':').join('').split(' ').join('')
+  return t === '' && line.indexOf('-') >= 0
+}
+function cfCells(line) {
+  var p = line.split('|')
+  if (p.length && p[0].trim() === '') p = p.slice(1)
+  if (p.length && p[p.length - 1].trim() === '') p = p.slice(0, p.length - 1)
+  var o = []; for (var i = 0; i < p.length; i++) { o.push(p[i].trim()) } return o
+}
+function cfIsOL(t) {
+  var k = 0; while (k < t.length && t.charCodeAt(k) >= 48 && t.charCodeAt(k) <= 57) k++
+  return k > 0 && t.charAt(k) === '.' && t.charAt(k + 1) === ' '
+}
+function cfOLText(t) {
+  var k = 0; while (k < t.length && t.charCodeAt(k) >= 48 && t.charCodeAt(k) <= 57) k++
+  return t.slice(k + 2)
+}
+function mdToHtml(md) {
+  if (md == null) return ''
+  var lines = String(md).split(String.fromCharCode(10))
+  var html = ''; var i = 0
+  while (i < lines.length) {
+    var line = lines[i]; var t = line.trim()
+    if (t.indexOf('|') >= 0 && i + 1 < lines.length && cfIsSep(lines[i + 1])) {
+      var head = cfCells(line); var body = []; var j = i + 2
+      while (j < lines.length && lines[j].indexOf('|') >= 0 && lines[j].trim() !== '') { body.push(cfCells(lines[j])); j++ }
+      var tb = '<table class="cf-md-table"><thead><tr>'
+      for (var h = 0; h < head.length; h++) { tb += '<th>' + cfInline(head[h]) + '</th>' }
+      tb += '</tr></thead><tbody>'
+      for (var b = 0; b < body.length; b++) { tb += '<tr>'; for (var c = 0; c < body[b].length; c++) { tb += '<td>' + cfInline(body[b][c]) + '</td>' } tb += '</tr>' }
+      tb += '</tbody></table>'; html += tb; i = j; continue
     }
-  });
-  return out;
+    if (t.indexOf('### ') === 0) { html += '<div class="cf-md-h">' + cfInline(t.slice(4)) + '</div>'; i++; continue }
+    if (t.indexOf('## ') === 0) { html += '<div class="cf-md-h">' + cfInline(t.slice(3)) + '</div>'; i++; continue }
+    if (t.indexOf('# ') === 0) { html += '<div class="cf-md-h">' + cfInline(t.slice(2)) + '</div>'; i++; continue }
+    if (t.indexOf('- ') === 0 || t.indexOf('* ') === 0) {
+      var items = []; while (i < lines.length) { var lt = lines[i].trim(); if (lt.indexOf('- ') === 0 || lt.indexOf('* ') === 0) { items.push(lt.slice(2)); i++ } else break }
+      html += '<ul class="cf-md-ul">'; for (var u = 0; u < items.length; u++) { html += '<li>' + cfInline(items[u]) + '</li>' } html += '</ul>'; continue
+    }
+    if (cfIsOL(t)) {
+      var oi = []; while (i < lines.length) { var l2 = lines[i].trim(); if (cfIsOL(l2)) { oi.push(cfOLText(l2)); i++ } else break }
+      html += '<ol class="cf-md-ol">'; for (var z = 0; z < oi.length; z++) { html += '<li>' + cfInline(oi[z]) + '</li>' } html += '</ol>'; continue
+    }
+    if (t === '') { i++; continue }
+    var para = []
+    while (i < lines.length) { var pl = lines[i].trim(); if (pl === '' || pl.indexOf('|') >= 0 || pl.indexOf('# ') === 0 || pl.indexOf('## ') === 0 || pl.indexOf('### ') === 0 || pl.indexOf('- ') === 0 || pl.indexOf('* ') === 0 || cfIsOL(pl)) break; para.push(pl); i++ }
+    if (para.length) { html += '<p class="cf-md-p">' + cfInline(para.join(' ')) + '</p>' }
+  }
+  return html
+}
+function renderRich(text) {
+  return <div className="cf-md" dangerouslySetInnerHTML={{ __html: mdToHtml(text) }} />
 }
 
 function parseChart(text) {
