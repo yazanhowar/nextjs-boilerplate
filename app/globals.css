@@ -257,3 +257,33 @@ a, button { transition: color 0.15s, background-color 0.15s, border-color 0.15s,
   --cf-negative:#E0675F;
   --cf-iris:#9E81C4;
 }
+
+
+/* ===== convo.finance design system components (chunk 3) ===== */
+.cf-mono{font-family:var(--cf-font-mono)}
+.cf-page{background:var(--cf-bg);color:var(--cf-ink);min-height:100vh}
+.cf-frame{background:var(--cf-bg);border:1px solid var(--cf-line);border-radius:18px;padding:24px;color:var(--cf-ink)}
+.cf-card{background:var(--cf-surface);border:1px solid var(--cf-line);border-radius:14px;padding:18px}
+.cf-light{--cf-bg:#F4F5FA;--cf-surface:#FFFFFF;--cf-surface2:#ECEEF6;--cf-line:#E0E3EE;--cf-ink:#1A2138;--cf-ink2:#5C6478;--cf-ink3:#8A91A3;--cf-primary:#3E639B;--cf-primary-strong:#2F5184;--cf-primary-soft:#E9EEF7;--cf-teal:#106B94;--cf-positive:#1E8A5A;--cf-negative:#C4504A;--cf-iris:#7A5AA4}
+.cf-btn{font-family:var(--cf-font-sans);font-weight:600;font-size:13.5px;line-height:1.2;padding:10px 16px;border-radius:10px;cursor:pointer;border:1px solid transparent;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;transition:filter .15s ease,background-color .15s ease}
+.cf-btn:hover{filter:brightness(1.04)}
+.cf-btn:active{filter:brightness(.96)}
+.cf-btn-primary{background:var(--cf-primary);color:#fff;border-color:var(--cf-primary)}
+.dark .cf-btn-primary{color:#0B1120}
+.cf-btn-secondary{background:transparent;color:var(--cf-ink);border-color:var(--cf-line)}
+.cf-btn-secondary:hover{background:var(--cf-surface2);filter:none}
+.cf-btn-gradient{background:var(--cf-grad);color:#fff;border-color:transparent}
+.cf-chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--cf-font-sans);font-size:12.5px;font-weight:500;line-height:1.4;padding:5px 12px;border-radius:999px;border:1px solid var(--cf-line);color:var(--cf-ink2);background:transparent}
+.cf-chip-primary{background:var(--cf-primary-soft);color:var(--cf-primary);border-color:transparent;font-weight:600}
+.cf-chip-positive{background:color-mix(in srgb,var(--cf-positive) 12%,transparent);color:var(--cf-positive);border-color:transparent;font-weight:600}
+.dark .cf-chip-positive{background:color-mix(in srgb,var(--cf-positive) 18%,transparent)}
+.cf-chip-negative{background:color-mix(in srgb,var(--cf-negative) 12%,transparent);color:var(--cf-negative);border-color:transparent;font-weight:600}
+.dark .cf-chip-negative{background:color-mix(in srgb,var(--cf-negative) 18%,transparent)}
+.cf-stat{background:var(--cf-surface);border:1px solid var(--cf-line);border-radius:12px;padding:15px}
+.cf-stat-label{font-family:var(--cf-font-mono);font-size:10.5px;letter-spacing:.02em;text-transform:uppercase;color:var(--cf-ink2);margin-bottom:6px}
+.cf-stat-value{font-family:var(--cf-font-sans);font-size:24px;font-weight:600;letter-spacing:-.02em;color:var(--cf-ink);line-height:1.1}
+.cf-stat-delta-pos{font-size:12px;color:var(--cf-positive);font-weight:600;margin-top:3px}
+.cf-stat-delta-neg{font-size:12px;color:var(--cf-negative);font-weight:600;margin-top:3px}
+.cf-insight{display:flex;gap:8px;align-items:flex-start;background:var(--cf-surface);border:1px solid var(--cf-line);border-radius:12px;padding:13px}
+.cf-insight-text{font-size:13px;color:var(--cf-ink)}
+.cf-insight-src{font-family:var(--cf-font-mono);font-size:10.5px;color:var(--cf-ink2);margin-top:5px}
