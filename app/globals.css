@@ -287,3 +287,20 @@ a, button { transition: color 0.15s, background-color 0.15s, border-color 0.15s,
 .cf-insight{display:flex;gap:8px;align-items:flex-start;background:var(--cf-surface);border:1px solid var(--cf-line);border-radius:12px;padding:13px}
 .cf-insight-text{font-size:13px;color:var(--cf-ink)}
 .cf-insight-src{font-family:var(--cf-font-mono);font-size:10.5px;color:var(--cf-ink2);margin-top:5px}
+
+
+/* ===== convo.finance design system base polish + utilities (chunk 4) ===== */
+:root{accent-color:var(--cf-primary)}
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+::selection{background:color-mix(in srgb,var(--cf-primary) 25%,transparent)}
+.cf-eyebrow{font-family:var(--cf-font-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--cf-ink3)}
+.cf-h1{font-family:var(--cf-font-sans);font-size:30px;font-weight:600;letter-spacing:-.02em;color:var(--cf-ink);line-height:1.15;margin:0}
+.cf-h2{font-family:var(--cf-font-sans);font-size:22px;font-weight:600;letter-spacing:-.02em;color:var(--cf-ink);line-height:1.2;margin:0}
+.cf-h3{font-family:var(--cf-font-sans);font-size:16px;font-weight:600;color:var(--cf-ink);line-height:1.3;margin:0}
+.cf-label{font-family:var(--cf-font-mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--cf-ink2)}
+.cf-muted{color:var(--cf-ink2)}
+.cf-divider{height:1px;background:var(--cf-line);border:0;margin:16px 0}
+.cf-link{color:var(--cf-primary);text-decoration:none;font-weight:500}
+.cf-link:hover{text-decoration:underline}
+.cf-grad-text{background:var(--cf-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cf-grad-bar{height:4px;border-radius:999px;background:var(--cf-grad)}
