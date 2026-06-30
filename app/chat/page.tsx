@@ -92,7 +92,7 @@ function stripChartBlock(text) {
   return o.trim();
 }
 function renderRich(text) {
-  return <div className="cf-md" dangerouslySetInnerHTML={{ __html: mdToHtml(stripChartBlock(text)) }} />
+  return <div className="cf-md" dangerouslySetInnerHTML={{ __html: mdToHtml(stripChartBlock(text)).split('<code></code>').join('') }} />
 }
 
 function parseChart(text) {
@@ -120,11 +120,11 @@ function ZLineChart(c) {
   var ptsArr = series.map(function (s, i) { return xAt(i) + ',' + yAt(Number(s.value) || 0); });
   var area = 'M ' + padL + ',' + (padT + plotH) + ' L ' + ptsArr.join(' L ') + ' L ' + (padL + plotW) + ',' + (padT + plotH) + ' Z';
   var nodes = series.map(function (s, i) {
-    var vx = xAt(i), vy = yAt(Number(s.value) || 0);
+    var vx = xAt(i), vy = yAt(Number(s.value) || 0); var anc = (i === 0) ? 'start' : (i === n - 1) ? 'end' : 'middle';
     return React.createElement('g', { key: i },
       React.createElement('circle', { cx: vx, cy: vy, r: 3.6, fill: '#1f6feb', stroke: '#ffffff', strokeWidth: 1.5 }),
-      React.createElement('text', { x: vx, y: vy - 9, textAnchor: 'middle', fontSize: 11, fontWeight: 700, fill: '#0c3057' }, (Math.round((Number(s.value) || 0) * 100) / 100).toLocaleString()),
-      React.createElement('text', { x: vx, y: H - 9, textAnchor: 'middle', fontSize: 10, fill: '#6b7c93' }, String(s.label)));
+      React.createElement('text', { x: vx, y: vy - 9, textAnchor: anc, fontSize: 11, fontWeight: 700, fill: '#0c3057' }, (Math.round((Number(s.value) || 0) * 100) / 100).toLocaleString()),
+      React.createElement('text', { x: vx, y: H - 9, textAnchor: anc, fontSize: 10, fill: '#6b7c93' }, String(s.label)));
   });
   var fillEl = React.createElement('path', { d: area, fill: 'rgba(31,111,235,0.10)', stroke: 'none' });
   var lineEl = React.createElement('polyline', { points: ptsArr.join(' '), fill: 'none', stroke: '#1f6feb', strokeWidth: 2.5, strokeLinejoin: 'round', strokeLinecap: 'round' });
