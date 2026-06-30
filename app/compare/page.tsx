@@ -135,7 +135,7 @@ function CompareContent() {
   const comparisonRows = [
     { label: 'Net Profit', key: 'net_profit', format: (v: number) => fmtJOD(v) },
     { label: 'Total Assets', key: 'total_assets', format: (v: number) => fmtJOD(v) },
-    { label: 'Customer Deposits', key: 'total_deposits', format: (v: number) => fmtJOD(v) },
+    { label: 'Customer Deposits', key: 'customer_deposits', format: (v: number) => fmtJOD(v) },
     { label: 'Net Loans', key: 'net_loans', format: (v: number) => fmtJOD(v) },
     { label: 'Return on Equity', key: 'roe', format: (v: number) => `${v?.toFixed(1)}%` },
     { label: 'Capital Ratio', key: 'car', format: (v: number) => `${v?.toFixed(1)}%` },
