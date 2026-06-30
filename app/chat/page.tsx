@@ -85,7 +85,11 @@ function stripChartBlock(text) {
   var ci = text.indexOf(BT + 'chart'); if (ci < 0) return text;
   var ns = text.indexOf(NL, ci); if (ns < 0) return text;
   var je = text.indexOf(BT, ns); if (je < 0) return text;
-  return (text.slice(0, ci) + text.slice(je + 1)).trim();
+  var st = ci; while (st > 0 && text.charAt(st - 1) === BT) { st--; }
+  var en = je; while (en < text.length && text.charAt(en) === BT) { en++; }
+  var o = (text.slice(0, st) + text.slice(en));
+  while (o.indexOf(NL + NL + NL) >= 0) { o = o.split(NL + NL + NL).join(NL + NL); }
+  return o.trim();
 }
 function renderRich(text) {
   return <div className="cf-md" dangerouslySetInnerHTML={{ __html: mdToHtml(stripChartBlock(text)) }} />
@@ -134,7 +138,7 @@ function ZChart(props) {
   var c = props.data;
   var vals = c.series.map(function (s) { return Math.abs(Number(s.value) || 0); });
   var max = Math.max.apply(null, vals) || 1;
-  function zcIsYr(L) { L = String(L).trim(); if (L.length !== 4) return false; for (var yi = 0; yi < 4; yi++) { var cc = L.charCodeAt(yi); if (cc < 48 || cc > 57) return false; } var yn = Number(L); return yn >= 1990 && yn <= 2099; }
+  function zcIsYr(L) { L = String(L); for (var qi = 0; qi + 4 <= L.length; qi++) { var ok = true; for (var qk = 0; qk < 4; qk++) { var cc = L.charCodeAt(qi + qk); if (cc < 48 || cc > 57) { ok = false; break; } } if (ok) { var yn = Number(L.substr(qi, 4)); if (yn >= 1990 && yn <= 2099) return true; } } return false; }
   var zcLine = (c.type === 'line') || (c.series.length >= 2 && c.series.every(function (s) { return zcIsYr(s.label); }));
   if (zcLine) return ZLineChart(c);
   var rows = c.series.slice(0, 8).map(function (s, i) {
