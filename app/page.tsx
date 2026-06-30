@@ -1,73 +1,114 @@
-'use client';
-import { useState, useEffect } from 'react';
+'use client'
 
-const CSS = ".zwl-root{--navy:#0c3057;--navy2:#0a2742;--blue:#3a6ea5;--blue2:#6c9bc8;--gold:#b0883c;--bg:#f4f7fa;--card:#fff;--ink:#0f1f30;--sub:#5a6b7d;--faint:#9aa7b4;--line:#e7edf3;min-height:100vh;background:radial-gradient(1100px 560px at 50% -8%,#eaf1f9 0,#f4f7fa 55%);color:#0f1f30;font-family:'Inter','Segoe UI',sans-serif}.zwl-root[dir='rtl']{font-family:'Cairo','Segoe UI',Tahoma,sans-serif}.zwl-wrap{max-width:1080px;margin:0 auto;padding:22px 24px 64px}.zwl-head{display:flex;align-items:center;justify-content:space-between}.zwl-brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}.zwl-mark{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#0c3057,#3a6ea5);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;letter-spacing:.5px;box-shadow:0 6px 18px rgba(12,48,87,.28)}.zwl-wm b{font-size:17px;font-weight:800;display:block;line-height:1.1}.zwl-wm span{font-size:12px;color:#5a6b7d;font-weight:600}.zwl-lang{border:1px solid #e7edf3;background:#fff;color:#0f1f30;font:inherit;font-size:13px;font-weight:700;padding:9px 15px;border-radius:999px;cursor:pointer;transition:.15s}.zwl-lang:hover{border-color:#3a6ea5;color:#3a6ea5}.zwl-hero{text-align:center;padding:56px 0 12px}.zwl-ey{display:inline-flex;align-items:center;gap:8px;background:#e9f1fb;color:#0c3057;font-size:12.5px;font-weight:700;padding:7px 15px;border-radius:999px}.zwl-ey::before{content:'';width:7px;height:7px;border-radius:50%;background:#3a6ea5}.zwl-h1{font-size:40px;font-weight:800;letter-spacing:-.8px;margin:18px 0 12px;line-height:1.12}.zwl-tag{font-size:16px;color:#5a6b7d;max-width:560px;margin:0 auto;line-height:1.6}.zwl-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:42px}.zwl-card{position:relative;display:block;background:#fff;border:1px solid #e7edf3;border-radius:20px;padding:26px 24px 24px;text-decoration:none;color:inherit;box-shadow:0 1px 2px rgba(15,31,48,.04),0 10px 30px rgba(15,31,48,.06);transition:.2s}.zwl-card:hover{transform:translateY(-4px);border-color:#6c9bc8;box-shadow:0 8px 18px rgba(15,31,48,.07),0 20px 50px rgba(15,31,48,.1)}.zwl-ic{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:18px}.zwl-c1 .zwl-ic{background:#e9f1fb;color:#0c3057}.zwl-c2 .zwl-ic{background:#fbf3e6;color:#b0883c}.zwl-c3 .zwl-ic{background:#e7f4ee;color:#1f8f5a}.zwl-card h3{font-size:18px;font-weight:800;margin:0 0 7px}.zwl-card p{font-size:13.5px;color:#5a6b7d;line-height:1.55;margin:0}.zwl-go{margin-top:16px;font-size:13px;font-weight:700;color:#3a6ea5;display:flex;align-items:center;gap:6px}.zwl-soon{opacity:.6;pointer-events:none}.zwl-badge{position:absolute;top:16px;inset-inline-end:16px;font-size:10.5px;font-weight:800;letter-spacing:.4px;color:#b0883c;background:#fbf3e6;padding:4px 9px;border-radius:999px;text-transform:uppercase}.zwl-ask{margin-top:34px;display:flex;justify-content:center}.zwl-askb{display:inline-flex;align-items:center;gap:12px;background:linear-gradient(135deg,#0c3057,#0a2742);color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:15px 26px;border-radius:16px;box-shadow:0 10px 28px rgba(12,48,87,.28);transition:.18s}.zwl-askb:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(12,48,87,.34)}.zwl-za{width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}.zwl-foot{text-align:center;color:#9aa7b4;font-size:12px;margin-top:48px}@media(max-width:820px){.zwl-cards{grid-template-columns:1fr}.zwl-h1{font-size:32px}}";
-const T = {"en":{"dir":"ltr","lang":"العربية","wm":"Banking Intelligence","ey":"ZAD Intelligence","h1":"Competitive banking intelligence for Jordan","tag":"Grounded analysis across every licensed Jordanian bank. Choose where to begin.","t1":"Bank Financials","s1":"As reported in audited financial statements, bank by bank.","t2":"Banking Sector","s2":"Sector aggregates per Association of Banks in Jordan figures.","t3":"CBJ Reports","s3":"Upload and analyze Central Bank regulatory returns.","go":"Open","soon":"Soon","ask":"Ask ZAD anything about Jordanian banking","foot":"convo.finance · ZAD — proprietary banking intelligence"},"ar":{"dir":"rtl","lang":"EN","wm":"ذكاء مصرفي","ey":"منصة زاد","h1":"ذكاء تنافسي للقطاع المصرفي الأردني","tag":"تحليل قائم على البيانات لكل بنك أردني مرخّص. اختر نقطة البداية.","t1":"البيانات المالية للبنوك","s1":"وفق القوائم المالية المدققة، بنكاً بنكاً.","t2":"القطاع المصرفي","s2":"مؤشرات القطاع وفق أرقام جمعية البنوك في الأردن.","t3":"تقارير البنك المركزي","s3":"رفع وتحليل التقارير الرقابية للبنك المركزي.","go":"فتح","soon":"قريباً","ask":"اسأل زاد عن القطاع المصرفي الأردني","foot":"convo.finance · زاد — ذكاء مصرفي خاص"}};
-const IC = {"bank":"<svg width='26' height='26' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/><path d='M14 2v6h6'/><line x1='8' y1='13' x2='16' y2='13'/><line x1='8' y1='17' x2='13' y2='17'/></svg>","sector":"<svg width='26' height='26' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><line x1='4' y1='19' x2='20' y2='19'/><line x1='7' y1='19' x2='7' y2='13'/><line x1='12' y1='19' x2='12' y2='9'/><line x1='17' y1='19' x2='17' y2='5'/></svg>","cbj":"<svg width='26' height='26' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2'/><polyline points='8 8 12 4 16 8'/><line x1='12' y1='4' x2='12' y2='15'/></svg>"};
+import { useState } from 'react'
 
-export default function Page() {
-  const [lang, setLang] = useState('en');
-  useEffect(function () {
-    var saved = 'en';
-    try { saved = localStorage.getItem('cf_lang') || 'en'; } catch (e) {}
-    if (saved !== 'en' && saved !== 'ar') saved = 'en';
-    setLang(saved);
-  }, []);
-  useEffect(function () {
-    try { document.documentElement.setAttribute('dir', T[lang].dir); document.documentElement.setAttribute('lang', lang); } catch (e) {}
-  }, [lang]);
-  function toggle() {
-    var nx = lang === 'en' ? 'ar' : 'en';
-    setLang(nx);
-    try { localStorage.setItem('cf_lang', nx); } catch (e) {}
-  }
-  var t = T[lang];
-  var arrow = t.dir === 'rtl' ? '←' : '→';
+function dec(b){ try{ var bin=atob(b); var u=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++){ u[i]=bin.charCodeAt(i) } return new TextDecoder('utf-8').decode(u) }catch(e){ return '' } }
+
+var T = {
+  tagline:{ en:'Banking Intelligence', ar:'2LDZg9in2KEg2YXYtdix2YHZig==' },
+  navFin:{ en:'Financials', ar:'2KfZhNmF2KfZhNmK2Kk=' },
+  navSector:{ en:'Sector', ar:'2KfZhNmC2LfYp9i5' },
+  navCbj:{ en:'CBJ Reports', ar:'2KrZgtin2LHZitixINin2YTZhdix2YPYstmK' },
+  eyebrow:{ en:'ZAD INTELLIGENCE', ar:'2KrYrdmE2YrZhNin2Kog2LLYp9iv' },
+  heroTitle:{ en:'Competitive banking intelligence for Jordan', ar:'2LDZg9in2KEg2KrZhtin2YHYs9mKINmE2YTZgti32KfYuSDYp9mE2YXYtdix2YHZiiDYp9mE2KPYsdiv2YbZig==' },
+  heroSub:{ en:'Grounded analysis across all 15 licensed Jordanian banks. Choose where to begin.', ar:'2KrYrdmE2YrZhCDZhdmI2KvZkdmCINmE2KzZhdmK2Lkg2KfZhNio2YbZiNmDINin2YTYo9ix2K/ZhtmK2Kkg2KfZhNmF2LHYrtmR2LXYqSDYp9mE2K7ZhdizINi52LTYsdipLiDYp9iu2KrYsSDZhdmGINij2YrZhiDYqtio2K/Yoy4=' },
+  stAssets:{ en:'Sector assets', ar:'2YXZiNis2YjYr9in2Kog2KfZhNmC2LfYp9i5' },
+  stDeposits:{ en:'Deposits', ar:'2KfZhNmI2K/Yp9im2Lk=' },
+  stCredit:{ en:'Credit facilities', ar:'2KfZhNiq2LPZh9mK2YTYp9iqINin2YTYp9im2KrZhdin2YbZitip' },
+  stBanks:{ en:'Licensed banks', ar:'2KjZhtmDINmF2LHYrtmR2LU=' },
+  stCD:{ en:'Credit-to-deposit', ar:'2KfZhNiq2LPZh9mK2YTYp9iqINil2YTZiSDYp9mE2YjYr9in2KbYuQ==' },
+  stSource:{ en:'Sector aggregate - Association of Banks in Jordan - Q1 2026', ar:'2KXYrNmF2KfZhNmKINin2YTZgti32KfYuSDCtyDYrNmF2LnZitipINin2YTYqNmG2YjZgyDZgdmKINin2YTYo9ix2K/ZhiDCtyDYp9mE2LHYqNi5INin2YTYo9mI2YQgMjAyNg==' },
+  c1t:{ en:'Bank Financials', ar:'2KfZhNio2YrYp9mG2KfYqiDYp9mE2YXYp9mE2YrYqSDZhNmE2KjZhtmI2YM=' },
+  c1d:{ en:'As reported in audited financial statements, bank by bank.', ar:'2YPZhdinINmI2LHYr9iqINmB2Yog2KfZhNmC2YjYp9im2YUg2KfZhNmF2KfZhNmK2Kkg2KfZhNmF2K/ZgtmR2YLYqdiMINio2YbZg9in2Ysg2KjZhtmD2KfZiy4=' },
+  c2t:{ en:'Banking Sector', ar:'2KfZhNmC2LfYp9i5INin2YTZhdi12LHZgdmK' },
+  c2d:{ en:'Sector aggregates per Association of Banks in Jordan figures.', ar:'2YXYpNi02ZHYsdin2Kog2KfZhNmC2LfYp9i5INin2YTZhdis2YXZkdi52Kkg2YjZgdmCINij2LHZgtin2YUg2KzZhdi52YrYqSDYp9mE2KjZhtmI2YMg2YHZiiDYp9mE2KPYsdiv2YYu' },
+  c3t:{ en:'CBJ Reports', ar:'2KrZgtin2LHZitixINin2YTYqNmG2YMg2KfZhNmF2LHZg9iy2Yo=' },
+  c3d:{ en:'Upload regulatory returns and auto-generate dashboards.', ar:'2KfYsdmB2Lkg2KfZhNiq2YLYp9ix2YrYsSDYp9mE2LHZgtin2KjZitipINmI2K/YuSDYp9mE2YXZhti12ZHYqSDYqtio2YbZiiDZhNmI2K3Yp9iq2YfYpyDYqtmE2YLYp9im2YrYp9mLLg==' },
+  open:{ en:'Open', ar:'2KfZgdiq2K0=' },
+  cta:{ en:'Ask ZAD anything about Jordanian banking', ar:'2KfYs9ij2YQg2LLYp9ivINij2Yog2LTZitihINi52YYg2KfZhNmC2LfYp9i5INin2YTZhdi12LHZgdmKINin2YTYo9ix2K/ZhtmK' },
+  footer:{ en:'convo.finance - ZAD proprietary banking intelligence', ar:'Y29udm8uZmluYW5jZSDCtyDYstin2K8g4oCUINiw2YPYp9ihINmF2LXYsdmB2Yog2YXZhdmE2YjZgw==' },
+  langWord:{ en:'English', ar:'2KfZhNi52LHYqNmK2Kk=' }
+}
+
+export default function Home(){
+  const [lang, setLang] = useState('en')
+  var ar = lang === 'ar'
+  function t(k){ var o=T[k]; if(!o) return ''; return ar ? dec(o.ar) : o.en }
+  var cards = [
+    { t:'c1t', d:'c1d', href:'/banks', accent:'var(--cf-primary)' },
+    { t:'c2t', d:'c2d', href:'/sector', accent:'var(--cf-teal)' },
+    { t:'c3t', d:'c3d', href:'/cbj', accent:'var(--cf-iris)' }
+  ]
+  var stats = [
+    { v:'75.43', u:'JOD bn', l:'stAssets' },
+    { v:'50.32', u:'JOD bn', l:'stDeposits' },
+    { v:'36.67', u:'JOD bn', l:'stCredit' },
+    { v:'72.9%', u:'', l:'stCD' },
+    { v:'15', u:'', l:'stBanks' }
+  ]
   return (
-    <div className="zwl-root" dir={t.dir}>
-      <style dangerouslySetInnerHTML={{ __html: CSS }} />
-      <div className="zwl-wrap">
-        <div className="zwl-head">
-          <a className="zwl-brand" href="/">
-            <div className="zwl-mark">ZAD</div>
-            <div className="zwl-wm"><b>convo.finance</b><span>{t.wm}</span></div>
-          </a>
-          <button className="zwl-lang" onClick={toggle}>{t.lang}</button>
-        </div>
-        <div className="zwl-hero">
-          <span className="zwl-ey">{t.ey}</span>
-          <h1 className="zwl-h1">{t.h1}</h1>
-          <p className="zwl-tag">{t.tag}</p>
-        </div>
-        <div className="zwl-cards">
-          <a className="zwl-card zwl-c1" href="/banks">
-            <span className="zwl-ic" dangerouslySetInnerHTML={{ __html: IC.bank }} />
-            <h3>{t.t1}</h3>
-            <p>{t.s1}</p>
-            <div className="zwl-go"><span>{t.go}</span><span>{arrow}</span></div>
-          </a>
-          <a className="zwl-card zwl-c2" href="/sector">
-            
-            <span className="zwl-ic" dangerouslySetInnerHTML={{ __html: IC.sector }} />
-            <h3>{t.t2}</h3>
-            <p>{t.s2}</p>
-            <div className="zwl-go"><span>{t.go}</span><span>{arrow}</span></div>
-          </a>
-          <a className="zwl-card zwl-c3" href="/cbj">
-            <span className="zwl-ic" dangerouslySetInnerHTML={{ __html: IC.cbj }} />
-            <h3>{t.t3}</h3>
-            <p>{t.s3}</p>
-            <div className="zwl-go"><span>{t.go}</span><span>{arrow}</span></div>
-          </a>
-        </div>
-        <div className="zwl-ask">
-          <a className="zwl-askb" href="/chat">
-            <span className="zwl-za">{"ز"}</span>
-            <span>{t.ask}</span>
-          </a>
-        </div>
-        <div className="zwl-foot">{t.foot}</div>
+    <div className='cf-page' dir={ar ? 'rtl' : 'ltr'} style={{ minHeight:'100vh', fontFamily: ar ? 'var(--cf-font-ar)' : 'var(--cf-font-sans)' }}>
+      <style>{'.cf-cardlink{transition:border-color .15s ease, transform .15s ease} .cf-cardlink:hover{border-color:var(--cf-primary); transform:translateY(-2px)} .cf-ctalink{transition:opacity .15s ease} .cf-ctalink:hover{opacity:.92} @media (max-width:680px){ .cf-nav-links{display:none} .cf-hero{font-size:34px !important} }'}</style>
+      <div style={{ maxWidth:'1080px', margin:'0 auto', padding:'22px 24px 60px' }}>
+
+        <header style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'56px' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
+            <div style={{ width:'42px', height:'42px', borderRadius:'11px', background:'var(--cf-grad)', display:'flex', alignItems:'center', justifyContent:'center', color:'#ffffff', fontWeight:'800', fontSize:'13px', letterSpacing:'0.04em' }}>ZAD</div>
+            <div>
+              <div style={{ fontWeight:'700', fontSize:'17px', color:'var(--cf-ink)', letterSpacing:'-0.01em' }}>convo.finance</div>
+              <div className='cf-muted' style={{ fontSize:'11.5px' }}>{ t('tagline') }</div>
+            </div>
+          </div>
+          <div style={{ display:'flex', alignItems:'center', gap:'22px' }}>
+            <nav className='cf-nav-links' style={{ display:'flex', gap:'20px' }}>
+              <a className='cf-link' href='/banks' style={{ fontSize:'13.5px' }}>{ t('navFin') }</a>
+              <a className='cf-link' href='/sector' style={{ fontSize:'13.5px' }}>{ t('navSector') }</a>
+              <a className='cf-link' href='/cbj' style={{ fontSize:'13.5px' }}>{ t('navCbj') }</a>
+            </nav>
+            <button onClick={function(){ setLang(ar ? 'en' : 'ar') }} className='cf-btn cf-btn-secondary' style={{ fontSize:'12.5px', padding:'7px 14px' }}>{ t('langWord') }</button>
+          </div>
+        </header>
+
+        <section style={{ textAlign:'center', maxWidth:'760px', margin:'0 auto 44px' }}>
+          <div className='cf-eyebrow' style={{ marginBottom:'14px' }}>{ t('eyebrow') }</div>
+          <h1 className='cf-hero' style={{ fontSize:'46px', lineHeight:'1.08', fontWeight:'700', letterSpacing:'-0.025em', color:'var(--cf-ink)', margin:'0 0 18px' }}>{ t('heroTitle') }</h1>
+          <p className='cf-muted' style={{ fontSize:'17px', lineHeight:'1.5', margin:'0' }}>{ t('heroSub') }</p>
+        </section>
+
+        <section style={{ marginBottom:'52px' }}>
+          <div style={{ display:'flex', flexWrap:'wrap', justifyContent:'center', border:'1px solid var(--cf-line)', borderRadius:'14px', background:'var(--cf-surface)', overflow:'hidden' }}>
+            { stats.map(function(s, i){
+              return (
+                <div key={i} style={{ flex:'1 1 0', minWidth:'150px', padding:'18px 20px', textAlign:'center', borderInlineStart: i===0 ? 'none' : '1px solid var(--cf-line)' }}>
+                  <div style={{ fontSize:'24px', fontWeight:'700', color:'var(--cf-ink)', letterSpacing:'-0.02em', fontFamily:'var(--cf-font-mono)' }}>{ s.v }</div>
+                  <div className='cf-muted' style={{ fontSize:'11px', marginTop:'3px' }}>{ t(s.l) }{ s.u ? (' ' + s.u) : '' }</div>
+                </div>
+              )
+            }) }
+          </div>
+          <div className='cf-muted' style={{ fontSize:'11px', textAlign:'center', marginTop:'10px' }}>{ t('stSource') }</div>
+        </section>
+
+        <section style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(260px, 1fr))', gap:'16px', marginBottom:'24px' }}>
+          { cards.map(function(c, i){
+            return (
+              <a key={i} href={c.href} className='cf-card cf-cardlink' style={{ display:'block', textDecoration:'none', padding:'22px' }}>
+                <div style={{ width:'38px', height:'4px', borderRadius:'2px', background:c.accent, marginBottom:'18px' }}></div>
+                <div style={{ fontSize:'18px', fontWeight:'700', color:'var(--cf-ink)', marginBottom:'7px' }}>{ t(c.t) }</div>
+                <div className='cf-muted' style={{ fontSize:'13.5px', lineHeight:'1.5', marginBottom:'18px' }}>{ t(c.d) }</div>
+                <div style={{ fontSize:'13px', fontWeight:'600', color:c.accent }}>{ t('open') }{ ar ? '' : ' ->' }</div>
+              </a>
+            )
+          }) }
+        </section>
+
+        <a href='/chat' className='cf-ctalink' style={{ display:'block', textDecoration:'none', background:'var(--cf-grad)', borderRadius:'14px', padding:'22px 26px', textAlign:'center', marginBottom:'40px' }}>
+          <span style={{ color:'#ffffff', fontSize:'16px', fontWeight:'600' }}>{ t('cta') }</span>
+        </a>
+
+        <footer className='cf-muted' style={{ textAlign:'center', fontSize:'11.5px' }}>{ t('footer') }</footer>
+
       </div>
     </div>
-  );
+  )
 }
