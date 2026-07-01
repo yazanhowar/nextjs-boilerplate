@@ -21,6 +21,9 @@ async function buildKnowledge(){
   var abj = abjRes.data || [];
   var bmap = {};
   banks.forEach(function(b){ bmap[b.id] = b; });
+  var latestFin = {};
+  fins.forEach(function(f){ var cur = latestFin[f.bank_id]; if(!cur || (f.fiscal_year||0) > (cur.fiscal_year||0)) latestFin[f.bank_id] = f; });
+  fins = Object.keys(latestFin).map(function(k){ return latestFin[k]; });
   fins.sort(function(a,b){ return (jod(b.total_assets,b.currency)||0) - (jod(a.total_assets,a.currency)||0); });
   var lines = [];
   fins.forEach(function(f){
@@ -37,7 +40,7 @@ async function buildKnowledge(){
     if(f.npl_ratio!==null && f.npl_ratio!==undefined) parts.push('NPL ' + f.npl_ratio + '%');
     if(f.loan_to_deposit!==null && f.loan_to_deposit!==undefined) parts.push('loan-to-deposit ' + f.loan_to_deposit + '%');
     var nm = b.name_en || ('Bank ' + f.bank_id);
-    lines.push('- ' + nm + ' (' + (b.ticker||'') + ', ' + (b.bank_type||'') + '): ' + parts.join(', '));
+    lines.push('- ' + nm + ' (' + (b.ticker||'') + ', ' + (b.bank_type||'') + ', FY' + f.fiscal_year + '): ' + parts.join(', '));
   });
   var latestPeriod = abj.length ? abj[0].data_period : null;
   var aLatest = {};
