@@ -4,6 +4,8 @@
 import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { BANKS } from '@/lib/banks-config'
+import { useLang } from '@/lib/LangContext'
+import { t as i18nDict } from '@/lib/i18n'
 import { createClient } from '@supabase/supabase-js'
 import {
   BarChart, Bar, LineChart, Line,
@@ -34,6 +36,9 @@ function fmtJOD(n: number | null | undefined, bankId?: number): string {
 }
 
 function CompareContent() {
+  const { lang } = useLang()
+  const L = i18nDict[lang]
+  const isAr = lang === 'ar'
   const searchParams = useSearchParams()
   const router = useRouter()
   const initialPrompt = searchParams.get('q') || ''
@@ -121,23 +126,23 @@ function CompareContent() {
 
   // Build comparison table rows
   const comparisonRows = [
-    { label: 'Net Profit', key: 'net_profit', format: (v: number, bankId?: number) => fmtJOD(v, bankId) },
-    { label: 'Total Assets', key: 'total_assets', format: (v: number, bankId?: number) => fmtJOD(v, bankId) },
-    { label: 'Customer Deposits', key: 'customer_deposits', format: (v: number, bankId?: number) => fmtJOD(v, bankId) },
-    { label: 'Net Loans', key: 'net_loans', format: (v: number, bankId?: number) => fmtJOD(v, bankId) },
-    { label: 'Return on Equity', key: 'roe', format: (v: number) => `${v?.toFixed(1)}%` },
-    { label: 'Capital Ratio', key: 'car', format: (v: number) => `${v?.toFixed(1)}%` },
-    { label: 'Bad Loan Ratio', key: 'npl_ratio', format: (v: number) => `${v?.toFixed(2)}%` },
+    { label: L.bk_netProfit, key: 'net_profit', format: (v: number, bankId?: number) => fmtJOD(v, bankId) },
+    { label: L.bk_totalAssets, key: 'total_assets', format: (v: number, bankId?: number) => fmtJOD(v, bankId) },
+    { label: L.cmp_deposits, key: 'customer_deposits', format: (v: number, bankId?: number) => fmtJOD(v, bankId) },
+    { label: L.cmp_netLoans, key: 'net_loans', format: (v: number, bankId?: number) => fmtJOD(v, bankId) },
+    { label: L.cmp_roe, key: 'roe', format: (v: number) => `${v?.toFixed(1)}%` },
+    { label: L.cmp_capRatio, key: 'car', format: (v: number) => `${v?.toFixed(1)}%` },
+    { label: L.cmp_npl, key: 'npl_ratio', format: (v: number) => `${v?.toFixed(2)}%` },
   ]
 
   const latest2025 = (bankId: number) => financials[bankId]?.find(f => f.fiscal_year === 2025)
 
   return (
-    <div className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-ink)]">
+    <div dir={isAr ? 'rtl' : 'ltr'} className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-ink)]">
       <header className="border-b border-[var(--cf-line)] px-6 py-4 flex items-center gap-4">
         
         
-        <div className="font-bold text-[var(--cf-ink)]">Compare Banks</div>
+        <div className="font-bold text-[var(--cf-ink)]">{L.compare}</div>
       </header>
 
       <div className="max-w-[1400px] mx-auto px-6 py-8 space-y-8">
@@ -168,18 +173,18 @@ function CompareContent() {
         <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <span className="text-[var(--cf-gold)]">{'\u26A1'}</span>
-            <span className="font-semibold text-[var(--cf-ink)]">Generate a chart</span>
+            <span className="font-semibold text-[var(--cf-ink)]">{L.cmp_generateChart}</span>
           </div>
 
           {/* Quick prompts */}
           <div className="flex flex-wrap gap-2 mb-4">
             {[
-              'Compare net profit for 3 years',
-              'Who has the highest return on equity?',
-              'Compare home loan rates',
-              'Compare credit card fees',
-              'Total assets growth trend',
-              'Who has the strongest capital ratio?',
+              L.cmp_c1,
+              L.cmp_c2,
+              L.cmp_c3,
+              L.cmp_c4,
+              L.cmp_c5,
+              L.cmp_c6,
             ].map(ex => (
               <button key={ex} onClick={() => setPrompt(ex)}
                 className="text-[11px] px-3 py-1.5 rounded-full border border-[var(--cf-line)]
@@ -268,7 +273,7 @@ function CompareContent() {
             <table className="w-full text-[13px]">
               <thead>
                 <tr className="border-b border-[var(--cf-line)]">
-                  <th className="text-start px-5 py-3 text-[var(--cf-ink2)] font-medium">Metric</th>
+                  <th className="text-start px-5 py-3 text-[var(--cf-ink2)] font-medium">{L.metric}</th>
                   {selectedBanks.map(id => {
                     const bank = BANKS.find(b => b.id === id)!
                     return (
@@ -313,7 +318,7 @@ function CompareContent() {
 
 export default function ComparePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[var(--cf-bg)] flex items-center justify-center text-[var(--cf-ink)]">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[var(--cf-bg)] flex items-center justify-center text-[var(--cf-ink)]">{L.cmp_loading}</div>}>
       <CompareContent />
     </Suspense>
   )
