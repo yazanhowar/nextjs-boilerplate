@@ -67,10 +67,10 @@ export default function SearchPage() {
   }, [query, search])
 
   const tagColors: Record<string, string> = {
-    Bank: '#004D8F', 'بنك': '#004D8F',
-    Product: '#6B3FA0', 'منتج': '#6B3FA0',
-    Rates: '#1A7A4A', 'أسعار': '#1A7A4A',
-    Tariffs: '#8A6D3B', 'تعريفات': '#8A6D3B',
+    Bank: 'var(--cf-primary)', 'بنك': 'var(--cf-primary)',
+    Product: 'var(--cf-iris)', 'منتج': 'var(--cf-iris)',
+    Rates: 'var(--cf-positive)', 'أسعار': 'var(--cf-positive)',
+    Tariffs: 'var(--cf-gold)', 'تعريفات': 'var(--cf-gold)',
   }
 
   const quickSearches = isAr
@@ -140,7 +140,7 @@ export default function SearchPage() {
                           <span style={{
                             fontSize: '0.625rem', fontWeight: 700, padding: '0.15rem 0.5rem',
                             borderRadius: '99px', textTransform: 'capitalize',
-                            background: `color-mix(in srgb, ${tagColors[r.tag || ''] || '#585A5B'} 15%, transparent)`,
+                            background: `color-mix(in srgb, ${tagColors[r.tag || ''] || 'var(--cf-ink3)'} 15%, transparent)`,
                             color: tagColors[r.tag || ''] || 'var(--text-muted)'
                           }}>{r.tag}</span>
                           <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{r.bank_name}</span>
