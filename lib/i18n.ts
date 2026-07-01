@@ -164,6 +164,12 @@ export const t = {
     cmp_c4: 'Compare credit card fees',
     cmp_c5: 'Total assets growth trend',
     cmp_c6: 'Who has the strongest capital ratio?',
+    // News page
+    nw_title: 'News & Announcements',
+    nw_askAI: 'Ask AI \u2192',
+    nw_allCategories: 'All Categories',
+    nw_noAnnouncements: 'No announcements found.',
+    nw_verified: '\u2713 Verified',
   },
   ar: {
     // Nav & Header
@@ -328,5 +334,11 @@ export const t = {
     cmp_c4: 'قارن رسوم البطاقات الائتمانية',
     cmp_c5: 'اتجاه نمو إجمالي الموجودات',
     cmp_c6: 'من يملك أقوى نسبة كفاية رأس مال؟',
+    // News page
+    nw_title: 'الأخبار والإفصاحات',
+    nw_askAI: 'اسأل زاد \u2190',
+    nw_allCategories: 'كل الفئات',
+    nw_noAnnouncements: 'لا توجد إعلانات.',
+    nw_verified: '\u2713 موثّق',
   },
 } as const
