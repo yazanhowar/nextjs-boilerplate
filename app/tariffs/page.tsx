@@ -114,12 +114,7 @@ export default function TariffsPage() {
           </div>
           <div className="hbtf-logo-title">{T.feeComparison}</div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <a href="/" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textDecoration: 'none' }}>
-            {isAr ? 'الرئيسية ←' : '← Dashboard'}
-          </a>
-          <LangToggle /><ThemeToggle />
-        </div>
+        
       </header>
 
       <div style={{ padding: '1.75rem 2rem', maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
