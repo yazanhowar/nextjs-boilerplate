@@ -215,6 +215,47 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
 }
 
 // ─── Main bank page ───────────────────────────────────────────────────────────
+function LoanCalculator() {
+  const [amount, setAmount] = useState<number>(50000)
+  const [rate, setRate] = useState<number>(7.5)
+  const [years, setYears] = useState<number>(10)
+  const n = Math.max(1, Math.round(years * 12))
+  const r = rate / 100 / 12
+  const monthly = r === 0 ? amount / n : (amount * r) / (1 - Math.pow(1 + r, -n))
+  const total = monthly * n
+  const interest = total - amount
+  const money = (x: number) => 'JOD ' + Math.round(x).toLocaleString()
+  const fieldStyle: any = { width: '100%', background: 'var(--cf-surface2)', border: '1px solid var(--cf-line)', borderRadius: '8px', padding: '9px 10px', color: 'var(--cf-ink)', fontSize: '14px', marginTop: '5px', outline: 'none', boxSizing: 'border-box' }
+  const lblStyle: any = { fontSize: '10.5px', color: 'var(--cf-ink3)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }
+  const outCard: any = { background: 'var(--cf-surface2)', borderRadius: '10px', padding: '12px 13px' }
+  return (
+    <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
+      <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>Loan Repayment Calculator</div>
+      <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>Estimate monthly instalments — enter the rate quoted to you</div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '18px' }}>
+        <label><div style={lblStyle}>Amount (JOD)</div><input type="number" value={amount} onChange={(e: any) => setAmount(Math.max(0, Number(e.target.value)))} style={fieldStyle} /></label>
+        <label><div style={lblStyle}>Rate (% APR)</div><input type="number" step="0.1" value={rate} onChange={(e: any) => setRate(Math.max(0, Number(e.target.value)))} style={fieldStyle} /></label>
+        <label><div style={lblStyle}>Term (years)</div><input type="number" value={years} onChange={(e: any) => setYears(Math.max(1, Number(e.target.value)))} style={fieldStyle} /></label>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+        <div style={{ background: 'var(--cf-primary-soft)', borderRadius: '10px', padding: '12px 13px' }}>
+          <div style={lblStyle}>Monthly</div>
+          <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--cf-primary-strong)', marginTop: '5px' }}>{money(monthly)}</div>
+        </div>
+        <div style={outCard}>
+          <div style={lblStyle}>Total Interest</div>
+          <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--cf-ink)', marginTop: '5px' }}>{money(interest)}</div>
+        </div>
+        <div style={outCard}>
+          <div style={lblStyle}>Total Repayment</div>
+          <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--cf-ink)', marginTop: '5px' }}>{money(total)}</div>
+        </div>
+      </div>
+      <div style={{ fontSize: '10.5px', color: 'var(--cf-ink3)', marginTop: '14px', lineHeight: '1.5' }}>Illustrative amortising loan. Actual rates, fees and eligibility are set by the bank.</div>
+    </div>
+  )
+}
+
 export default function BankPage() {
   useEffect(function () {
     try {
@@ -421,83 +462,115 @@ export default function BankPage() {
         {/* OVERVIEW */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            <div className="grid grid-cols-3 gap-6">
-              {/* About */}
-              <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
-                <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-3">About</div>
-                <p className="text-[13px] text-[#CBD5E0] leading-relaxed">{bank.description}</p>
-                <div className="mt-4 pt-4 border-t border-[#383838] space-y-2">
-                  <div className="flex justify-between text-[12px]">
-                    <span className="text-[#9CA3AF]">Sector</span>
-                    <span className="text-white">{bank.sector === 'islamic' ? 'Islamic Banking' : 'Commercial Banking'}</span>
-                  </div>
-                  <div className="flex justify-between text-[12px]">
-                    <span className="text-[#9CA3AF]">Stock ticker</span>
-                    <span className="text-white">{bank.ticker}</span>
-                  </div>
-                  <div className="flex justify-between text-[12px]">
-                    <span className="text-[#9CA3AF]">Website</span>
-                    <a href={`https://${bank.domain}`} target="_blank" rel="noopener"
-                       className="text-[#004D8F] hover:text-[#CEBA95] transition-colors">
-                      {bank.domain}
-                    </a>
-                  </div>
-                </div>
-              </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '12px' }}>
+              {(() => {
+                const latest: any = financials[financials.length - 1] || {}
+                const prev: any = financials[financials.length - 2] || {}
+                const items: any[] = [
+                  { label: 'Total Assets', v: latest.total_assets, p: prev.total_assets, kind: 'money' },
+                  { label: 'Cust. Deposits', v: latest.customer_deposits, p: prev.customer_deposits, kind: 'money' },
+                  { label: 'Net Loans', v: latest.net_loans, p: prev.net_loans, kind: 'money' },
+                  { label: 'Net Profit', v: latest.net_profit, p: prev.net_profit, kind: 'money' },
+                  { label: 'ROE', v: latest.roe, p: prev.roe, kind: 'pct' },
+                  { label: 'CAR', v: latest.car, p: prev.car, kind: 'pct' },
+                ]
+                return items.map((k: any, i: number) => {
+                  const delta = (k.v != null && k.p != null && k.p !== 0) ? ((k.v - k.p) / Math.abs(k.p) * 100) : null
+                  const valStr = k.v == null ? '—' : (k.kind === 'pct' ? (k.v + '%') : fmtJOD(k.v))
+                  return (
+                    <div key={i} style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '12px', padding: '14px 15px' }}>
+                      <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--cf-ink3)', marginBottom: '7px', fontWeight: 600 }}>{k.label}</div>
+                      <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--cf-ink)', letterSpacing: '-0.01em' }}>{valStr}</div>
+                      {delta != null && (
+                        <div style={{ fontSize: '11px', marginTop: '5px', fontWeight: 600, color: delta >= 0 ? 'var(--cf-positive)' : 'var(--cf-negative)' }}>{(delta >= 0 ? '\u25B2 ' : '\u25BC ') + Math.abs(delta).toFixed(1) + '% YoY'}</div>
+                      )}
+                    </div>
+                  )
+                })
+              })()}
+            </div>
 
-              {/* 3-year profit chart */}
-              <div className="col-span-2 bg-[#242424] border border-[#383838] rounded-xl p-5">
-                <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">
-                  Net Profit (JOD millions) — 3-year trend
-                </div>
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={profitTrend}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#383838" />
-                    <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
-                    <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
-                    <Tooltip
-                      contentStyle={{ backgroundColor: '#242424', border: '1px solid #383838', borderRadius: 8 }}
-                      labelStyle={{ color: '#CEBA95' }}
-                      itemStyle={{ color: '#fff' }}
-                      formatter={(v: any) => [`JOD ${v}M`, 'Net Profit']}
-                    />
-                    <Line isAnimationActive={false} type="monotone" dataKey="Net Profit"
-                      stroke="#CEBA95" strokeWidth={2.5}
-                      dot={{ fill: '#CEBA95', r: 5 }}
-                      activeDot={{ r: 7 }} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
+                <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>Balance Sheet Trend</div>
+                <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>JOD billions, by fiscal year</div>
+                <ResponsiveContainer width="100%" height={240}>
+                  <BarChart data={financials.map((f: any) => ({ name: 'FY' + f.fiscal_year, Assets: Number(((f.total_assets || 0) / 1000000).toFixed(2)), Deposits: Number(((f.customer_deposits || 0) / 1000000).toFixed(2)), Loans: Number(((f.net_loans || 0) / 1000000).toFixed(2)) }))} margin={{ top: 4, right: 8, left: -12, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--cf-ink2)' }} axisLine={{ stroke: 'var(--cf-line)' }} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: 'var(--cf-ink2)' }} axisLine={false} tickLine={false} />
+                    <Tooltip contentStyle={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '8px', fontSize: '12px', color: 'var(--cf-ink)' }} />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <Bar dataKey="Assets" fill="var(--cf-primary)" isAnimationActive={false} radius={[3, 3, 0, 0]} />
+                    <Bar dataKey="Deposits" fill="var(--cf-teal)" isAnimationActive={false} radius={[3, 3, 0, 0]} />
+                    <Bar dataKey="Loans" fill="var(--cf-iris)" isAnimationActive={false} radius={[3, 3, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
+                <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>Profitability Trend</div>
+                <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>Return ratios (%), by fiscal year</div>
+                <ResponsiveContainer width="100%" height={240}>
+                  <LineChart data={financials.map((f: any) => ({ name: 'FY' + f.fiscal_year, ROE: f.roe, ROA: f.roa }))} margin={{ top: 4, right: 8, left: -12, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--cf-ink2)' }} axisLine={{ stroke: 'var(--cf-line)' }} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: 'var(--cf-ink2)' }} axisLine={false} tickLine={false} />
+                    <Tooltip contentStyle={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '8px', fontSize: '12px', color: 'var(--cf-ink)' }} />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <Line type="monotone" dataKey="ROE" stroke="var(--cf-primary)" strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
+                    <Line type="monotone" dataKey="ROA" stroke="var(--cf-teal)" strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            {/* AI Chart prompt */}
-            <ChartPrompt bankId={bankId} bankName={bank.shortName} />
-
-            {/* Recent news */}
-            {announcements.length > 0 && (
-              <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
-                <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">Recent announcements</div>
-                <div className="space-y-3">
-                  {announcements.slice(0, 5).map((a, i) => (
-                    <div key={i} className="flex items-start gap-3 py-2 border-b border-[#383838] last:border-0">
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full mt-0.5 whitespace-nowrap
-                        ${a.category === 'financial_results' ? 'bg-[#004D8F]/20 text-[#60A5FA]' :
-                          a.category === 'dividend' ? 'bg-[#2ECC71]/20 text-[#2ECC71]' :
-                          a.category === 'leadership_change' ? 'bg-[#CEBA95]/20 text-[#CEBA95]' :
-                          'bg-[#383838] text-[#9CA3AF]'}`}>
-                        {catLabel[a.category] || a.category}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[13px] text-white truncate">{a.headline_en}</div>
-                        <div className="text-[11px] text-[#9CA3AF] mt-0.5">
-                          {new Date(a.announcement_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
+                <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>Key Ratios — Latest FY</div>
+                <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>Capital, returns and asset quality (%)</div>
+                <ResponsiveContainer width="100%" height={240}>
+                  <BarChart layout="vertical" data={(() => { const f: any = financials[financials.length - 1] || {}; return [{ name: 'CAR', value: f.car }, { name: 'Loan/Deposit', value: f.loan_to_deposit }, { name: 'ROE', value: f.roe }, { name: 'ROA', value: f.roa }, { name: 'NPL', value: f.npl_ratio }].filter((x: any) => x.value != null) })()} margin={{ top: 4, right: 16, left: 20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" horizontal={false} />
+                    <XAxis type="number" tick={{ fontSize: 11, fill: 'var(--cf-ink2)' }} axisLine={false} tickLine={false} />
+                    <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: 'var(--cf-ink2)' }} axisLine={false} tickLine={false} width={82} />
+                    <Tooltip contentStyle={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '8px', fontSize: '12px', color: 'var(--cf-ink)' }} />
+                    <Bar dataKey="value" fill="var(--cf-primary)" isAnimationActive={false} radius={[0, 4, 4, 0]} barSize={16} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
-            )}
+              <LoanCalculator />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: bank && bank.description ? '1fr 1fr' : '1fr', gap: '16px' }}>
+              {bank && bank.description && (
+                <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
+                  <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '12px' }}>About {bank.name || 'the Bank'}</div>
+                  <p style={{ fontSize: '13px', color: 'var(--cf-ink2)', lineHeight: '1.6', margin: 0 }}>{bank.description}</p>
+                  <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid var(--cf-line)', display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                    <span style={{ color: 'var(--cf-ink3)' }}>Type</span>
+                    <span style={{ color: 'var(--cf-ink)', fontWeight: 600 }}>{bank.sector === 'islamic' ? 'Islamic Banking' : 'Commercial Banking'}</span>
+                  </div>
+                </div>
+              )}
+              {products && products.length > 0 && (
+                <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
+                  <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>Product Portfolio</div>
+                  <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>{products.length + ' products across categories'}</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    {(() => {
+                      const byCat: any = {}
+                      products.forEach((p: any) => { const c = (p.category || 'other').replace(/_/g, ' '); byCat[c] = (byCat[c] || 0) + 1 })
+                      return Object.keys(byCat).sort((a: any, b: any) => byCat[b] - byCat[a]).slice(0, 6).map((c: any, i: number) => (
+                        <div key={i} style={{ background: 'var(--cf-surface2)', borderRadius: '10px', padding: '11px 13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontSize: '12px', color: 'var(--cf-ink2)', textTransform: 'capitalize' }}>{c}</span>
+                          <span style={{ fontSize: '17px', fontWeight: 800, color: 'var(--cf-primary)' }}>{byCat[c]}</span>
+                        </div>
+                      ))
+                    })()}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
