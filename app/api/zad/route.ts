@@ -4,11 +4,11 @@ import { createClient } from '@supabase/supabase-js';
 const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPA_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
-const PEG = 0.710;
+const PEG = 0.709;
 
 function jod(v, cur){ if(v===null||v===undefined) return null; return cur==='USD' ? v*PEG : v; }
-function fmtB(v, cur){ var j=jod(v,cur); if(j===null) return 'n/a'; return (Math.round(j/1000000*100)/100)+'B'; }
-function fmtM(v, cur){ var j=jod(v,cur); if(j===null) return 'n/a'; return (Math.round(j/1000*10)/10)+'M'; }
+function fmtB(v, cur){ var j=jod(v,cur); if(j===null) return 'n/a'; var s=(Math.round(j/1000000*100)/100)+'B'; if(cur==='USD') s+=' (USD '+(Math.round(v/1000000*100)/100)+'B)'; return s; }
+function fmtM(v, cur){ var j=jod(v,cur); if(j===null) return 'n/a'; var s=(Math.round(j/1000*10)/10)+'M'; if(cur==='USD') s+=' (USD '+(Math.round(v/1000*10)/10)+'M)'; return s; }
 
 async function buildKnowledge(){
   var sb = createClient(SUPA_URL, SUPA_KEY);
