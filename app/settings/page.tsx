@@ -67,13 +67,13 @@ export default function SettingsPage() {
   }
 
   const t = {
-    bg: dark ? '#1a1a1a' : '#F3F4F6',
-    card: dark ? '#242424' : '#FFFFFF',
-    cardAlt: dark ? '#2a2a2a' : '#F9FAFB',
-    text: dark ? '#FFFFFF' : '#1a1a1a',
-    sub: dark ? '#9CA3AF' : '#6B7280',
-    border: dark ? '#383838' : '#E5E7EB',
-    accent: '#3B82F6',
+    bg: 'var(--cf-bg)',
+    card: 'var(--cf-surface)',
+    cardAlt: 'var(--cf-surface2)',
+    text: 'var(--cf-ink)',
+    sub: 'var(--cf-ink2)',
+    border: 'var(--cf-line)',
+    accent: 'var(--cf-primary)',
   }
 
   function fmtJOD(n: number) { return 'JOD ' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }
@@ -133,8 +133,8 @@ export default function SettingsPage() {
               <AreaChart data={data} margin={{ top: 8, right: 8, left: -10, bottom: 0 }}>
                 <defs>
                   <linearGradient id="spendGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#3B82F6" stopOpacity={0} />
+                    <stop offset="0%" stopColor="var(--cf-primary)" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="var(--cf-primary)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke={t.border} vertical={false} />
@@ -144,7 +144,7 @@ export default function SettingsPage() {
                   contentStyle={{ backgroundColor: t.card, border: '1px solid ' + t.border, borderRadius: 10, color: t.text, fontSize: 13 }}
                   formatter={(v: number) => [fmtJOD(v), 'Spend']}
                 />
-                <Area type="monotone" dataKey="spend" stroke="#3B82F6" strokeWidth={2.5} fill="url(#spendGrad)" />
+                <Area type="monotone" dataKey="spend" stroke="var(--cf-primary)" strokeWidth={2.5} fill="url(#spendGrad)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -198,7 +198,7 @@ export default function SettingsPage() {
 
       {/* Toast */}
       {toast && (
-        <div style={{ position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)', backgroundColor: toast.startsWith('Success') ? '#22C55E' : '#EF4444', color: '#fff', padding: '12px 22px', borderRadius: 12, fontSize: 14, fontWeight: 600, boxShadow: '0 8px 30px rgba(0,0,0,0.25)', zIndex: 1000 }}>
+        <div style={{ position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)', backgroundColor: toast.startsWith('Success') ? 'var(--cf-positive)' : 'var(--cf-negative)', color: '#fff', padding: '12px 22px', borderRadius: 12, fontSize: 14, fontWeight: 600, boxShadow: '0 8px 30px rgba(0,0,0,0.25)', zIndex: 1000 }}>
           {toast}
         </div>
       )}
