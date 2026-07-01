@@ -147,8 +147,8 @@ function CompareContent() {
   return (
     <div className="min-h-screen bg-[#0A1628] text-white">
       <header className="border-b border-[#1E3450] px-6 py-4 flex items-center gap-4">
-        <button onClick={() => router.push('/')} className="text-[#8B9AB0] hover:text-white text-[13px]">{'\u2190'} Dashboard</button>
-        <div className="w-px h-5 bg-[#1E3450]" />
+        
+        
         <div className="font-bold text-white">Compare Banks</div>
       </header>
 
