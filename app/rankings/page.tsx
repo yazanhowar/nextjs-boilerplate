@@ -67,7 +67,7 @@ export default function RankingsPage() {
       <header className="hbtf-header">
         <div>
           <div className="hbtf-logo-eyebrow">
-            <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>{isAr ? 'الرئيسية' : 'Rapid Intelligence'}</a>
+            <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>{isAr ? 'الرئيسية' : 'convo.finance'}</a>
             {' / '}{T.rankings}
           </div>
           <div className="hbtf-logo-title">{T.sectorRankings}</div>
