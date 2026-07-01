@@ -309,7 +309,7 @@ export default function BankPage() {
         <div className="max-w-[1400px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => router.push('/')}
+              onClick={() => router.push('/banks')}
               className="text-[#9CA3AF] hover:text-white transition-colors text-[13px]"
             >
               ← All banks
