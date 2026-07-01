@@ -74,7 +74,7 @@ export default function NewsPage() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: t.bg, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', color: t.text }}>
       {/* Header */}
-      <header style={{ backgroundColor: 'color-mix(in srgb, var(--cf-surface) 88%, transparent)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${t.border}`, position: 'sticky', top: 0, zIndex: 100 }}>
+      <header style={{ backgroundColor: 'var(--cf-surface)', borderBottom: `1px solid ${t.border}`, position: 'relative' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             
