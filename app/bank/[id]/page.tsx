@@ -175,7 +175,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
                   <Tooltip
                     contentStyle={{ backgroundColor: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: 8 }}
                     labelStyle={{ color: 'var(--cf-gold)' }}
-                    itemStyle={{ color: '#fff' }}
+                    itemStyle={{ color: 'var(--cf-ink)' }}
                   />
                   <Legend />
                   {chartData.series.map((s: string, i: number) => (
@@ -190,7 +190,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
                   <Tooltip
                     contentStyle={{ backgroundColor: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: 8 }}
                     labelStyle={{ color: 'var(--cf-gold)' }}
-                    itemStyle={{ color: '#fff' }}
+                    itemStyle={{ color: 'var(--cf-ink)' }}
                   />
                   <Legend />
                   {chartData.series.map((s: string, i: number) => (
@@ -342,9 +342,7 @@ export default function BankPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--cf-bg)] text-white">
-      <style dangerouslySetInnerHTML={{ __html: '[class*="bg-[var(--cf-surface)]"]{background:#fff!important;border:1px solid var(--cf-line)!important;border-radius:14px!important;box-shadow:0 1px 2px rgba(12,48,87,.04),0 4px 16px rgba(12,48,87,.05)!important}[class*="bg-[var(--cf-bg)]"]{background:var(--cf-surface)!important}[class*="bg-[var(--cf-line)]"]{background:var(--cf-surface2)!important}[class*="border-[var(--cf-line)]"]{border-color:var(--cf-line)!important}[class*="text-[var(--cf-ink2)]"]{color:var(--cf-ink2)!important}[class*="text-[var(--cf-ink2)]"]{color:var(--cf-ink2)!important}[class*="text-[var(--cf-gold)]"]{color:var(--cf-gold)!important}button{-webkit-appearance:none!important;appearance:none!important;font-family:inherit!important;cursor:pointer!important;transition:all .15s ease!important}button[class*="border"]{background:#fff!important;border:1px solid var(--cf-line)!important;border-radius:10px!important;padding:7px 14px!important;color:var(--cf-primary)!important;font-weight:600!important}button[class*="border"]:hover{border-color:var(--cf-primary)!important;color:var(--cf-primary)!important;background:var(--cf-surface)!important}button[class*="rounded-full"]{border-radius:999px!important;padding:6px 13px!important;background:var(--cf-surface)!important;border:1px solid var(--cf-line)!important;color:var(--cf-primary)!important;font-weight:500!important}button[class*="rounded-full"]:hover{background:var(--cf-primary-soft)!important;border-color:var(--cf-primary)!important;color:var(--cf-primary)!important}button[type="submit"],button[class*="D9CC9E"]{background:var(--cf-primary)!important;color:#fff!important;border:none!important;border-radius:10px!important;padding:11px 20px!important;font-weight:600!important;box-shadow:0 2px 10px rgba(12,48,87,.18)!important}button[type="submit"]:hover,button[class*="D9CC9E"]:hover{background:var(--cf-primary)!important}input,textarea{-webkit-appearance:none!important;appearance:none!important;font-family:inherit!important;border:1px solid var(--cf-line)!important;border-radius:10px!important;padding:11px 14px!important;background:#fff!important;color:var(--cf-primary)!important;outline:none!important}input:focus,textarea:focus{border-color:var(--cf-primary)!important;box-shadow:0 0 0 3px rgba(31,111,235,.12)!important}' }} />
-
+    <div className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-ink)]">
       {/* ── Header ── */}
       <header className="border-b border-[var(--cf-line)] px-6 py-4">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between">
