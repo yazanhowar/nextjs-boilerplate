@@ -261,10 +261,7 @@ export default function ProductsPage() {
           </div>
           <div className="hbtf-logo-title">{isAr ? 'مقارنة المنتجات المصرفية' : 'Banking Product Comparison'}</div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <a href="/" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textDecoration: 'none' }}>← {isAr ? 'الرئيسية' : 'Dashboard'}</a>
-          <LangToggle /><ThemeToggle />
-        </div>
+        
       </header>
 
       <div style={{ padding: '1.75rem 2rem', maxWidth: '1600px', margin: '0 auto' }}>
