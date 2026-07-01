@@ -36,12 +36,12 @@ function fmtJOD(n: number | null | undefined, bankId?: number): string {
 function CompareContent() {
   useEffect(function () {
     try {
-      var ov = [['bg-[var(--cf-bg)]','background-color','var(--cf-surface)'],['bg-[var(--cf-surface)]','background-color','#FFFFFF'],['bg-[var(--cf-surface2)]','background-color','var(--cf-surface2)'],['border-[var(--cf-line)]','border-color','var(--cf-line)'],['text-[var(--cf-ink2)]','color','var(--cf-ink2)'],['text-[var(--cf-gold)]','color','var(--cf-gold)'],['text-[var(--cf-positive)]','color','var(--cf-positive)'],['text-white','color','var(--cf-ink)']];
+      var ov = [['bg-[var(--cf-bg)]','background-color','var(--cf-surface)'],['bg-[var(--cf-surface)]','background-color','var(--cf-surface)'],['bg-[var(--cf-surface2)]','background-color','var(--cf-surface2)'],['border-[var(--cf-line)]','border-color','var(--cf-line)'],['text-[var(--cf-ink2)]','color','var(--cf-ink2)'],['text-[var(--cf-gold)]','color','var(--cf-gold)'],['text-[var(--cf-positive)]','color','var(--cf-positive)'],['text-white','color','var(--cf-ink)']];
       var css = '';
       for (var i = 0; i < ov.length; i++) { css += 'html:not(.dark) .' + CSS.escape(ov[i][0]) + '{' + ov[i][1] + ':' + ov[i][2] + ' !important}'; }
-      css += 'html:not(.dark) .' + CSS.escape('bg-[var(--cf-primary)]') + '.' + CSS.escape('text-white') + '{color:#FFFFFF !important}';
-      css += 'html:not(.dark) .' + CSS.escape('placeholder-[#4A5568]') + '::placeholder{color:#94A3B8 !important}';
-      css += 'html:not(.dark) .' + CSS.escape('hover:bg-[var(--cf-surface)]') + ':hover{background-color:#EEF2F8 !important}';
+      css += 'html:not(.dark) .' + CSS.escape('bg-[var(--cf-primary)]') + '.' + CSS.escape('text-white') + '{color:var(--cf-ink) !important}';
+      css += 'html:not(.dark) .' + CSS.escape('placeholder-[#4A5568]') + '::placeholder{color:var(--cf-ink3) !important}';
+      css += 'html:not(.dark) .' + CSS.escape('hover:bg-[var(--cf-surface)]') + ':hover{background-color:var(--cf-surface2) !important}';
       var st = document.createElement('style'); st.setAttribute('data-cmp-light', '1'); st.textContent = css; document.head.appendChild(st);
       return function () { if (st && st.parentNode) { st.parentNode.removeChild(st); } };
     } catch (e) {}
@@ -236,7 +236,7 @@ function CompareContent() {
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" />
                       <XAxis dataKey="name" stroke="var(--cf-ink2)" tick={{ fontSize: 11 }} />
                       <YAxis stroke="var(--cf-ink2)" tick={{ fontSize: 11 }} />
-                      <Tooltip contentStyle={{ backgroundColor: 'var(--cf-surface)', border: '1px solid #1E3450', borderRadius: 8 }}
+                      <Tooltip contentStyle={{ backgroundColor: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: 8 }}
                                labelStyle={{ color: 'var(--cf-gold)' }} itemStyle={{ color: '#fff' }} />
                       <Legend />
                       {chartData.series.map((s: string, i: number) => (
@@ -248,7 +248,7 @@ function CompareContent() {
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" />
                       <XAxis dataKey="name" stroke="var(--cf-ink2)" tick={{ fontSize: 11 }} />
                       <YAxis stroke="var(--cf-ink2)" tick={{ fontSize: 11 }} />
-                      <Tooltip contentStyle={{ backgroundColor: 'var(--cf-surface)', border: '1px solid #1E3450', borderRadius: 8 }}
+                      <Tooltip contentStyle={{ backgroundColor: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: 8 }}
                                labelStyle={{ color: 'var(--cf-gold)' }} itemStyle={{ color: '#fff' }} />
                       <Legend />
                       {chartData.series.map((s: string, i: number) => (
