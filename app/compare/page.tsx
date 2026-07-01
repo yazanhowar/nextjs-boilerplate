@@ -15,7 +15,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-const CHART_COLORS = ['#004D8F', '#CEBA95', '#2ECC71', '#E05252', '#8B9AB0', '#F39C12']
+const CHART_COLORS = ['var(--cf-primary)', 'var(--cf-gold)', 'var(--cf-positive)', 'var(--cf-negative)', 'var(--cf-ink2)', 'var(--cf-gold)']
 
 // DB values stored in THOUSANDS. Arab Bank (id=1) = USD thousands, others = JOD thousands.
 const ARAB_BANK_ID = 1
@@ -36,12 +36,12 @@ function fmtJOD(n: number | null | undefined, bankId?: number): string {
 function CompareContent() {
   useEffect(function () {
     try {
-      var ov = [['bg-[#0A1628]','background-color','#F7F9FC'],['bg-[#0F1E35]','background-color','#FFFFFF'],['bg-[#1E3450]','background-color','#EEF2F8'],['border-[#1E3450]','border-color','#E2E8F0'],['text-[#8B9AB0]','color','#5B6B82'],['text-[#CEBA95]','color','#9A7B45'],['text-[#2ECC71]','color','#15803D'],['text-white','color','#16243B']];
+      var ov = [['bg-[var(--cf-bg)]','background-color','var(--cf-surface)'],['bg-[var(--cf-surface)]','background-color','#FFFFFF'],['bg-[var(--cf-surface2)]','background-color','var(--cf-surface2)'],['border-[var(--cf-line)]','border-color','var(--cf-line)'],['text-[var(--cf-ink2)]','color','var(--cf-ink2)'],['text-[var(--cf-gold)]','color','var(--cf-gold)'],['text-[var(--cf-positive)]','color','var(--cf-positive)'],['text-white','color','var(--cf-ink)']];
       var css = '';
       for (var i = 0; i < ov.length; i++) { css += 'html:not(.dark) .' + CSS.escape(ov[i][0]) + '{' + ov[i][1] + ':' + ov[i][2] + ' !important}'; }
-      css += 'html:not(.dark) .' + CSS.escape('bg-[#004D8F]') + '.' + CSS.escape('text-white') + '{color:#FFFFFF !important}';
+      css += 'html:not(.dark) .' + CSS.escape('bg-[var(--cf-primary)]') + '.' + CSS.escape('text-white') + '{color:#FFFFFF !important}';
       css += 'html:not(.dark) .' + CSS.escape('placeholder-[#4A5568]') + '::placeholder{color:#94A3B8 !important}';
-      css += 'html:not(.dark) .' + CSS.escape('hover:bg-[#132240]') + ':hover{background-color:#EEF2F8 !important}';
+      css += 'html:not(.dark) .' + CSS.escape('hover:bg-[var(--cf-surface)]') + ':hover{background-color:#EEF2F8 !important}';
       var st = document.createElement('style'); st.setAttribute('data-cmp-light', '1'); st.textContent = css; document.head.appendChild(st);
       return function () { if (st && st.parentNode) { st.parentNode.removeChild(st); } };
     } catch (e) {}
@@ -113,7 +113,7 @@ function CompareContent() {
     if (!chartRef.current) return
     const { default: html2canvas } = await import('html2canvas')
     const { jsPDF } = await import('jspdf')
-    const canvas = await html2canvas(chartRef.current, { backgroundColor: '#0A1628' })
+    const canvas = await html2canvas(chartRef.current, { backgroundColor: 'var(--cf-bg)' })
     const imgData = canvas.toDataURL('image/png')
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] })
     pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height)
@@ -145,8 +145,8 @@ function CompareContent() {
   const latest2025 = (bankId: number) => financials[bankId]?.find(f => f.fiscal_year === 2025)
 
   return (
-    <div className="min-h-screen bg-[#0A1628] text-white">
-      <header className="border-b border-[#1E3450] px-6 py-4 flex items-center gap-4">
+    <div className="min-h-screen bg-[var(--cf-bg)] text-white">
+      <header className="border-b border-[var(--cf-line)] px-6 py-4 flex items-center gap-4">
         
         
         <div className="font-bold text-white">Compare Banks</div>
@@ -156,7 +156,7 @@ function CompareContent() {
 
         {/* Bank selector */}
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-[#8B9AB0] mb-3">
+          <div className="text-[11px] uppercase tracking-wider text-[var(--cf-ink2)] mb-3">
             Select banks to compare (up to 6)
           </div>
           <div className="flex flex-wrap gap-2">
@@ -166,8 +166,8 @@ function CompareContent() {
                 onClick={() => toggleBank(bank.id)}
                 className={`px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all border
                   ${selectedBanks.includes(bank.id)
-                    ? 'bg-[#004D8F] text-white border-[#004D8F]'
-                    : 'bg-transparent text-[#8B9AB0] border-[#1E3450] hover:border-[#004D8F]'
+                    ? 'bg-[var(--cf-primary)] text-white border-[var(--cf-primary)]'
+                    : 'bg-transparent text-[var(--cf-ink2)] border-[var(--cf-line)] hover:border-[var(--cf-primary)]'
                   }`}
               >
                 {bank.shortName}
@@ -177,9 +177,9 @@ function CompareContent() {
         </div>
 
         {/* AI Chart prompt */}
-        <div className="bg-[#0F1E35] border border-[#1E3450] rounded-xl p-6">
+        <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-[#CEBA95]">{'\u26A1'}</span>
+            <span className="text-[var(--cf-gold)]">{'\u26A1'}</span>
             <span className="font-semibold text-white">Generate a chart</span>
           </div>
 
@@ -194,8 +194,8 @@ function CompareContent() {
               'Who has the strongest capital ratio?',
             ].map(ex => (
               <button key={ex} onClick={() => setPrompt(ex)}
-                className="text-[11px] px-3 py-1.5 rounded-full border border-[#1E3450]
-                           text-[#8B9AB0] hover:border-[#CEBA95] hover:text-[#CEBA95] transition-colors">
+                className="text-[11px] px-3 py-1.5 rounded-full border border-[var(--cf-line)]
+                           text-[var(--cf-ink2)] hover:border-[var(--cf-gold)] hover:text-[var(--cf-gold)] transition-colors">
                 {ex}
               </button>
             ))}
@@ -206,38 +206,38 @@ function CompareContent() {
               value={prompt}
               onChange={e => setPrompt(e.target.value)}
               placeholder="e.g. Compare deposit rates, Compare credit card fees, Who grew profits fastest?"
-              className="flex-1 bg-[#0A1628] border border-[#1E3450] rounded-lg px-4 py-3
+              className="flex-1 bg-[var(--cf-bg)] border border-[var(--cf-line)] rounded-lg px-4 py-3
                          text-[13px] text-white placeholder-[#4A5568]
-                         focus:outline-none focus:border-[#CEBA95] transition-colors"
+                         focus:outline-none focus:border-[var(--cf-gold)] transition-colors"
             />
             <button type="submit" disabled={loading}
-              className="bg-[#CEBA95] text-[#0A1628] font-semibold text-[13px]
-                         px-6 py-3 rounded-lg hover:bg-[#D9CC9E] disabled:opacity-50 transition-colors">
+              className="bg-[var(--cf-gold)] text-[var(--cf-ink)] font-semibold text-[13px]
+                         px-6 py-3 rounded-lg hover:bg-[var(--cf-gold)] disabled:opacity-50 transition-colors">
               {loading ? 'Generating...' : 'Generate'}
             </button>
           </form>
 
-          {error && <div className="mt-4 text-[#E05252] text-[13px]">{error}</div>}
+          {error && <div className="mt-4 text-[var(--cf-negative)] text-[13px]">{error}</div>}
 
           {chartData && (
             <div className="mt-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="text-[14px] font-semibold text-white">{chartData.title}</div>
                 <button onClick={exportPDF}
-                  className="text-[11px] px-3 py-1.5 rounded-lg border border-[#1E3450]
-                             text-[#8B9AB0] hover:border-[#CEBA95] hover:text-[#CEBA95] transition-colors">
+                  className="text-[11px] px-3 py-1.5 rounded-lg border border-[var(--cf-line)]
+                             text-[var(--cf-ink2)] hover:border-[var(--cf-gold)] hover:text-[var(--cf-gold)] transition-colors">
                   {'\u2193'} Export PDF
                 </button>
               </div>
-              <div ref={chartRef} className="bg-[#0A1628] rounded-xl p-4">
+              <div ref={chartRef} className="bg-[var(--cf-bg)] rounded-xl p-4">
                 <ResponsiveContainer width="100%" height={320}>
                   {chartData.type === 'bar' ? (
                     <BarChart data={chartData.data}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1E3450" />
-                      <XAxis dataKey="name" stroke="#8B9AB0" tick={{ fontSize: 11 }} />
-                      <YAxis stroke="#8B9AB0" tick={{ fontSize: 11 }} />
-                      <Tooltip contentStyle={{ backgroundColor: '#0F1E35', border: '1px solid #1E3450', borderRadius: 8 }}
-                               labelStyle={{ color: '#CEBA95' }} itemStyle={{ color: '#fff' }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" />
+                      <XAxis dataKey="name" stroke="var(--cf-ink2)" tick={{ fontSize: 11 }} />
+                      <YAxis stroke="var(--cf-ink2)" tick={{ fontSize: 11 }} />
+                      <Tooltip contentStyle={{ backgroundColor: 'var(--cf-surface)', border: '1px solid #1E3450', borderRadius: 8 }}
+                               labelStyle={{ color: 'var(--cf-gold)' }} itemStyle={{ color: '#fff' }} />
                       <Legend />
                       {chartData.series.map((s: string, i: number) => (
                         <Bar key={s} dataKey={s} fill={CHART_COLORS[i % CHART_COLORS.length]} radius={[4, 4, 0, 0]} />
@@ -245,11 +245,11 @@ function CompareContent() {
                     </BarChart>
                   ) : (
                     <LineChart data={chartData.data}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1E3450" />
-                      <XAxis dataKey="name" stroke="#8B9AB0" tick={{ fontSize: 11 }} />
-                      <YAxis stroke="#8B9AB0" tick={{ fontSize: 11 }} />
-                      <Tooltip contentStyle={{ backgroundColor: '#0F1E35', border: '1px solid #1E3450', borderRadius: 8 }}
-                               labelStyle={{ color: '#CEBA95' }} itemStyle={{ color: '#fff' }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" />
+                      <XAxis dataKey="name" stroke="var(--cf-ink2)" tick={{ fontSize: 11 }} />
+                      <YAxis stroke="var(--cf-ink2)" tick={{ fontSize: 11 }} />
+                      <Tooltip contentStyle={{ backgroundColor: 'var(--cf-surface)', border: '1px solid #1E3450', borderRadius: 8 }}
+                               labelStyle={{ color: 'var(--cf-gold)' }} itemStyle={{ color: '#fff' }} />
                       <Legend />
                       {chartData.series.map((s: string, i: number) => (
                         <Line key={s} type="monotone" dataKey={s}
@@ -260,7 +260,7 @@ function CompareContent() {
                   )}
                 </ResponsiveContainer>
                 {chartData.insight && (
-                  <div className="mt-4 p-3 bg-[#CEBA95]/10 border border-[#CEBA95]/20 rounded-lg text-[12px] text-[#CEBA95]">
+                  <div className="mt-4 p-3 bg-[var(--cf-gold)]/10 border border-[var(--cf-gold)]/20 rounded-lg text-[12px] text-[var(--cf-gold)]">
                     {'\uD83D\uDCA1'} {chartData.insight}
                   </div>
                 )}
@@ -270,22 +270,22 @@ function CompareContent() {
         </div>
 
         {/* Side-by-side table */}
-        <div className="bg-[#0F1E35] border border-[#1E3450] rounded-xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#1E3450]">
-            <div className="text-[12px] uppercase tracking-wider text-[#8B9AB0]">
+        <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-[var(--cf-line)]">
+            <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)]">
               FY2025 Side-by-side Comparison
             </div>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-[13px]">
               <thead>
-                <tr className="border-b border-[#1E3450]">
-                  <th className="text-start px-5 py-3 text-[#8B9AB0] font-medium">Metric</th>
+                <tr className="border-b border-[var(--cf-line)]">
+                  <th className="text-start px-5 py-3 text-[var(--cf-ink2)] font-medium">Metric</th>
                   {selectedBanks.map(id => {
                     const bank = BANKS.find(b => b.id === id)!
                     return (
                       <th key={id} className="text-end px-5 py-3 font-medium">
-                        <span className={bank.isHBTF ? 'text-[#CEBA95]' : 'text-white'}>
+                        <span className={bank.isHBTF ? 'text-[var(--cf-gold)]' : 'text-white'}>
                           {bank.shortName}
                         </span>
                       </th>
@@ -299,14 +299,14 @@ function CompareContent() {
                   const maxVal = Math.max(...values.filter(v => v != null) as number[])
 
                   return (
-                    <tr key={row.key} className="border-b border-[#1E3450] hover:bg-[#132240] transition-colors">
-                      <td className="px-5 py-3 text-[#8B9AB0]">{row.label}</td>
+                    <tr key={row.key} className="border-b border-[var(--cf-line)] hover:bg-[var(--cf-surface)] transition-colors">
+                      <td className="px-5 py-3 text-[var(--cf-ink2)]">{row.label}</td>
                       {selectedBanks.map((id, i) => {
                         const val = values[i]
                         const isMax = val === maxVal && val != null
                         return (
                           <td key={id} className={`px-5 py-3 text-end font-medium
-                            ${isMax ? 'text-[#2ECC71]' : 'text-white'}`}>
+                            ${isMax ? 'text-[var(--cf-positive)]' : 'text-white'}`}>
                             {val != null ? row.format(val, id) : '\u2014'}
                           </td>
                         )
@@ -325,7 +325,7 @@ function CompareContent() {
 
 export default function ComparePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#0A1628] flex items-center justify-center text-white">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[var(--cf-bg)] flex items-center justify-center text-white">Loading...</div>}>
       <CompareContent />
     </Suspense>
   )
