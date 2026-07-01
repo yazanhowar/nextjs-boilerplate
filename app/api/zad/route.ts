@@ -21,10 +21,8 @@ async function buildKnowledge(){
   var abj = abjRes.data || [];
   var bmap = {};
   banks.forEach(function(b){ bmap[b.id] = b; });
-  var latestFin = {};
-  fins.forEach(function(f){ var cur = latestFin[f.bank_id]; if(!cur || (f.fiscal_year||0) > (cur.fiscal_year||0)) latestFin[f.bank_id] = f; });
-  fins = Object.keys(latestFin).map(function(k){ return latestFin[k]; });
-  fins.sort(function(a,b){ return (jod(b.total_assets,b.currency)||0) - (jod(a.total_assets,a.currency)||0); });
+  fins.sort(function(a,b){ return (a.bank_id - b.bank_id) || ((b.fiscal_year||0) - (a.fiscal_year||0)); });
+  
   var lines = [];
   fins.forEach(function(f){
     var b = bmap[f.bank_id] || {};
