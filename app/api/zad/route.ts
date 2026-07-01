@@ -15,6 +15,7 @@ async function buildKnowledge(){
   var banksRes = await sb.from('banks').select('id,name_en,name_ar,ticker,bank_type').order('id');
   var finRes = await sb.from('bank_financials').select('bank_id,fiscal_year,total_assets,customer_deposits,net_loans,total_equity,net_profit,roe,roa,car,npl_ratio,loan_to_deposit,currency').order('bank_id', { ascending: true }).order('fiscal_year', { ascending: true });
   var abjRes = await sb.from('abj_sector_indicators').select('metric,data_period,value,unit').eq('category', 'balance_sheet').order('data_period', { ascending: false });
+  var prodRes = await sb.from('bank_products').select('bank_id,category,sub_category,product_name_en').eq('is_active', true).order('bank_id');
   var banks = banksRes.data || [];
   var fins = finRes.data || [];
   var abj = abjRes.data || [];
@@ -58,7 +59,13 @@ async function buildKnowledge(){
   }
   var abjStr = 'OFFICIAL ABJ SECTOR AGGREGATE (source: Association of Banks in Jordan; authoritative basis for any whole-sector question; as of ' + (latestPeriod||'latest') + '): total assets JOD ' + av('total_assets') + 'B, total deposits JOD ' + av('total_deposits') + 'B, total credit facilities JOD ' + av('total_credit_facilities') + 'B. For any sector-wide or ABJ figure use THESE numbers. Do NOT sum the individual banks below for a sector total, because Arab Bank is stored at its global consolidated balance sheet (USD) and over-counts the Jordanian sector.' + ewSentence;
   var perBank = 'PER-BANK FY2025 (group consolidated; normalized to JOD; Arab Bank converted from USD at ' + PEG + '):\n' + lines.join('\n');
-  return perBank + '\n\n' + abjStr;
+  var prods = prodRes.data || [];
+  var pByBank = {};
+  prods.forEach(function(p){ var id = p.bank_id; (pByBank[id] = pByBank[id] || []).push(p.product_name_en + ' [' + (p.sub_category || p.category || '') + ']'); });
+  var prodLines = [];
+  Object.keys(pByBank).forEach(function(id){ var b = bmap[id] || {}; var nm = b.name_en || ('Bank ' + id); prodLines.push('- ' + nm + ' (' + pByBank[id].length + ' products): ' + pByBank[id].join('; ')); });
+  var prodStr = prodLines.length ? ('BANKING PRODUCTS PER BANK (source: each bank official website; product availability/catalogue only, no pricing or interest rates): ' + prodLines.join('\n')) : '';
+  return perBank + '\n\n' + abjStr + (prodStr ? ('\n\n' + prodStr) : '');
 }
 
 function buildSystem(knowledge){
