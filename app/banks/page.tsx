@@ -76,6 +76,8 @@ export default function Dashboard() {
     localStorage.setItem('hbtf-theme', next ? 'dark' : 'light')
   }
 
+  const cfNorm = (r: any) => { if (r && r.currency === 'USD' && !r.__cfJod) { const F = ['total_assets','net_profit','customer_deposits','net_loans','total_equity','operating_income','net_interest_income','gross_loans','total_liabilities']; F.forEach((k) => { if (typeof r[k] === 'number') r[k] = r[k] * 0.709 }); r.__cfJod = true } return r }
+
   useEffect(() => {
     setLoading(true)
     async function load() {
@@ -86,12 +88,12 @@ export default function Dashboard() {
       ])
       if (curr.data && curr.data.length > 0) {
         const m: Record<number,any> = {}
-        curr.data.forEach((r: any) => { m[r.bank_id] = r })
+        curr.data.forEach((r: any) => { m[r.bank_id] = cfNorm(r) })
         setFinancials(m); setDataYear(selectedYear)
       }
       if (prev.data) {
         const m: Record<number,any> = {}
-        prev.data.forEach((r: any) => { m[r.bank_id] = r })
+        prev.data.forEach((r: any) => { m[r.bank_id] = cfNorm(r) })
         setPrevFinancials(m)
       }
       setLoading(false)
