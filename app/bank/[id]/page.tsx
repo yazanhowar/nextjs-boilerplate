@@ -35,8 +35,8 @@ function pct(n: number | null | undefined): string {
 }
 
 function deltaColor(n: number | null | undefined): string {
-  if (n == null) return 'text-[#9CA3AF]'
-  return n >= 0 ? 'text-[#2ECC71]' : 'text-[#E05252]'
+  if (n == null) return 'text-[var(--cf-ink2)]'
+  return n >= 0 ? 'text-[var(--cf-positive)]' : 'text-[var(--cf-negative)]'
 }
 
 function deltaSign(n: number | null | undefined): string {
@@ -44,7 +44,7 @@ function deltaSign(n: number | null | undefined): string {
   return n >= 0 ? '↑' : '↓'
 }
 
-const CHART_COLORS = ['#004D8F', '#CEBA95', '#2ECC71', '#E05252', '#9CA3AF', '#F39C12']
+const CHART_COLORS = ['var(--cf-primary)', 'var(--cf-gold)', 'var(--cf-positive)', 'var(--cf-negative)', 'var(--cf-ink2)', 'var(--cf-gold)']
 
 // ─── Section tabs ─────────────────────────────────────────────────────────────
 const TABS = [
@@ -99,7 +99,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
     if (!chartRef.current) return
     const { default: html2canvas } = await import('html2canvas')
     const { jsPDF } = await import('jspdf')
-    const canvas = await html2canvas(chartRef.current, { backgroundColor: '#1a1a1a' })
+    const canvas = await html2canvas(chartRef.current, { backgroundColor: 'var(--cf-bg)' })
     const imgData = canvas.toDataURL('image/png')
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] })
     pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height)
@@ -107,9 +107,9 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
   }
 
   return (
-    <div className="bg-[#242424] border border-[#383838] rounded-xl p-6">
+    <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-6">
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-[#CEBA95] text-[18px]">⚡</span>
+        <span className="text-[var(--cf-gold)] text-[18px]">⚡</span>
         <span className="font-semibold text-white">Ask about {bankName}</span>
       </div>
 
@@ -119,8 +119,8 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
           <button
             key={ex}
             onClick={() => setPrompt(ex)}
-            className="text-[11px] px-3 py-1.5 rounded-full border border-[#383838]
-                       text-[#9CA3AF] hover:border-[#CEBA95] hover:text-[#CEBA95]
+            className="text-[11px] px-3 py-1.5 rounded-full border border-[var(--cf-line)]
+                       text-[var(--cf-ink2)] hover:border-[var(--cf-gold)] hover:text-[var(--cf-gold)]
                        transition-colors"
           >
             {ex}
@@ -133,15 +133,15 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
           placeholder={`e.g. "Compare ${bankName} loan rates vs market average"`}
-          className="flex-1 bg-[#1a1a1a] border border-[#383838] rounded-lg px-4 py-3
-                     text-[13px] text-white placeholder-[#4A5568]
-                     focus:outline-none focus:border-[#CEBA95] transition-colors"
+          className="flex-1 bg-[var(--cf-bg)] border border-[var(--cf-line)] rounded-lg px-4 py-3
+                     text-[13px] text-white placeholder-[var(--cf-ink3)]
+                     focus:outline-none focus:border-[var(--cf-gold)] transition-colors"
         />
         <button
           type="submit"
           disabled={loading}
-          className="bg-[#CEBA95] text-[#0A1628] font-semibold text-[13px]
-                     px-5 py-3 rounded-lg hover:bg-[#D9CC9E] disabled:opacity-50
+          className="bg-[var(--cf-gold)] text-[var(--cf-bg)] font-semibold text-[13px]
+                     px-5 py-3 rounded-lg hover:bg-[var(--cf-gold)] disabled:opacity-50
                      transition-colors whitespace-nowrap"
         >
           {loading ? 'Generating...' : 'Generate chart'}
@@ -149,7 +149,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
       </form>
 
       {error && (
-        <div className="mt-4 text-[#E05252] text-[13px]">{error}</div>
+        <div className="mt-4 text-[var(--cf-negative)] text-[13px]">{error}</div>
       )}
 
       {chartData && (
@@ -158,23 +158,23 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
             <div className="text-[14px] font-semibold text-white">{chartData.title}</div>
             <button
               onClick={exportPDF}
-              className="text-[11px] px-3 py-1.5 rounded-lg border border-[#383838]
-                         text-[#9CA3AF] hover:border-[#CEBA95] hover:text-[#CEBA95]
+              className="text-[11px] px-3 py-1.5 rounded-lg border border-[var(--cf-line)]
+                         text-[var(--cf-ink2)] hover:border-[var(--cf-gold)] hover:text-[var(--cf-gold)]
                          transition-colors flex items-center gap-1.5"
             >
               ↓ Export PDF
             </button>
           </div>
-          <div ref={chartRef} className="bg-[#1a1a1a] rounded-xl p-4">
+          <div ref={chartRef} className="bg-[var(--cf-bg)] rounded-xl p-4">
             <ResponsiveContainer width="100%" height={300}>
               {chartData.type === 'bar' ? (
                 <BarChart data={chartData.data}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#383838" />
-                  <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
-                  <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" />
+                  <XAxis dataKey="name" stroke="var(--cf-ink2)" tick={{ fontSize: 11 }} />
+                  <YAxis stroke="var(--cf-ink2)" tick={{ fontSize: 11 }} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#242424', border: '1px solid #383838', borderRadius: 8 }}
-                    labelStyle={{ color: '#CEBA95' }}
+                    contentStyle={{ backgroundColor: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: 8 }}
+                    labelStyle={{ color: 'var(--cf-gold)' }}
                     itemStyle={{ color: '#fff' }}
                   />
                   <Legend />
@@ -184,12 +184,12 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
                 </BarChart>
               ) : (
                 <LineChart data={chartData.data}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#383838" />
-                  <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
-                  <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" />
+                  <XAxis dataKey="name" stroke="var(--cf-ink2)" tick={{ fontSize: 11 }} />
+                  <YAxis stroke="var(--cf-ink2)" tick={{ fontSize: 11 }} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#242424', border: '1px solid #383838', borderRadius: 8 }}
-                    labelStyle={{ color: '#CEBA95' }}
+                    contentStyle={{ backgroundColor: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: 8 }}
+                    labelStyle={{ color: 'var(--cf-gold)' }}
                     itemStyle={{ color: '#fff' }}
                   />
                   <Legend />
@@ -202,8 +202,8 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
               )}
             </ResponsiveContainer>
             {chartData.insight && (
-              <div className="mt-4 p-3 bg-[#CEBA95]/10 border border-[#CEBA95]/20 rounded-lg
-                              text-[12px] text-[#CEBA95]">
+              <div className="mt-4 p-3 bg-[var(--cf-gold)]/10 border border-[var(--cf-gold)]/20 rounded-lg
+                              text-[12px] text-[var(--cf-gold)]">
                 💡 {chartData.insight}
               </div>
             )}
@@ -259,11 +259,11 @@ function LoanCalculator() {
 export default function BankPage() {
   useEffect(function () {
     try {
-      var ov = [['bg-[#1a1a1a]','background-color','#F5F7FA'],['bg-[#242424]','background-color','#FFFFFF'],['bg-[#383838]','background-color','#EEF1F5'],['border-[#383838]','border-color','#E2E8F0'],['text-[#9CA3AF]','color','#5B6B82'],['text-[#6B7280]','color','#64748B'],['text-[#CBD5E0]','color','#475569'],['text-[#CEBA95]','color','#9A7B45'],['text-[#2ECC71]','color','#15803D'],['text-[#60A5FA]','color','#2563EB'],['text-white','color','#16243B']];
+      var ov = [['bg-[var(--cf-bg)]','background-color','var(--cf-surface)'],['bg-[var(--cf-surface)]','background-color','var(--cf-surface)'],['bg-[var(--cf-line)]','background-color','var(--cf-surface2)'],['border-[var(--cf-line)]','border-color','var(--cf-line)'],['text-[var(--cf-ink2)]','color','var(--cf-ink2)'],['text-[var(--cf-ink2)]','color','var(--cf-ink2)'],['text-[var(--cf-ink)]','color','var(--cf-ink2)'],['text-[var(--cf-gold)]','color','var(--cf-gold)'],['text-[var(--cf-positive)]','color','var(--cf-positive)'],['text-[var(--cf-primary)]','color','var(--cf-primary)'],['text-white','color','var(--cf-ink)']];
       var css = '';
       for (var i = 0; i < ov.length; i++) { css += 'html:not(.dark) .' + CSS.escape(ov[i][0]) + '{' + ov[i][1] + ':' + ov[i][2] + ' !important}'; }
-      css += 'html:not(.dark) .' + CSS.escape('placeholder-[#4A5568]') + '::placeholder{color:#94A3B8 !important}';
-      css += 'html:not(.dark) .' + CSS.escape('hover:bg-[#2a2a2a]') + ':hover{background-color:#EEF1F5 !important}';
+      css += 'html:not(.dark) .' + CSS.escape('placeholder-[var(--cf-ink3)]') + '::placeholder{color:var(--cf-ink3) !important}';
+      css += 'html:not(.dark) .' + CSS.escape('hover:bg-[var(--cf-surface2)]') + ':hover{background-color:var(--cf-surface2) !important}';
       var st = document.createElement('style'); st.setAttribute('data-bid-light', '1'); st.textContent = css; document.head.appendChild(st);
       return function () { if (st && st.parentNode) { st.parentNode.removeChild(st); } };
     } catch (e) {}
@@ -310,7 +310,7 @@ export default function BankPage() {
     load()
   }, [bankId])
 
-  if (!bank) return <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center text-white">Bank not found</div>
+  if (!bank) return <div className="min-h-screen bg-[var(--cf-bg)] flex items-center justify-center text-white">Bank not found</div>
 
   // Latest + previous financials for delta
   if (Number(bankId) === 1) { (financials || []).forEach(function (r) { if (r && !r.__cfJod) { ['total_assets','net_profit','customer_deposits','net_loans','total_equity'].forEach(function (k) { if (r[k] != null) r[k] = r[k] * 0.709; }); r.__cfJod = true; } }); }
@@ -342,38 +342,38 @@ export default function BankPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1a1a1a] text-white">
-      <style dangerouslySetInnerHTML={{ __html: '[class*="bg-[#242424]"]{background:#fff!important;border:1px solid #e6ecf3!important;border-radius:14px!important;box-shadow:0 1px 2px rgba(12,48,87,.04),0 4px 16px rgba(12,48,87,.05)!important}[class*="bg-[#1a1a1a]"]{background:#f4f7fa!important}[class*="bg-[#383838]"]{background:#eef2f7!important}[class*="border-[#383838]"]{border-color:#e7edf4!important}[class*="text-[#9CA3AF]"]{color:#5b6b82!important}[class*="text-[#6B7280]"]{color:#7286a0!important}[class*="text-[#D9CC9E]"]{color:#b8902f!important}button{-webkit-appearance:none!important;appearance:none!important;font-family:inherit!important;cursor:pointer!important;transition:all .15s ease!important}button[class*="border"]{background:#fff!important;border:1px solid #d8e0ea!important;border-radius:10px!important;padding:7px 14px!important;color:#0c3057!important;font-weight:600!important}button[class*="border"]:hover{border-color:#1f6feb!important;color:#1f6feb!important;background:#f7faff!important}button[class*="rounded-full"]{border-radius:999px!important;padding:6px 13px!important;background:#f4f7fb!important;border:1px solid #e1e8f0!important;color:#33526f!important;font-weight:500!important}button[class*="rounded-full"]:hover{background:#eaf2fd!important;border-color:#1f6feb!important;color:#1f6feb!important}button[type="submit"],button[class*="D9CC9E"]{background:#0c3057!important;color:#fff!important;border:none!important;border-radius:10px!important;padding:11px 20px!important;font-weight:600!important;box-shadow:0 2px 10px rgba(12,48,87,.18)!important}button[type="submit"]:hover,button[class*="D9CC9E"]:hover{background:#16406f!important}input,textarea{-webkit-appearance:none!important;appearance:none!important;font-family:inherit!important;border:1px solid #d8e0ea!important;border-radius:10px!important;padding:11px 14px!important;background:#fff!important;color:#0c3057!important;outline:none!important}input:focus,textarea:focus{border-color:#1f6feb!important;box-shadow:0 0 0 3px rgba(31,111,235,.12)!important}' }} />
+    <div className="min-h-screen bg-[var(--cf-bg)] text-white">
+      <style dangerouslySetInnerHTML={{ __html: '[class*="bg-[var(--cf-surface)]"]{background:#fff!important;border:1px solid var(--cf-line)!important;border-radius:14px!important;box-shadow:0 1px 2px rgba(12,48,87,.04),0 4px 16px rgba(12,48,87,.05)!important}[class*="bg-[var(--cf-bg)]"]{background:var(--cf-surface)!important}[class*="bg-[var(--cf-line)]"]{background:var(--cf-surface2)!important}[class*="border-[var(--cf-line)]"]{border-color:var(--cf-line)!important}[class*="text-[var(--cf-ink2)]"]{color:var(--cf-ink2)!important}[class*="text-[var(--cf-ink2)]"]{color:var(--cf-ink2)!important}[class*="text-[var(--cf-gold)]"]{color:var(--cf-gold)!important}button{-webkit-appearance:none!important;appearance:none!important;font-family:inherit!important;cursor:pointer!important;transition:all .15s ease!important}button[class*="border"]{background:#fff!important;border:1px solid var(--cf-line)!important;border-radius:10px!important;padding:7px 14px!important;color:var(--cf-primary)!important;font-weight:600!important}button[class*="border"]:hover{border-color:var(--cf-primary)!important;color:var(--cf-primary)!important;background:var(--cf-surface)!important}button[class*="rounded-full"]{border-radius:999px!important;padding:6px 13px!important;background:var(--cf-surface)!important;border:1px solid var(--cf-line)!important;color:var(--cf-primary)!important;font-weight:500!important}button[class*="rounded-full"]:hover{background:var(--cf-primary-soft)!important;border-color:var(--cf-primary)!important;color:var(--cf-primary)!important}button[type="submit"],button[class*="D9CC9E"]{background:var(--cf-primary)!important;color:#fff!important;border:none!important;border-radius:10px!important;padding:11px 20px!important;font-weight:600!important;box-shadow:0 2px 10px rgba(12,48,87,.18)!important}button[type="submit"]:hover,button[class*="D9CC9E"]:hover{background:var(--cf-primary)!important}input,textarea{-webkit-appearance:none!important;appearance:none!important;font-family:inherit!important;border:1px solid var(--cf-line)!important;border-radius:10px!important;padding:11px 14px!important;background:#fff!important;color:var(--cf-primary)!important;outline:none!important}input:focus,textarea:focus{border-color:var(--cf-primary)!important;box-shadow:0 0 0 3px rgba(31,111,235,.12)!important}' }} />
 
       {/* ── Header ── */}
-      <header className="border-b border-[#383838] px-6 py-4">
+      <header className="border-b border-[var(--cf-line)] px-6 py-4">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.push('/banks')}
-              className="text-[#9CA3AF] hover:text-white transition-colors text-[13px]"
+              className="text-[var(--cf-ink2)] hover:text-white transition-colors text-[13px]"
             >
               ← All banks
             </button>
-            <div className="w-px h-5 bg-[#383838]" />
+            <div className="w-px h-5 bg-[var(--cf-line)]" />
             <div className="flex items-center gap-3">
               <div style={{ width:36, height:36, borderRadius:8, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden', flexShrink:0 }}>
                 {!imgError ? (
                   <img src={bank.logoUrl} alt={bank.name} style={{ width:28, height:28, objectFit:'contain' }}
                     onError={() => setImgError(true)} />
                 ) : (
-                  <span style={{ fontSize:10, fontWeight:700, color:'#9CA3AF' }}>{bank.shortName.slice(0, 3)}</span>
+                  <span style={{ fontSize:10, fontWeight:700, color:'var(--cf-ink2)' }}>{bank.shortName.slice(0, 3)}</span>
                 )}
                 </div>
               <div>
                 <div className="font-bold text-white text-[16px]">{bank.name}</div>
-                <div className="text-[11px] text-[#9CA3AF]">
+                <div className="text-[11px] text-[var(--cf-ink2)]">
                   {bank.sector === 'islamic' ? 'Islamic Bank' : 'Commercial Bank'} · {bank.ticker} · ASE listed
                 </div>
               </div>
               {bank.isHBTF && (
-                <span className="text-[10px] font-semibold text-[#CEBA95] bg-[#CEBA95]/10
-                                 border border-[#CEBA95]/20 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-semibold text-[var(--cf-gold)] bg-[var(--cf-gold)]/10
+                                 border border-[var(--cf-gold)]/20 px-2 py-0.5 rounded-full">
                   OUR BANK
                 </span>
               )}
@@ -381,8 +381,8 @@ export default function BankPage() {
           </div>
           <button
             onClick={() => router.push(`/compare?bank=${bankId}`)}
-            className="text-[12px] px-4 py-2 rounded-lg border border-[#383838]
-                       text-[#9CA3AF] hover:border-[#CEBA95] hover:text-[#CEBA95] transition-colors"
+            className="text-[12px] px-4 py-2 rounded-lg border border-[var(--cf-line)]
+                       text-[var(--cf-ink2)] hover:border-[var(--cf-gold)] hover:text-[var(--cf-gold)] transition-colors"
           >
             Compare with another bank
           </button>
@@ -426,30 +426,30 @@ export default function BankPage() {
                 sub: 'FY2024 basic EPS',
               },
             ].map(kpi => (
-              <div key={kpi.label} className="bg-[#242424] border border-[#383838] rounded-xl p-4">
-                <div className="text-[10px] uppercase tracking-wider text-[#9CA3AF] mb-2">{kpi.label}</div>
+              <div key={kpi.label} className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-4">
+                <div className="text-[10px] uppercase tracking-wider text-[var(--cf-ink2)] mb-2">{kpi.label}</div>
                 <div className="text-[20px] font-bold text-white">{loading ? '...' : kpi.value}</div>
                 {kpi.delta != null && (
                   <div className={`text-[11px] font-medium mt-1 ${deltaColor(kpi.delta)}`}>
                     {deltaSign(kpi.delta)} {Math.abs(kpi.delta).toFixed(1)}% vs prior year
                   </div>
                 )}
-                <div className="text-[10px] text-[#6B7280] mt-1">{kpi.sub}</div>
+                <div className="text-[10px] text-[var(--cf-ink2)] mt-1">{kpi.sub}</div>
               </div>
             ))}
           </div>
         )}
 
         {/* ── Tab bar ── */}
-        <div className="flex gap-1 border-b border-[#383838] mb-6 overflow-x-auto">
+        <div className="flex gap-1 border-b border-[var(--cf-line)] mb-6 overflow-x-auto">
           {TABS.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2.5 text-[13px] font-medium whitespace-nowrap transition-colors border-b-2 -mb-px
                 ${activeTab === tab.id
-                  ? 'text-white border-[#CEBA95]'
-                  : 'text-[#9CA3AF] border-transparent hover:text-white'
+                  ? 'text-white border-[var(--cf-gold)]'
+                  : 'text-[var(--cf-ink2)] border-transparent hover:text-white'
                 }`}
             >
               {tab.label}
@@ -578,17 +578,17 @@ export default function BankPage() {
         {activeTab === 'financials' && (
           <div className="space-y-6">
             {/* Year-over-year table */}
-            <div className="bg-[#242424] border border-[#383838] rounded-xl overflow-hidden">
-              <div className="px-5 py-4 border-b border-[#383838]">
-                <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF]">Year-over-year comparison</div>
+            <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-[var(--cf-line)]">
+                <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)]">Year-over-year comparison</div>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-[13px]">
                   <thead>
-                    <tr className="border-b border-[#383838]">
-                      <th className="text-start px-5 py-3 text-[#9CA3AF] font-medium">Metric</th>
+                    <tr className="border-b border-[var(--cf-line)]">
+                      <th className="text-start px-5 py-3 text-[var(--cf-ink2)] font-medium">Metric</th>
                       {financials.map(f => (
-                        <th key={f.fiscal_year} className="text-end px-5 py-3 text-[#9CA3AF] font-medium">
+                        <th key={f.fiscal_year} className="text-end px-5 py-3 text-[var(--cf-ink2)] font-medium">
                           FY{f.fiscal_year}
                         </th>
                       ))}
@@ -606,8 +606,8 @@ export default function BankPage() {
                       { label: 'Capital Adequacy Ratio', key: 'car', format: pct },
                       { label: 'Bad Loan Ratio', key: 'npl_ratio', format: pct },
                     ].map(row => (
-                      <tr key={row.key} className="border-b border-[#383838] hover:bg-[#2a2a2a] transition-colors">
-                        <td className="px-5 py-3 text-[#9CA3AF]">{row.label}</td>
+                      <tr key={row.key} className="border-b border-[var(--cf-line)] hover:bg-[var(--cf-surface2)] transition-colors">
+                        <td className="px-5 py-3 text-[var(--cf-ink2)]">{row.label}</td>
                         {financials.map(f => (
                           <td key={f.fiscal_year} className="px-5 py-3 text-end text-white font-medium">
                             {row.format(f[row.key])}
@@ -621,8 +621,8 @@ export default function BankPage() {
             </div>
 
             {/* Assets vs Deposits chart */}
-            <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
-              <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">
+            <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
+              <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">
                 Assets & Deposits Growth (JOD billions)
               </div>
               <ResponsiveContainer width="100%" height={250}>
@@ -632,18 +632,18 @@ export default function BankPage() {
                   'Customer Deposits': Math.round((f.customer_deposits || 0) / 1_000_000),
                   'Loans': Math.round((f.net_loans || 0) / 1_000_000),
                 }))}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#383838" />
-                  <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
-                  <YAxis stroke="#9CA3AF" tick={{ fontSize: 11 }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" />
+                  <XAxis dataKey="name" stroke="var(--cf-ink2)" tick={{ fontSize: 11 }} />
+                  <YAxis stroke="var(--cf-ink2)" tick={{ fontSize: 11 }} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#242424', border: '1px solid #383838', borderRadius: 8 }}
-                    labelStyle={{ color: '#CEBA95' }}
+                    contentStyle={{ backgroundColor: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: 8 }}
+                    labelStyle={{ color: 'var(--cf-gold)' }}
                     formatter={(v: any) => [`JOD ${v}M`]}
                   />
                   <Legend />
-                  <Bar isAnimationActive={false} dataKey="Total Assets" fill="#004D8F" radius={[3, 3, 0, 0]} />
-                  <Bar isAnimationActive={false} dataKey="Customer Deposits" fill="#CEBA95" radius={[3, 3, 0, 0]} />
-                  <Bar isAnimationActive={false} dataKey="Loans" fill="#2ECC71" radius={[3, 3, 0, 0]} />
+                  <Bar isAnimationActive={false} dataKey="Total Assets" fill="var(--cf-primary)" radius={[3, 3, 0, 0]} />
+                  <Bar isAnimationActive={false} dataKey="Customer Deposits" fill="var(--cf-gold)" radius={[3, 3, 0, 0]} />
+                  <Bar isAnimationActive={false} dataKey="Loans" fill="var(--cf-positive)" radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -658,8 +658,8 @@ export default function BankPage() {
             {rates ? (
               <div className="grid grid-cols-2 gap-6">
                 {/* Lending rates */}
-                <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
-                  <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">Loan Interest Rates</div>
+                <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
+                  <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">Loan Interest Rates</div>
                   <div className="space-y-3">
                     {[
                       { label: 'Home Loans', min: rates.home_loan_min, max: rates.home_loan_max },
@@ -668,8 +668,8 @@ export default function BankPage() {
                       { label: 'Business Loans', min: rates.corporate_loan_min, max: rates.corporate_loan_max },
                     ].map(r => (
                       <div key={r.label} className="flex justify-between items-center py-2
-                                                      border-b border-[#383838] last:border-0">
-                        <span className="text-[13px] text-[#CBD5E0]">{r.label}</span>
+                                                      border-b border-[var(--cf-line)] last:border-0">
+                        <span className="text-[13px] text-[var(--cf-ink)]">{r.label}</span>
                         <span className="text-[13px] font-medium text-white">
                           {r.min && r.max ? `${r.min}% – ${r.max}%` :
                            r.min ? `From ${r.min}%` : '—'}
@@ -680,8 +680,8 @@ export default function BankPage() {
                 </div>
 
                 {/* Savings rates */}
-                <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
-                  <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">Deposit Interest Rates</div>
+                <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
+                  <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">Deposit Interest Rates</div>
                   <div className="space-y-3">
                     {[
                       { label: 'Savings Account', val: rates.saving_rate },
@@ -691,8 +691,8 @@ export default function BankPage() {
                       { label: '12-Month Term Deposit', val: rates.td_12m },
                     ].map(r => (
                       <div key={r.label} className="flex justify-between items-center py-2
-                                                      border-b border-[#383838] last:border-0">
-                        <span className="text-[13px] text-[#CBD5E0]">{r.label}</span>
+                                                      border-b border-[var(--cf-line)] last:border-0">
+                        <span className="text-[13px] text-[var(--cf-ink)]">{r.label}</span>
                         <span className="text-[13px] font-medium text-white">
                           {r.val != null ? `${r.val}%` : '—'}
                         </span>
@@ -705,7 +705,7 @@ export default function BankPage() {
                 {/* tariffs would go here */}
               </div>
             ) : (
-              <div className="text-[#9CA3AF] text-center py-12">No rate data available</div>
+              <div className="text-[var(--cf-ink2)] text-center py-12">No rate data available</div>
             )}
             <ChartPrompt bankId={bankId} bankName={bank.shortName} />
           </div>
@@ -715,18 +715,18 @@ export default function BankPage() {
         {activeTab === 'products' && (
           <div className="space-y-4">
             {productCategories.map(cat => (
-              <div key={cat} className="bg-[#242424] border border-[#383838] rounded-xl p-5">
-                <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">{cat.split('_').join(' ')}</div>
+              <div key={cat} className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
+                <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">{cat.split('_').join(' ')}</div>
                 <div className="grid grid-cols-2 gap-3">
                   {products.filter(p => p.category === cat).map((p, i) => (
-                    <div key={i} className="p-3 rounded-lg bg-[#1a1a1a] border border-[#383838]">
+                    <div key={i} className="p-3 rounded-lg bg-[var(--cf-bg)] border border-[var(--cf-line)]">
                       <div className="text-[13px] font-medium text-white">{p.product_name_en}</div>
                       {p.description_en && (
-                        <div className="text-[11px] text-[#9CA3AF] mt-1 line-clamp-2">{p.description_en}</div>
+                        <div className="text-[11px] text-[var(--cf-ink2)] mt-1 line-clamp-2">{p.description_en}</div>
                       )}
                       {p.is_islamic && (
-                        <span className="mt-2 inline-block text-[10px] text-[#2ECC71] bg-[#2ECC71]/10
-                                         border border-[#2ECC71]/20 px-2 py-0.5 rounded-full">
+                        <span className="mt-2 inline-block text-[10px] text-[var(--cf-positive)] bg-[var(--cf-positive)]/10
+                                         border border-[var(--cf-positive)]/20 px-2 py-0.5 rounded-full">
                           Sharia-compliant
                         </span>
                       )}
@@ -736,7 +736,7 @@ export default function BankPage() {
               </div>
             ))}
             {products.length === 0 && (
-              <div className="text-center py-12 text-[#9CA3AF]">No product data available</div>
+              <div className="text-center py-12 text-[var(--cf-ink2)]">No product data available</div>
             )}
           </div>
         )}
@@ -744,8 +744,8 @@ export default function BankPage() {
         {/* OWNERSHIP */}
         {activeTab === 'ownership' && (
           <div className="space-y-6">
-            <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
-              <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">
+            <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
+              <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">
                 Who owns {bank.shortName}
               </div>
               {ownership.length > 0 ? (
@@ -755,19 +755,19 @@ export default function BankPage() {
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-[13px] text-white">{o.shareholder_name_en}</span>
                         <div className="flex items-center gap-3">
-                          <span className="text-[11px] text-[#9CA3AF]">{o.country || ''}</span>
-                          <span className="text-[14px] font-bold text-[#CEBA95]">
+                          <span className="text-[11px] text-[var(--cf-ink2)]">{o.country || ''}</span>
+                          <span className="text-[14px] font-bold text-[var(--cf-gold)]">
                             {o.ownership_pct != null ? `${o.ownership_pct.toFixed(2)}%` : 'Controlling'}
                           </span>
                         </div>
                       </div>
                       {o.ownership_pct != null && (
-                        <div className="h-1.5 bg-[#383838] rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-[var(--cf-line)] rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-500"
                             style={{
                               width: `${Math.min(o.ownership_pct, 100)}%`,
-                              backgroundColor: bank.primaryColor || '#004D8F',
+                              backgroundColor: bank.primaryColor || 'var(--cf-primary)',
                             }}
                           />
                         </div>
@@ -776,7 +776,7 @@ export default function BankPage() {
                   ))}
                 </div>
               ) : (
-                <div className="text-[#9CA3AF] text-center py-8">No ownership data available</div>
+                <div className="text-[var(--cf-ink2)] text-center py-8">No ownership data available</div>
               )}
             </div>
           </div>
@@ -786,48 +786,48 @@ export default function BankPage() {
         {activeTab === 'governance' && (
           <div className="grid grid-cols-2 gap-6">
             {/* Executives */}
-            <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
-              <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">Executive Management</div>
+            <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
+              <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">Executive Management</div>
               <div className="space-y-3">
                 {executives.slice(0, 8).map((e, i) => (
-                  <div key={i} className="flex items-start gap-3 py-2 border-b border-[#383838] last:border-0">
-                    <div className="w-8 h-8 rounded-full bg-[#004D8F]/20 border border-[#004D8F]/30
+                  <div key={i} className="flex items-start gap-3 py-2 border-b border-[var(--cf-line)] last:border-0">
+                    <div className="w-8 h-8 rounded-full bg-[var(--cf-primary)]/20 border border-[var(--cf-primary)]/30
                                     flex items-center justify-center flex-shrink-0">
-                      <span className="text-[11px] font-bold text-[#004D8F]">
+                      <span className="text-[11px] font-bold text-[var(--cf-primary)]">
                         {e.full_name_en?.split(' ').map((n: string) => n[0]).slice(0, 2).join('')}
                       </span>
                     </div>
                     <div>
                       <div className="text-[13px] font-medium text-white">{e.full_name_en}</div>
-                      <div className="text-[11px] text-[#9CA3AF]">{e.title_en}</div>
+                      <div className="text-[11px] text-[var(--cf-ink2)]">{e.title_en}</div>
                     </div>
                   </div>
                 ))}
                 {executives.length === 0 && (
-                  <div className="text-[#9CA3AF] text-center py-6">No data available</div>
+                  <div className="text-[var(--cf-ink2)] text-center py-6">No data available</div>
                 )}
               </div>
             </div>
 
             {/* Board */}
-            <div className="bg-[#242424] border border-[#383838] rounded-xl p-5">
-              <div className="text-[12px] uppercase tracking-wider text-[#9CA3AF] mb-4">Board of Directors</div>
+            <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
+              <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">Board of Directors</div>
               <div className="space-y-3">
                 {boardMembers.slice(0, 12).map((b, i) => (
-                  <div key={i} className="flex items-start gap-3 py-2 border-b border-[#383838] last:border-0">
-                    <div className="w-8 h-8 rounded-full bg-[#CEBA95]/10 border border-[#CEBA95]/20
+                  <div key={i} className="flex items-start gap-3 py-2 border-b border-[var(--cf-line)] last:border-0">
+                    <div className="w-8 h-8 rounded-full bg-[var(--cf-gold)]/10 border border-[var(--cf-gold)]/20
                                     flex items-center justify-center flex-shrink-0">
-                      <span className="text-[11px] font-bold text-[#CEBA95]">
+                      <span className="text-[11px] font-bold text-[var(--cf-gold)]">
                         {b.full_name_en?.split(' ').map((n: string) => n[0]).slice(0, 2).join('')}
                       </span>
                     </div>
                     <div>
                       <div className="text-[13px] font-medium text-white">{b.full_name_en}</div>
-                      <div className="text-[11px] text-[#9CA3AF]">
+                      <div className="text-[11px] text-[var(--cf-ink2)]">
                         {b.role}
                         {b.is_independent && (
-                          <span className="ml-2 text-[10px] text-[#2ECC71] bg-[#2ECC71]/10
-                                           border border-[#2ECC71]/20 px-1.5 py-0 rounded-full">
+                          <span className="ml-2 text-[10px] text-[var(--cf-positive)] bg-[var(--cf-positive)]/10
+                                           border border-[var(--cf-positive)]/20 px-1.5 py-0 rounded-full">
                             Independent
                           </span>
                         )}
@@ -836,7 +836,7 @@ export default function BankPage() {
                   </div>
                 ))}
                 {boardMembers.length === 0 && (
-                  <div className="text-[#9CA3AF] text-center py-6">No data available</div>
+                  <div className="text-[var(--cf-ink2)] text-center py-6">No data available</div>
                 )}
               </div>
             </div>
@@ -847,41 +847,41 @@ export default function BankPage() {
         {activeTab === 'news' && (
           <div className="space-y-3">
             {announcements.map((a, i) => (
-              <div key={i} className="bg-[#242424] border border-[#383838] rounded-xl p-4 flex items-start gap-4">
+              <div key={i} className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-4 flex items-start gap-4">
                 <div className="text-center flex-shrink-0 w-12">
                   <div className="text-[18px] font-bold text-white">
                     {new Date(a.announcement_date).getDate()}
                   </div>
-                  <div className="text-[10px] text-[#9CA3AF] uppercase">
+                  <div className="text-[10px] text-[var(--cf-ink2)] uppercase">
                     {new Date(a.announcement_date).toLocaleDateString('en-GB', { month: 'short' })}
                   </div>
-                  <div className="text-[10px] text-[#6B7280]">
+                  <div className="text-[10px] text-[var(--cf-ink2)]">
                     {new Date(a.announcement_date).getFullYear()}
                   </div>
                 </div>
-                <div className="w-px bg-[#383838] self-stretch flex-shrink-0" />
+                <div className="w-px bg-[var(--cf-line)] self-stretch flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full
-                      ${a.category === 'financial_results' ? 'bg-[#004D8F]/20 text-[#60A5FA]' :
-                        a.category === 'dividend' ? 'bg-[#2ECC71]/20 text-[#2ECC71]' :
-                        a.category === 'agm' ? 'bg-[#CEBA95]/20 text-[#CEBA95]' :
+                      ${a.category === 'financial_results' ? 'bg-[var(--cf-primary)]/20 text-[var(--cf-primary)]' :
+                        a.category === 'dividend' ? 'bg-[var(--cf-positive)]/20 text-[var(--cf-positive)]' :
+                        a.category === 'agm' ? 'bg-[var(--cf-gold)]/20 text-[var(--cf-gold)]' :
                         a.category === 'leadership_change' ? 'bg-purple-500/20 text-purple-400' :
-                        'bg-[#383838] text-[#9CA3AF]'}`}>
+                        'bg-[var(--cf-line)] text-[var(--cf-ink2)]'}`}>
                       {catLabel[a.category] || a.category}
                     </span>
                     {a.fiscal_year && (
-                      <span className="text-[10px] text-[#6B7280]">FY{a.fiscal_year}</span>
+                      <span className="text-[10px] text-[var(--cf-ink2)]">FY{a.fiscal_year}</span>
                     )}
                   </div>
                   <div className="text-[14px] font-medium text-white">{a.headline_en}</div>
                   {a.summary_en && (
-                    <div className="text-[12px] text-[#9CA3AF] mt-1.5 line-clamp-2">{a.summary_en}</div>
+                    <div className="text-[12px] text-[var(--cf-ink2)] mt-1.5 line-clamp-2">{a.summary_en}</div>
                   )}
                 </div>
                 {a.source_url && (
                   <a href={a.source_url} target="_blank" rel="noopener"
-                     className="text-[11px] text-[#9CA3AF] hover:text-[#CEBA95] transition-colors
+                     className="text-[11px] text-[var(--cf-ink2)] hover:text-[var(--cf-gold)] transition-colors
                                 flex-shrink-0 mt-0.5">
                     Source →
                   </a>
@@ -889,7 +889,7 @@ export default function BankPage() {
               </div>
             ))}
             {announcements.length === 0 && (
-              <div className="text-center py-12 text-[#9CA3AF]">No announcements available</div>
+              <div className="text-center py-12 text-[var(--cf-ink2)]">No announcements available</div>
             )}
           </div>
         )}
