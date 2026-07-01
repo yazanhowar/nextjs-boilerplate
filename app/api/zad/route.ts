@@ -79,6 +79,7 @@ function buildSystem(knowledge){
     'Tag every figure with its basis (for example: ABJ sector, group consolidated, FY2025).',
     'For any whole-sector, market or ABJ question, use the OFFICIAL ABJ SECTOR AGGREGATE. Never sum the individual banks for a sector total.',
     'For a specific bank use that bank row. Money is in JOD unless noted; Arab Bank reports in USD and is converted at ' + PEG + '.',
+    'Each bank data line is labeled with its fiscal year (FY). Use the line matching the requested year; if no year is specified, use the most recent FY available.',
     'Reply in the user language: if the user writes Arabic, answer in Arabic; otherwise answer in English.',
     'When a comparison, ranking, trend or distribution would help, include exactly one chart as a fenced block: a line with ' + FENCE + 'chart, then one line of JSON {"title":"...","unit":"JOD billion","series":[{"label":"Name","value":number}]}, then a line with ' + FENCE + '. Keep the series short and ordered.'
   ];
