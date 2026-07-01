@@ -110,7 +110,7 @@ export default function TariffsPage() {
       <header className="hbtf-header">
         <div>
           <div className="hbtf-logo-eyebrow">
-            <a href="/">{isAr ? 'الرئيسية' : 'Rapid Intelligence'}</a>{' / '}{T.tariffs}
+            <a href="/">{isAr ? 'الرئيسية' : 'convo.finance'}</a>{' / '}{T.tariffs}
           </div>
           <div className="hbtf-logo-title">{T.feeComparison}</div>
         </div>
