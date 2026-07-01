@@ -44,6 +44,9 @@ async function buildKnowledge(){
   var aLatest = {};
   abj.forEach(function(r){ if(r.data_period===latestPeriod && aLatest[r.metric]===undefined) aLatest[r.metric]=r.value; });
   function av(m){ return (aLatest[m]!==null && aLatest[m]!==undefined) ? aLatest[m] : 'n/a'; }
+  var abjHist = {};
+  abj.forEach(function(r){ var p = String(r.data_period||''); if (p.indexOf('-12-') > 0 || r.data_period === latestPeriod) { (abjHist[r.metric] = abjHist[r.metric] || []).push({ p: p.slice(0,7), v: r.value, u: r.unit }); } });
+  Object.keys(abjHist).forEach(function(mm){ var pts = abjHist[mm].sort(function(a,b){ return a.p < b.p ? -1 : 1; }); var ser = pts.map(function(x){ return x.p + ': ' + x.v; }).join(', '); lines.push('- ABJ sector ' + mm + (pts[0] && pts[0].u ? ' (' + pts[0].u + ')' : '') + ' time series: ' + ser); });
   var ewRes = await sb.from('abj_sector_indicators').select('metric,data_period,value,unit').eq('category', 'ewallet').order('data_period', { ascending: false });
   var ewRows = (ewRes && ewRes.data) || [];
   var ewLatestPeriod = null; if (ewRows.length) { ewLatestPeriod = ewRows[0].data_period; }
@@ -73,7 +76,7 @@ function buildSystem(knowledge){
   var FENCE = String.fromCharCode(96,96,96);
   var rules = [
     'You are ZAD, a competitive banking-intelligence analyst for the Jordanian banking sector, built by convo.finance.',
-    'Answer using ONLY the DATA provided below. Never invent or estimate numbers; if something is not in the data, say it is not available.',
+    'Every FIGURE you state must come from the DATA below - never invent or estimate numbers. You ARE the analyst: when asked for drivers, causes, outlook or implications, give sharp qualitative analysis from your banking expertise. Never write disclaimers like "not available in the provided data" in analytical answers - analyze or omit.',
     'The product catalogue lists availability only, not pricing. If asked for a product interest rate, fee, or amount, state that specific pricing is not in the knowledge base rather than estimating.',
     'No filler, no flattery, no preamble. Lead with the direct answer, then brief supporting detail.',
     'Tag every figure with its basis (for example: ABJ sector, group consolidated, FY2025).',
@@ -81,7 +84,7 @@ function buildSystem(knowledge){
     'For a specific bank use that bank row. Money is in JOD unless noted; Arab Bank reports in USD and is converted at ' + PEG + '.',
     'Each bank data line is labeled with its fiscal year (FY). Use the line matching the requested year; if no year is specified, use the most recent FY available.',
     'Reply in the user language: if the user writes Arabic, answer in Arabic; otherwise answer in English.',
-    'When a comparison, ranking, trend or distribution would help, include exactly one chart as a fenced block: a line with ' + FENCE + 'chart, then one line of JSON {"title":"...","unit":"JOD billion","series":[{"label":"Name","value":number}]}, then a line with ' + FENCE + '. Keep the series short and ordered.'
+    'Include exactly one chart ONLY when the user asks for a chart, or the answer inherently compares 3 or more entities, or shows a multi-year/multi-period trend. NEVER chart a single figure - state it in text. The chart must contain exactly the metric, entities and periods the user asked about. Provide the chart as a fenced block: a line with ' + FENCE + 'chart, then one line of JSON {"title":"...","unit":"JOD billion","series":[{"label":"Name","value":number}]}, then a line with ' + FENCE + '. Keep the series short and ordered.'
   ];
   return rules.join('\n') + '\n\nDATA:\n' + knowledge;
 }
