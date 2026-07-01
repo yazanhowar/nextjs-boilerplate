@@ -635,7 +635,7 @@ export default function BankPage() {
               </ResponsiveContainer>
             </div>
 
-            <ChartPrompt bankId={bankId} bankName={bank.shortName} />
+            
           </div>
         )}
 
@@ -694,7 +694,7 @@ export default function BankPage() {
             ) : (
               <div className="text-[var(--cf-ink2)] text-center py-12">No rate data available</div>
             )}
-            <ChartPrompt bankId={bankId} bankName={bank.shortName} />
+            
           </div>
         )}
 
@@ -880,6 +880,8 @@ export default function BankPage() {
             )}
           </div>
         )}
+
+        <ChartPrompt bankId={bankId} bankName={bank.shortName} />
       </div>
     </div>
   )
