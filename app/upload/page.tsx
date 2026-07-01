@@ -7,6 +7,11 @@ export default function Page() {
   // Bilingual (EN/AR) for CBJ upload tool - defaults to English via cf_lang, with toggle
   useEffect(function () {
     var MAP = [
+      ["→ لوحة البنوك", "← Banks Dashboard"],
+      ["لوحة تنفيذية · بيانات فعلية", "Executive Dashboard · Actual Data"],
+      ["مولّدة من التقارير الرقابية المرفوعة · convo.finance", "Generated from the uploaded regulatory returns · convo.finance"],
+      ["اسحب ملفات النماذج الرقابية الخاصة بالبنك لشهرٍ واحد، وسيقوم المحرّك بقراءتها وتجميعها تلقائياً وتوليد لوحة المؤشرات التنفيذية من البيانات الفعلية.", "Drag the bank's regulatory return files for a single month; the engine reads and aggregates them automatically and generates the executive dashboard from actual data."],
+      ["تُعالَج الملفات بالكامل داخل المتصفّح ولا تُرفع إلى أي خادم. بما أنّ الرفع لشهرٍ واحد، تُعرَض لقطة أداء (دون اتجاهات أو نمو زمني).", "Files are processed entirely in your browser and are never uploaded to any server. Since the upload covers a single month, a performance snapshot is shown (no trends or time series)."],
       ["اسحب ملفات النماذج الرقابية الخاصة بالبنك لشهرٍ واحد، وسيقوم المحرّك بقراءتها وتجميعها تلقائياً وتوليد لوحة المؤشرات التنفيذية من البيانات الفعلية", "Drag the bank's regulatory return files for a single month; the engine reads and aggregates them automatically and generates the executive dashboard from actual data."],
       ["تُعالَج الملفات بالكامل داخل المتصفّح ولا تُرفع إلى أي خادم. بما أنّ الرفع لشهرٍ واحد، تُعرَض لقطة أداء (دون اتجاهات أو نمو زمني)", "Files are processed entirely in your browser and are never uploaded to any server. Since the upload covers a single month, a performance snapshot is shown (no trends or time series)."],
       ["يُقبل رفع عدة ملفات بصيغة xls. أو xlsx.", "Accepts multiple .xls or .xlsx files."],
