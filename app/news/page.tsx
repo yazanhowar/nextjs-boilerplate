@@ -28,9 +28,9 @@ const CAT_LABELS: Record<string,string> = {
   leadership_change: 'Leadership', strategic: 'Strategic', other: 'Other'
 }
 const CAT_COLORS: Record<string,string> = {
-  agm: '#0071E3', financial_results: '#34C759', dividend: '#FF9500', rating: '#AF52DE',
-  merger_acquisition: '#FF3B30', regulation: '#5AC8FA', product_launch: '#30D158',
-  leadership_change: '#FF6B35', strategic: '#0071E3', other: '#98989D'
+  agm: 'var(--cf-primary)', financial_results: 'var(--cf-positive)', dividend: 'var(--cf-gold)', rating: 'var(--cf-iris)',
+  merger_acquisition: 'var(--cf-negative)', regulation: 'var(--cf-teal)', product_launch: 'var(--cf-primary-strong)',
+  leadership_change: 'var(--cf-gold)', strategic: 'var(--cf-primary)', other: 'var(--cf-ink3)'
 }
 
 export default function NewsPage() {
@@ -42,14 +42,14 @@ export default function NewsPage() {
   const [filterCat, setFilterCat] = useState('all')
 
   const t = {
-    bg: dark ? '#0D0D0D' : '#F5F5F7',
-    surface: dark ? '#1C1C1E' : '#FFFFFF',
-    border: dark ? '#2C2C2E' : '#E5E5EA',
-    text: dark ? '#FFFFFF' : '#1C1C1E',
-    textSub: dark ? '#98989D' : '#6E6E73',
-    textMuted: dark ? '#48484A' : '#AEAEB2',
-    accent: '#0071E3',
-    inputBg: dark ? '#2C2C2E' : '#FFFFFF',
+    bg: 'var(--cf-bg)',
+    surface: 'var(--cf-surface)',
+    border: 'var(--cf-surface2)',
+    text: 'var(--cf-ink)',
+    textSub: 'var(--cf-ink2)',
+    textMuted: 'var(--cf-ink3)',
+    accent: 'var(--cf-primary)',
+    inputBg: 'var(--cf-surface2)',
   }
 
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function NewsPage() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: t.bg, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', color: t.text }}>
       {/* Header */}
-      <header style={{ backgroundColor: dark ? 'rgba(13,13,13,0.8)' : 'rgba(245,245,247,0.8)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${t.border}`, position: 'sticky', top: 0, zIndex: 100 }}>
+      <header style={{ backgroundColor: 'color-mix(in srgb, var(--cf-surface) 88%, transparent)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${t.border}`, position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             
@@ -115,15 +115,15 @@ export default function NewsPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {filtered.map((a, i) => {
               const bank = bankMap[a.bank_id]
-              const color = CAT_COLORS[a.category] || '#98989D'
+              const color = CAT_COLORS[a.category] || 'var(--cf-ink2)'
               return (
                 <div key={i} style={{ backgroundColor: t.surface, border: `1px solid ${t.border}`, borderRadius: 12, padding: '16px 20px' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: 11, fontWeight: 700, color, backgroundColor: color + '18', padding: '2px 8px', borderRadius: 20 }}>{CAT_LABELS[a.category] || a.category}</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color, backgroundColor: 'color-mix(in srgb, ' + color + ' 10%, transparent)', padding: '2px 8px', borderRadius: 20 }}>{CAT_LABELS[a.category] || a.category}</span>
                         {bank && <span style={{ fontSize: 11, color: t.textSub, fontWeight: 500 }}>{bank.shortName}</span>}
-                        {a.is_verified && <span style={{ fontSize: 10, color: '#30D158' }}>✓ Verified</span>}
+                        {a.is_verified && <span style={{ fontSize: 10, color: 'var(--cf-positive)' }}>✓ Verified</span>}
                       </div>
                       <div style={{ fontSize: 15, fontWeight: 600, color: t.text, marginBottom: 6, lineHeight: 1.4 }}>{a.headline_en}</div>
                       {a.summary_en && <div style={{ fontSize: 13, color: t.textSub, lineHeight: 1.5 }}>{a.summary_en}</div>}
