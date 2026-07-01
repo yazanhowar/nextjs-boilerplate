@@ -82,7 +82,7 @@ export default function SearchPage() {
       <header className="hbtf-header">
         <div>
           <div className="hbtf-logo-eyebrow">
-            <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>{isAr ? 'الرئيسية' : 'Rapid Intelligence'}</a>{' / '}{T.search}
+            <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>{isAr ? 'الرئيسية' : 'convo.finance'}</a>{' / '}{T.search}
           </div>
           <div className="hbtf-logo-title">{T.search}</div>
         </div>
