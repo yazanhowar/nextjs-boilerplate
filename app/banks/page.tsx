@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation'
 import { BANKS } from '@/lib/banks-config'
 import SettingsPanel from '@/components/SettingsPanel'
 import { createClient } from '@supabase/supabase-js'
+import { useLang } from '@/lib/LangContext'
+import { t as i18nDict } from '@/lib/i18n'
 
 function getSupabase() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
@@ -52,6 +54,9 @@ function BankLogo({ bank }: { bank: any }) {
 }
 export default function Dashboard() {
   const router = useRouter()
+  const { lang } = useLang()
+  const L = i18nDict[lang]
+  const isAr = lang === 'ar'
   const [dark, setDark] = useState(false)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'all' | 'conventional' | 'islamic'>('all')
@@ -128,10 +133,10 @@ export default function Dashboard() {
   })
 
   return (
-    <div style={{ minHeight:'100vh', backgroundColor:t.bg, fontFamily:'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif', color:t.text }}>
+    <div dir={isAr ? 'rtl' : 'ltr'} style={{ minHeight:'100vh', backgroundColor:t.bg, fontFamily:'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif', color:t.text }}>
       <main style={{ maxWidth:1200, margin:'0 auto', padding:'32px 24px' }}>
         <div style={{ marginBottom:28 }}>
-          <h1 style={{ fontSize:28, fontWeight:700, margin:'0 0 8px', color:t.text }}>Jordanian Banks</h1>
+          <h1 style={{ fontSize:28, fontWeight:700, margin:'0 0 8px', color:t.text }}>{L.bk_title}</h1>
           <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
             <span style={{ fontSize:14, color:t.textSub }}>FY{dataYear} data &middot; All figures in JOD unless noted</span>
             <div style={{ display:'flex', gap:4 }}>
@@ -144,10 +149,10 @@ export default function Dashboard() {
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12, marginBottom:32 }}>
           {[
-            { label:'Combined Total Assets', value:fmtK(grandAssets), sub:'All 15 banks, group basis' },
-            { label:'Combined Net Profit', value:fmtK(grandProfit), sub:`FY${dataYear}` },
-            { label:'Avg ROE', value:avgROE!=null?`${avgROE.toFixed(1)}%`:'-', sub:'Return on equity' },
-            { label:'Avg CAR', value:avgCAR!=null?`${avgCAR.toFixed(1)}%`:'-', sub:'Capital adequacy' },
+            { label:L.bk_combinedAssets, value:fmtK(grandAssets), sub:'All 15 banks, group basis' },
+            { label:L.bk_combinedProfit, value:fmtK(grandProfit), sub:`FY${dataYear}` },
+            { label:L.bk_avgROE, value:avgROE!=null?`${avgROE.toFixed(1)}%`:'-', sub:L.bk_roeSub },
+            { label:L.bk_avgCAR, value:avgCAR!=null?`${avgCAR.toFixed(1)}%`:'-', sub:L.bk_carSub },
           ].map((kpi,i) => (
             <div key={i} style={{ backgroundColor:t.surface, borderRadius:12, padding:'16px 18px', border:`1px solid ${t.border}`, boxShadow:t.shadow }}>
               <div style={{ fontSize:11, color:t.textSub, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:6 }}>{kpi.label}</div>
@@ -160,12 +165,12 @@ export default function Dashboard() {
         <div style={{ display:'flex', gap:12, marginBottom:24, alignItems:'center', flexWrap:'wrap' }}>
           <div style={{ position:'relative', flex:1, minWidth:200 }}>
             <span style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:t.textMuted, fontSize:14 }}>&#128269;</span>
-            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search banks..." style={{ width:'100%', backgroundColor:t.inputBg, border:`1px solid ${t.border}`, borderRadius:10, padding:'9px 12px 9px 34px', fontSize:14, color:t.text, outline:'none', boxSizing:'border-box' }} />
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={L.bk_search} style={{ width:'100%', backgroundColor:t.inputBg, border:`1px solid ${t.border}`, borderRadius:10, padding:'9px 12px 9px 34px', fontSize:14, color:t.text, outline:'none', boxSizing:'border-box' }} />
           </div>
           <div style={{ display:'flex', gap:6 }}>
             {(['all','conventional','islamic'] as const).map(f => (
               <button key={f} onClick={() => setFilter(f)} style={{ padding:'8px 16px', borderRadius:20, fontSize:13, fontWeight:500, cursor:'pointer', backgroundColor:filter===f?t.accent:t.surface, color:filter===f?'#fff':t.textSub, border:`1px solid ${filter===f?t.accent:t.border}`, transition:'all 0.15s' }}>
-                {f==='all'?'All banks':f==='conventional'?'Commercial':'Islamic'}
+                {f==='all'?L.bk_allBanks:f==='conventional'?L.bk_commercial:L.bk_islamic}
               </button>
             ))}
           </div>
@@ -179,7 +184,7 @@ export default function Dashboard() {
             return <BankCard key={bank.id} bank={bank} fin={fin} delta={delta} loading={loading} dark={dark} t={t} dataYear={dataYear} hovered={hovered===bank.id} onMouseEnter={() => setHovered(bank.id)} onMouseLeave={() => setHovered(null)} onClick={() => router.push(`/chat?bank=${bank.id}`)} />
           })}
         </div>
-        {filtered.length===0 && <div style={{ textAlign:'center', padding:'60px 0', color:t.textSub }}>No banks match your search.</div>}
+        {filtered.length===0 && <div style={{ textAlign:'center', padding:'60px 0', color:t.textSub }}>{L.bk_noMatch}</div>}
       </main>
     </div>
   )
@@ -189,32 +194,32 @@ function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMou
   return (
     <div onClick={onClick} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={{ backgroundColor:hovered?t.surfaceHover:t.surface, border:`1px solid ${hovered?t.accent+'55':t.border}`, borderRadius:14, padding:20, cursor:'pointer', transition:'all 0.15s ease', transform:hovered?'translateY(-2px)':'none', boxShadow:hovered?`0 8px 24px ${dark?'rgba(0,0,0,0.5)':'rgba(0,0,0,0.1)'}`:t.shadow }}>
  <div style={{ minHeight:22, display:'flex', justifyContent:'flex-end', marginBottom:4 }}>
-      {bank.isHBTF && <span style={{ fontSize:10, fontWeight:700, color:t.accent, backgroundColor:t.accent+'18', padding:'2px 8px', borderRadius:20, letterSpacing:'0.05em' }}>OUR BANK</span>}
+      {bank.isHBTF && <span style={{ fontSize:10, fontWeight:700, color:t.accent, backgroundColor:'color-mix(in srgb, '+t.accent+' 10%, transparent)', padding:'2px 8px', borderRadius:20, letterSpacing:'0.05em' }}>{L.bk_ourBank}</span>}
       </div>
       <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:16 }}>
         <div style={{ width:44, height:44, borderRadius:10, backgroundColor:'var(--cf-line)', border:`1px solid ${t.border}`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden' }}>
           <BankLogo bank={bank} />
         </div>
         <div>
-          <div style={{ fontWeight:600, fontSize:15, color:t.text }}>{bank.name}</div>
+          <div style={{ fontWeight:600, fontSize:15, color:t.text }}>{isAr ? bank.nameAr : bank.name}</div>
           <div style={{ fontSize:12, color:t.textSub, marginTop:2 }}>{bank.sector==='islamic'?'Islamic':'Commercial'} &middot; {bank.ticker}</div>
         </div>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:16 }}>
         <div style={{ backgroundColor:'var(--cf-surface2)', borderRadius:10, padding:'12px 14px' }}>
-          <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>Net Profit</div>
+          <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>{L.bk_netProfit}</div>
           <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.net_profit,bank.id):'-')}</div>
           {delta!=null&&!loading&&<div style={{ fontSize:11, color:delta>=0?t.green:t.red, marginTop:3, fontWeight:500 }}>{delta>=0?String.fromCharCode(8593):String.fromCharCode(8595)} {Math.abs(delta).toFixed(1)}% vs {dataYear-1}</div>}
         </div>
         <div style={{ backgroundColor:'var(--cf-surface2)', borderRadius:10, padding:'12px 14px' }}>
-          <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>Total Assets</div>
+          <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>{L.bk_totalAssets}</div>
           <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.total_assets,bank.id):'-')}</div>
           {fin?.roe!=null&&!loading&&<div style={{ fontSize:11, color:t.textSub, marginTop:3 }}>ROE {fin.roe.toFixed(1)}%</div>}
         </div>
       </div>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
         <span style={{ fontSize:12, color:t.textSub }}>{bank.description.slice(0,52)}...</span>
-        <span style={{ backgroundColor:hovered?t.accent:('var(--cf-surface2)'), color:hovered?'#fff':t.textSub, borderRadius:8, padding:'5px 12px', fontSize:12, fontWeight:500, transition:'all 0.15s', whiteSpace:'nowrap', marginLeft:8 }}>Ask AI</span>
+        <span style={{ backgroundColor:hovered?t.accent:('var(--cf-surface2)'), color:hovered?'#fff':t.textSub, borderRadius:8, padding:'5px 12px', fontSize:12, fontWeight:500, transition:'all 0.15s', whiteSpace:'nowrap', marginLeft:8 }}>{L.bk_askAI}</span>
       </div>
     </div>
   )
