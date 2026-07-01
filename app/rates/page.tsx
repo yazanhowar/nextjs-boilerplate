@@ -61,7 +61,7 @@ export default function RatesPage() {
       <header className="hbtf-header">
         <div>
           <div className="hbtf-logo-eyebrow">
-            <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>{isAr ? 'الرئيسية' : 'convo.finance'}</a>{' / '}{T.rates}
+            <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>{'convo.finance'}</a>{' / '}{T.rates}
           </div>
           <div className="hbtf-logo-title">{T.rateComparison}</div>
         </div>
