@@ -482,7 +482,7 @@ export default function BankPage() {
                 <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>Balance Sheet Trend</div>
                 <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>JOD billions, by fiscal year</div>
                 <ResponsiveContainer width="100%" height={240}>
-                  <BarChart data={financials.map((f: any) => ({ name: 'FY' + f.fiscal_year, Assets: Number(((f.total_assets || 0) / 1000000).toFixed(2)), Deposits: Number(((f.customer_deposits || 0) / 1000000).toFixed(2)), Loans: Number(((f.net_loans || 0) / 1000000).toFixed(2)) }))} margin={{ top: 4, right: 8, left: -12, bottom: 0 }}>
+                  <BarChart data={financials.map((f: any) => ({ name: 'FY' + f.fiscal_year, Assets: Number(((f.total_assets || 0) / 1000000).toFixed(2)), Deposits: Number(((f.customer_deposits || 0) / 1000000).toFixed(2)), Loans: (f.net_loans == null ? null : Number((f.net_loans / 1000000).toFixed(2))) }))} margin={{ top: 4, right: 8, left: -12, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" vertical={false} />
                     <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--cf-ink2)' }} axisLine={{ stroke: 'var(--cf-line)' }} tickLine={false} />
                     <YAxis tick={{ fontSize: 11, fill: 'var(--cf-ink2)' }} axisLine={false} tickLine={false} />
@@ -617,7 +617,7 @@ export default function BankPage() {
                   name: `FY${f.fiscal_year}`,
                   'Total Assets': Math.round((f.total_assets || 0) / 1_000_000),
                   'Customer Deposits': Math.round((f.customer_deposits || 0) / 1_000_000),
-                  'Loans': Math.round((f.net_loans || 0) / 1_000_000),
+                  'Loans': (f.net_loans == null ? null : Math.round(f.net_loans / 1_000_000)),
                 }))}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" />
                   <XAxis dataKey="name" stroke="var(--cf-ink2)" tick={{ fontSize: 11 }} />
