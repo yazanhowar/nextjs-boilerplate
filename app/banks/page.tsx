@@ -126,22 +126,6 @@ export default function Dashboard() {
 
   return (
     <div style={{ minHeight:'100vh', backgroundColor:t.bg, fontFamily:'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif', color:t.text }}>
-      <header style={{ backgroundColor:'color-mix(in srgb, var(--cf-surface) 88%, transparent)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderBottom:`1px solid ${t.border}`, position:'sticky', top:0, zIndex:100 }}>
-        <div style={{ maxWidth:1200, margin:'0 auto', height:52, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 24px' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-            <img src="/convo-icon.svg" alt="" style={{ width:30, height:30 }} />
-            <img src="/convo-wordmark.svg" alt="convo.finance" style={{ height:30, filter: dark ? 'brightness(0) invert(1)' : 'none' }} />
-          </div>
-          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-            <button onClick={() => router.push('/chat')} style={{ backgroundColor:t.accent, color:'#fff', border:'none', borderRadius:8, padding:'7px 16px', fontSize:13, fontWeight:500, cursor:'pointer' }}>
-              Open AI Analyst
-            </button>
-            
-            <SettingsPanel dark={dark} />
-          </div>
-        </div>
-      </header>
-
       <main style={{ maxWidth:1200, margin:'0 auto', padding:'32px 24px' }}>
         <div style={{ marginBottom:28 }}>
           <h1 style={{ fontSize:28, fontWeight:700, margin:'0 0 8px', color:t.text }}>Jordanian Banks</h1>
