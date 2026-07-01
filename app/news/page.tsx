@@ -92,7 +92,7 @@ export default function NewsPage() {
             <span style={{ fontWeight: 600, fontSize: 15, color: t.text }}>{L.nw_title}</span>
           </div>
           <button onClick={() => router.push('/chat')} style={{ backgroundColor: t.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '7px 16px', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>
-            Ask AI →
+            {L.nw_askAI}
           </button>
         </div>
       </header>
