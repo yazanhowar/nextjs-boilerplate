@@ -77,8 +77,7 @@ export default function NewsPage() {
       <header style={{ backgroundColor: dark ? 'rgba(13,13,13,0.8)' : 'rgba(245,245,247,0.8)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${t.border}`, position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', color: t.textSub, cursor: 'pointer', fontSize: 14 }}>← Dashboard</button>
-            <span style={{ color: t.border }}>|</span>
+            
             <span style={{ fontWeight: 600, fontSize: 15, color: t.text }}>News & Announcements</span>
           </div>
           <button onClick={() => router.push('/chat')} style={{ backgroundColor: t.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '7px 16px', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>
