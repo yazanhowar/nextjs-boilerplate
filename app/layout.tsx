@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic, IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
 import PasswordGate from '@/components/PasswordGate'
+import { LangProvider } from '@/lib/LangContext'
 
 const ibmSans = IBM_Plex_Sans({ subsets: ['latin'], weight: ['400','500','600','700'], display: 'swap', variable: '--font-ibm-sans' })
 const ibmArabic = IBM_Plex_Sans_Arabic({ subsets: ['arabic'], weight: ['400','500','600','700'], display: 'swap', variable: '--font-ibm-ar' })
@@ -24,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           __html: `(function(){try{var s=localStorage.getItem('hbtf-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;if(s==='dark'||((!s)&&d)){document.documentElement.classList.add('dark');}}catch(e){}})();`
         }} />
       </head>
-      <body className={ibmSans.variable + ' ' + ibmArabic.variable + ' ' + ibmMono.variable + ' ' + ibmSans.className}><PasswordGate>{children}</PasswordGate></body>
+      <body className={ibmSans.variable + ' ' + ibmArabic.variable + ' ' + ibmMono.variable + ' ' + ibmSans.className}><LangProvider><PasswordGate>{children}</PasswordGate></LangProvider></body>
     </html>
   )
 }
