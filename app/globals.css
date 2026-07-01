@@ -4,7 +4,7 @@
 /* ── Light mode (default) ───────────────────────────────────────────────── */
 :root {
   --hbtf-blue: var(--cf-primary-strong);
-  --hbtf-gold: #CEBA95;
+  --hbtf-gold: var(--cf-gold);
   --bg-primary: var(--cf-bg);
   --bg-card: var(--cf-surface);
   --bg-hover: var(--cf-surface2);
