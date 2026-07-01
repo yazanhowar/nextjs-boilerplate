@@ -110,7 +110,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
     <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-6">
       <div className="flex items-center gap-2 mb-4">
         <span className="text-[var(--cf-gold)] text-[18px]">⚡</span>
-        <span className="font-semibold text-white">Ask about {bankName}</span>
+        <span className="font-semibold text-[var(--cf-ink)]">Ask about {bankName}</span>
       </div>
 
       {/* Example prompts */}
@@ -134,7 +134,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
           onChange={e => setPrompt(e.target.value)}
           placeholder={`e.g. "Compare ${bankName} loan rates vs market average"`}
           className="flex-1 bg-[var(--cf-bg)] border border-[var(--cf-line)] rounded-lg px-4 py-3
-                     text-[13px] text-white placeholder-[var(--cf-ink3)]
+                     text-[13px] text-[var(--cf-ink)] placeholder-[var(--cf-ink3)]
                      focus:outline-none focus:border-[var(--cf-gold)] transition-colors"
         />
         <button
@@ -155,7 +155,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
       {chartData && (
         <div className="mt-6">
           <div className="flex items-center justify-between mb-4">
-            <div className="text-[14px] font-semibold text-white">{chartData.title}</div>
+            <div className="text-[14px] font-semibold text-[var(--cf-ink)]">{chartData.title}</div>
             <button
               onClick={exportPDF}
               className="text-[11px] px-3 py-1.5 rounded-lg border border-[var(--cf-line)]
@@ -257,17 +257,6 @@ function LoanCalculator() {
 }
 
 export default function BankPage() {
-  useEffect(function () {
-    try {
-      var ov = [['bg-[var(--cf-bg)]','background-color','var(--cf-surface)'],['bg-[var(--cf-surface)]','background-color','var(--cf-surface)'],['bg-[var(--cf-line)]','background-color','var(--cf-surface2)'],['border-[var(--cf-line)]','border-color','var(--cf-line)'],['text-[var(--cf-ink2)]','color','var(--cf-ink2)'],['text-[var(--cf-ink2)]','color','var(--cf-ink2)'],['text-[var(--cf-ink)]','color','var(--cf-ink2)'],['text-[var(--cf-gold)]','color','var(--cf-gold)'],['text-[var(--cf-positive)]','color','var(--cf-positive)'],['text-[var(--cf-primary)]','color','var(--cf-primary)'],['text-white','color','var(--cf-ink)']];
-      var css = '';
-      for (var i = 0; i < ov.length; i++) { css += 'html:not(.dark) .' + CSS.escape(ov[i][0]) + '{' + ov[i][1] + ':' + ov[i][2] + ' !important}'; }
-      css += 'html:not(.dark) .' + CSS.escape('placeholder-[var(--cf-ink3)]') + '::placeholder{color:var(--cf-ink3) !important}';
-      css += 'html:not(.dark) .' + CSS.escape('hover:bg-[var(--cf-surface2)]') + ':hover{background-color:var(--cf-surface2) !important}';
-      var st = document.createElement('style'); st.setAttribute('data-bid-light', '1'); st.textContent = css; document.head.appendChild(st);
-      return function () { if (st && st.parentNode) { st.parentNode.removeChild(st); } };
-    } catch (e) {}
-  }, []);
   const params = useParams()
   const router = useRouter()
   const bankId = parseInt(params.id as string)
@@ -310,7 +299,7 @@ export default function BankPage() {
     load()
   }, [bankId])
 
-  if (!bank) return <div className="min-h-screen bg-[var(--cf-bg)] flex items-center justify-center text-white">Bank not found</div>
+  if (!bank) return <div className="min-h-screen bg-[var(--cf-bg)] flex items-center justify-center text-[var(--cf-ink)]">Bank not found</div>
 
   // Latest + previous financials for delta
   if (Number(bankId) === 1) { (financials || []).forEach(function (r) { if (r && !r.__cfJod) { ['total_assets','net_profit','customer_deposits','net_loans','total_equity'].forEach(function (k) { if (r[k] != null) r[k] = r[k] * 0.709; }); r.__cfJod = true; } }); }
@@ -349,13 +338,13 @@ export default function BankPage() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.push('/banks')}
-              className="text-[var(--cf-ink2)] hover:text-white transition-colors text-[13px]"
+              className="text-[var(--cf-ink2)] hover:text-[var(--cf-ink)] transition-colors text-[13px]"
             >
               ← All banks
             </button>
             <div className="w-px h-5 bg-[var(--cf-line)]" />
             <div className="flex items-center gap-3">
-              <div style={{ width:36, height:36, borderRadius:8, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden', flexShrink:0 }}>
+              <div style={{ width:36, height:36, borderRadius:8, background:'var(--cf-surface2)', border:'1px solid var(--cf-line)', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden', flexShrink:0 }}>
                 {!imgError ? (
                   <img src={bank.logoUrl} alt={bank.name} style={{ width:28, height:28, objectFit:'contain' }}
                     onError={() => setImgError(true)} />
@@ -364,7 +353,7 @@ export default function BankPage() {
                 )}
                 </div>
               <div>
-                <div className="font-bold text-white text-[16px]">{bank.name}</div>
+                <div className="font-bold text-[var(--cf-ink)] text-[16px]">{bank.name}</div>
                 <div className="text-[11px] text-[var(--cf-ink2)]">
                   {bank.sector === 'islamic' ? 'Islamic Bank' : 'Commercial Bank'} · {bank.ticker} · ASE listed
                 </div>
@@ -426,7 +415,7 @@ export default function BankPage() {
             ].map(kpi => (
               <div key={kpi.label} className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-4">
                 <div className="text-[10px] uppercase tracking-wider text-[var(--cf-ink2)] mb-2">{kpi.label}</div>
-                <div className="text-[20px] font-bold text-white">{loading ? '...' : kpi.value}</div>
+                <div className="text-[20px] font-bold text-[var(--cf-ink)]">{loading ? '...' : kpi.value}</div>
                 {kpi.delta != null && (
                   <div className={`text-[11px] font-medium mt-1 ${deltaColor(kpi.delta)}`}>
                     {deltaSign(kpi.delta)} {Math.abs(kpi.delta).toFixed(1)}% vs prior year
@@ -446,8 +435,8 @@ export default function BankPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2.5 text-[13px] font-medium whitespace-nowrap transition-colors border-b-2 -mb-px
                 ${activeTab === tab.id
-                  ? 'text-white border-[var(--cf-gold)]'
-                  : 'text-[var(--cf-ink2)] border-transparent hover:text-white'
+                  ? 'text-[var(--cf-ink)] border-[var(--cf-gold)]'
+                  : 'text-[var(--cf-ink2)] border-transparent hover:text-[var(--cf-ink)]'
                 }`}
             >
               {tab.label}
@@ -607,7 +596,7 @@ export default function BankPage() {
                       <tr key={row.key} className="border-b border-[var(--cf-line)] hover:bg-[var(--cf-surface2)] transition-colors">
                         <td className="px-5 py-3 text-[var(--cf-ink2)]">{row.label}</td>
                         {financials.map(f => (
-                          <td key={f.fiscal_year} className="px-5 py-3 text-end text-white font-medium">
+                          <td key={f.fiscal_year} className="px-5 py-3 text-end text-[var(--cf-ink)] font-medium">
                             {row.format(f[row.key])}
                           </td>
                         ))}
@@ -668,7 +657,7 @@ export default function BankPage() {
                       <div key={r.label} className="flex justify-between items-center py-2
                                                       border-b border-[var(--cf-line)] last:border-0">
                         <span className="text-[13px] text-[var(--cf-ink)]">{r.label}</span>
-                        <span className="text-[13px] font-medium text-white">
+                        <span className="text-[13px] font-medium text-[var(--cf-ink)]">
                           {r.min && r.max ? `${r.min}% – ${r.max}%` :
                            r.min ? `From ${r.min}%` : '—'}
                         </span>
@@ -691,7 +680,7 @@ export default function BankPage() {
                       <div key={r.label} className="flex justify-between items-center py-2
                                                       border-b border-[var(--cf-line)] last:border-0">
                         <span className="text-[13px] text-[var(--cf-ink)]">{r.label}</span>
-                        <span className="text-[13px] font-medium text-white">
+                        <span className="text-[13px] font-medium text-[var(--cf-ink)]">
                           {r.val != null ? `${r.val}%` : '—'}
                         </span>
                       </div>
@@ -718,7 +707,7 @@ export default function BankPage() {
                 <div className="grid grid-cols-2 gap-3">
                   {products.filter(p => p.category === cat).map((p, i) => (
                     <div key={i} className="p-3 rounded-lg bg-[var(--cf-bg)] border border-[var(--cf-line)]">
-                      <div className="text-[13px] font-medium text-white">{p.product_name_en}</div>
+                      <div className="text-[13px] font-medium text-[var(--cf-ink)]">{p.product_name_en}</div>
                       {p.description_en && (
                         <div className="text-[11px] text-[var(--cf-ink2)] mt-1 line-clamp-2">{p.description_en}</div>
                       )}
@@ -751,7 +740,7 @@ export default function BankPage() {
                   {ownership.map((o, i) => (
                     <div key={i}>
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-[13px] text-white">{o.shareholder_name_en}</span>
+                        <span className="text-[13px] text-[var(--cf-ink)]">{o.shareholder_name_en}</span>
                         <div className="flex items-center gap-3">
                           <span className="text-[11px] text-[var(--cf-ink2)]">{o.country || ''}</span>
                           <span className="text-[14px] font-bold text-[var(--cf-gold)]">
@@ -796,7 +785,7 @@ export default function BankPage() {
                       </span>
                     </div>
                     <div>
-                      <div className="text-[13px] font-medium text-white">{e.full_name_en}</div>
+                      <div className="text-[13px] font-medium text-[var(--cf-ink)]">{e.full_name_en}</div>
                       <div className="text-[11px] text-[var(--cf-ink2)]">{e.title_en}</div>
                     </div>
                   </div>
@@ -820,7 +809,7 @@ export default function BankPage() {
                       </span>
                     </div>
                     <div>
-                      <div className="text-[13px] font-medium text-white">{b.full_name_en}</div>
+                      <div className="text-[13px] font-medium text-[var(--cf-ink)]">{b.full_name_en}</div>
                       <div className="text-[11px] text-[var(--cf-ink2)]">
                         {b.role}
                         {b.is_independent && (
@@ -847,7 +836,7 @@ export default function BankPage() {
             {announcements.map((a, i) => (
               <div key={i} className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-4 flex items-start gap-4">
                 <div className="text-center flex-shrink-0 w-12">
-                  <div className="text-[18px] font-bold text-white">
+                  <div className="text-[18px] font-bold text-[var(--cf-ink)]">
                     {new Date(a.announcement_date).getDate()}
                   </div>
                   <div className="text-[10px] text-[var(--cf-ink2)] uppercase">
@@ -872,7 +861,7 @@ export default function BankPage() {
                       <span className="text-[10px] text-[var(--cf-ink2)]">FY{a.fiscal_year}</span>
                     )}
                   </div>
-                  <div className="text-[14px] font-medium text-white">{a.headline_en}</div>
+                  <div className="text-[14px] font-medium text-[var(--cf-ink)]">{a.headline_en}</div>
                   {a.summary_en && (
                     <div className="text-[12px] text-[var(--cf-ink2)] mt-1.5 line-clamp-2">{a.summary_en}</div>
                   )}
