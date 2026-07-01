@@ -126,7 +126,7 @@ export default function Dashboard() {
 
   return (
     <div style={{ minHeight:'100vh', backgroundColor:t.bg, fontFamily:'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif', color:t.text }}>
-      <header style={{ backgroundColor:dark?'rgba(26,26,26,0.95)':'rgba(242,244,247,0.9)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderBottom:`1px solid ${t.border}`, position:'sticky', top:0, zIndex:100 }}>
+      <header style={{ backgroundColor:'color-mix(in srgb, var(--cf-surface) 88%, transparent)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderBottom:`1px solid ${t.border}`, position:'sticky', top:0, zIndex:100 }}>
         <div style={{ maxWidth:1200, margin:'0 auto', height:52, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 24px' }}>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
             <img src="/convo-icon.svg" alt="" style={{ width:30, height:30 }} />
@@ -205,7 +205,7 @@ function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMou
       {bank.isHBTF && <span style={{ fontSize:10, fontWeight:700, color:t.accent, backgroundColor:t.accent+'18', padding:'2px 8px', borderRadius:20, letterSpacing:'0.05em' }}>OUR BANK</span>}
       </div>
       <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:16 }}>
-        <div style={{ width:44, height:44, borderRadius:10, backgroundColor:dark?'#383838':'#F0F4FA', border:`1px solid ${t.border}`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden' }}>
+        <div style={{ width:44, height:44, borderRadius:10, backgroundColor:'var(--cf-line)', border:`1px solid ${t.border}`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden' }}>
           <BankLogo bank={bank} />
         </div>
         <div>
@@ -214,12 +214,12 @@ function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMou
         </div>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:16 }}>
-        <div style={{ backgroundColor:dark?'#2a2a2a':'#F5F8FD', borderRadius:10, padding:'12px 14px' }}>
+        <div style={{ backgroundColor:'var(--cf-surface2)', borderRadius:10, padding:'12px 14px' }}>
           <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>Net Profit</div>
           <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.net_profit,bank.id):'-')}</div>
           {delta!=null&&!loading&&<div style={{ fontSize:11, color:delta>=0?t.green:t.red, marginTop:3, fontWeight:500 }}>{delta>=0?String.fromCharCode(8593):String.fromCharCode(8595)} {Math.abs(delta).toFixed(1)}% vs {dataYear-1}</div>}
         </div>
-        <div style={{ backgroundColor:dark?'#2a2a2a':'#F5F8FD', borderRadius:10, padding:'12px 14px' }}>
+        <div style={{ backgroundColor:'var(--cf-surface2)', borderRadius:10, padding:'12px 14px' }}>
           <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>Total Assets</div>
           <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.total_assets,bank.id):'-')}</div>
           {fin?.roe!=null&&!loading&&<div style={{ fontSize:11, color:t.textSub, marginTop:3 }}>ROE {fin.roe.toFixed(1)}%</div>}
@@ -227,7 +227,7 @@ function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMou
       </div>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
         <span style={{ fontSize:12, color:t.textSub }}>{bank.description.slice(0,52)}...</span>
-        <span style={{ backgroundColor:hovered?t.accent:(dark?'#2a2a2a':'#EEF2F7'), color:hovered?'#fff':t.textSub, borderRadius:8, padding:'5px 12px', fontSize:12, fontWeight:500, transition:'all 0.15s', whiteSpace:'nowrap', marginLeft:8 }}>Ask AI</span>
+        <span style={{ backgroundColor:hovered?t.accent:('var(--cf-surface2)'), color:hovered?'#fff':t.textSub, borderRadius:8, padding:'5px 12px', fontSize:12, fontWeight:500, transition:'all 0.15s', whiteSpace:'nowrap', marginLeft:8 }}>Ask AI</span>
       </div>
     </div>
   )
