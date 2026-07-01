@@ -150,7 +150,7 @@ function CompareContent() {
         {/* Bank selector */}
         <div>
           <div className="text-[11px] uppercase tracking-wider text-[var(--cf-ink2)] mb-3">
-            Select banks to compare (up to 6)
+            {L.cmp_selectHint}
           </div>
           <div className="flex flex-wrap gap-2">
             {BANKS.map(bank => (
