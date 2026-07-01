@@ -257,7 +257,7 @@ export default function ProductsPage() {
       <header className="hbtf-header">
         <div>
           <div className="hbtf-logo-eyebrow">
-            <a href="/">{isAr ? 'الرئيسية' : 'Rapid Intelligence'}</a>{' / '}{isAr ? 'مقارنة المنتجات' : 'Product Comparison'}
+            <a href="/">{isAr ? 'الرئيسية' : 'convo.finance'}</a>{' / '}{isAr ? 'مقارنة المنتجات' : 'Product Comparison'}
           </div>
           <div className="hbtf-logo-title">{isAr ? 'مقارنة المنتجات المصرفية' : 'Banking Product Comparison'}</div>
         </div>
