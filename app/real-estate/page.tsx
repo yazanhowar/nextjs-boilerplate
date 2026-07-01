@@ -56,8 +56,7 @@ export default function RealEstatePage() {
       <header style={{ backgroundColor: dark ? 'rgba(10,22,40,0.9)' : 'rgba(242,244,247,0.9)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${t.border}`, position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', color: t.textSub, fontSize: 13, cursor: 'pointer' }}>&larr; Dashboard</button>
-            <div style={{ width: 1, height: 18, backgroundColor: t.border }} />
+            
             <span style={{ fontWeight: 600, fontSize: 15, color: t.text }}>Bank Real Estate Listings</span>
           </div>
           <button onClick={() => router.push('/chat')} style={{ backgroundColor: t.accent, color: '#fff', border: 'none', borderRadius: 8, padding: '7px 16px', fontSize: 13, cursor: 'pointer' }}>
