@@ -3,32 +3,32 @@
 
 /* ── Light mode (default) ───────────────────────────────────────────────── */
 :root {
-  --hbtf-blue: #004D8F;
+  --hbtf-blue: var(--cf-primary-strong);
   --hbtf-gold: #CEBA95;
-  --bg-primary: #F2F4F7;
-  --bg-card: #FFFFFF;
-  --bg-hover: #E8EDF5;
-  --border: #DDE2EA;
-  --text-primary: #0F172A;
-  --text-secondary: #4A5568;
-  --text-muted: #94A3B8;
-  --accent: #004D8F;
-  --green: #16A34A;
-  --red: #DC2626;
+  --bg-primary: var(--cf-bg);
+  --bg-card: var(--cf-surface);
+  --bg-hover: var(--cf-surface2);
+  --border: var(--cf-line);
+  --text-primary: var(--cf-ink);
+  --text-secondary: var(--cf-ink2);
+  --text-muted: var(--cf-ink3);
+  --accent: var(--cf-primary);
+  --green: var(--cf-positive);
+  --red: var(--cf-negative);
 }
 
 /* ── Dark mode — toggled by .dark on <html> ─────────────────────────────── */
 html.dark {
-  --bg-primary: #1a1a1a;
-  --bg-card: #242424;
-  --bg-hover: #2a2a2a;
-  --border: #383838;
-  --text-primary: #FFFFFF;
-  --text-secondary: #9CA3AF;
-  --text-muted: #6B7280;
-  --accent: #3B82F6;
-  --green: #22C55E;
-  --red: #EF4444;
+  --bg-primary: var(--cf-bg);
+  --bg-card: var(--cf-surface);
+  --bg-hover: var(--cf-surface2);
+  --border: var(--cf-line);
+  --text-primary: var(--cf-ink);
+  --text-secondary: var(--cf-ink2);
+  --text-muted: var(--cf-ink3);
+  --accent: var(--cf-primary);
+  --green: var(--cf-positive);
+  --red: var(--cf-negative);
 }
 
 * { box-sizing: border-box; }
