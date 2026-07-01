@@ -29,13 +29,13 @@ export default function RealEstatePage() {
   }, [])
 
   const t = {
-    bg: dark ? '#0A1628' : '#F2F4F7',
-    surface: dark ? '#0F1E35' : '#FFFFFF',
-    border: dark ? '#1E3450' : '#DDE2EA',
-    text: dark ? '#FFFFFF' : '#0F172A',
-    textSub: dark ? '#8B9AB0' : '#4A5568',
-    textMuted: dark ? '#4A5568' : '#94A3B8',
-    accent: dark ? '#3B82F6' : '#004D8F',
+    bg: 'var(--cf-bg)',
+    surface: 'var(--cf-surface)',
+    border: 'var(--cf-line)',
+    text: 'var(--cf-ink)',
+    textSub: 'var(--cf-ink2)',
+    textMuted: 'var(--cf-ink3)',
+    accent: 'var(--cf-primary)',
     shadow: dark ? 'none' : '0 1px 4px rgba(0,0,0,0.07)',
   }
 
@@ -93,7 +93,7 @@ export default function RealEstatePage() {
           <div style={{ textAlign: 'center', padding: '60px 0', color: t.textSub }}>Loading listings...</div>
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>&#127968;</div>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>&var(--cf-teal);</div>
             <p style={{ color: t.textSub, fontSize: 15, margin: '0 0 8px' }}>
               {listings.length === 0 ? 'No property listings yet.' : 'No listings match your search.'}
             </p>
@@ -109,9 +109,9 @@ export default function RealEstatePage() {
               const bank = BANKS.find(b => b.id === listing.bank_id)
               return (
                 <div key={i} style={{ backgroundColor: t.surface, border: `1px solid ${t.border}`, borderRadius: 14, overflow: 'hidden', boxShadow: t.shadow }}>
-                  <div style={{ backgroundColor: dark ? '#132240' : '#EEF4FF', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ backgroundColor: 'var(--cf-surface2)', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: 6, backgroundColor: dark ? '#1E3450' : '#fff', border: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                      <div style={{ width: 28, height: 28, borderRadius: 6, backgroundColor: dark ? 'var(--cf-ink)' : '#fff', border: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                         <img src={`https://www.google.com/s2/favicons?domain=${bank?.domain}&sz=32`} width={18} height={18} style={{ objectFit: 'contain' }} onError={(e: any) => e.target.style.display='none'} />
                       </div>
                       <span style={{ fontSize: 12, fontWeight: 600, color: t.textSub }}>{bank?.shortName || 'Bank'}</span>
@@ -124,7 +124,7 @@ export default function RealEstatePage() {
                     <div style={{ fontSize: 20, fontWeight: 700, color: t.text, marginBottom: 4 }}>
                       {listing.price_jod ? `JOD ${listing.price_jod.toLocaleString()}` : 'Price on request'}
                     </div>
-                    {listing.location && <div style={{ fontSize: 13, color: t.textSub, marginBottom: 8 }}>&#128205; {listing.location}</div>}
+                    {listing.location && <div style={{ fontSize: 13, color: t.textSub, marginBottom: 8 }}>&var(--cf-positive); {listing.location}</div>}
                     {listing.area_sqm && <div style={{ fontSize: 12, color: t.textMuted, marginBottom: 8 }}>{listing.area_sqm.toLocaleString()} m&sup2;</div>}
                     {listing.description_en && <p style={{ fontSize: 13, color: t.textSub, margin: '0 0 12px', lineHeight: 1.5 }}>{listing.description_en.slice(0, 120)}{listing.description_en.length > 120 ? '...' : ''}</p>}
                     {listing.listing_url && (
