@@ -234,6 +234,7 @@ a, button { transition: color 0.15s, background-color 0.15s, border-color 0.15s,
   --cf-positive:#1E8A5A;
   --cf-negative:#C4504A;
   --cf-iris:#7A5AA4;
+  --cf-gold:#9A7B45;
   --cf-grad:linear-gradient(105deg,#7A5AA4,#695CA1,#3E639B,#106B94);
   --cf-font-sans:var(--font-ibm-sans),'IBM Plex Sans',system-ui,-apple-system,sans-serif;
   --cf-font-ar:var(--font-ibm-ar),'IBM Plex Sans Arabic','IBM Plex Sans',sans-serif;
@@ -254,6 +255,7 @@ a, button { transition: color 0.15s, background-color 0.15s, border-color 0.15s,
   --cf-positive:#34B97E;
   --cf-negative:#E0675F;
   --cf-iris:#9E81C4;
+  --cf-gold:#CEBA95;
 }
 
 
@@ -262,7 +264,7 @@ a, button { transition: color 0.15s, background-color 0.15s, border-color 0.15s,
 .cf-page{background:var(--cf-bg);color:var(--cf-ink);min-height:100vh}
 .cf-frame{background:var(--cf-bg);border:1px solid var(--cf-line);border-radius:18px;padding:24px;color:var(--cf-ink)}
 .cf-card{background:var(--cf-surface);border:1px solid var(--cf-line);border-radius:14px;padding:18px}
-.cf-light{--cf-bg:#F4F5FA;--cf-surface:#FFFFFF;--cf-surface2:#ECEEF6;--cf-line:#E0E3EE;--cf-ink:#1A2138;--cf-ink2:#5C6478;--cf-ink3:#8A91A3;--cf-primary:#3E639B;--cf-primary-strong:#2F5184;--cf-primary-soft:#E9EEF7;--cf-teal:#106B94;--cf-positive:#1E8A5A;--cf-negative:#C4504A;--cf-iris:#7A5AA4}
+.cf-light{--cf-bg:#F4F5FA;--cf-surface:#FFFFFF;--cf-surface2:#ECEEF6;--cf-line:#E0E3EE;--cf-ink:#1A2138;--cf-ink2:#5C6478;--cf-ink3:#8A91A3;--cf-primary:#3E639B;--cf-primary-strong:#2F5184;--cf-primary-soft:#E9EEF7;--cf-teal:#106B94;--cf-positive:#1E8A5A;--cf-negative:#C4504A;--cf-iris:#7A5AA4;--cf-gold:#9A7B45}
 .cf-btn{font-family:var(--cf-font-sans);font-weight:600;font-size:13.5px;line-height:1.2;padding:10px 16px;border-radius:10px;cursor:pointer;border:1px solid transparent;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;transition:filter .15s ease,background-color .15s ease}
 .cf-btn:hover{filter:brightness(1.04)}
 .cf-btn:active{filter:brightness(.96)}
