@@ -34,18 +34,6 @@ function fmtJOD(n: number | null | undefined, bankId?: number): string {
 }
 
 function CompareContent() {
-  useEffect(function () {
-    try {
-      var ov = [['bg-[var(--cf-bg)]','background-color','var(--cf-surface)'],['bg-[var(--cf-surface)]','background-color','var(--cf-surface)'],['bg-[var(--cf-surface2)]','background-color','var(--cf-surface2)'],['border-[var(--cf-line)]','border-color','var(--cf-line)'],['text-[var(--cf-ink2)]','color','var(--cf-ink2)'],['text-[var(--cf-gold)]','color','var(--cf-gold)'],['text-[var(--cf-positive)]','color','var(--cf-positive)'],['text-white','color','var(--cf-ink)']];
-      var css = '';
-      for (var i = 0; i < ov.length; i++) { css += 'html:not(.dark) .' + CSS.escape(ov[i][0]) + '{' + ov[i][1] + ':' + ov[i][2] + ' !important}'; }
-      css += 'html:not(.dark) .' + CSS.escape('bg-[var(--cf-primary)]') + '.' + CSS.escape('text-white') + '{color:var(--cf-ink) !important}';
-      css += 'html:not(.dark) .' + CSS.escape('placeholder-[#4A5568]') + '::placeholder{color:var(--cf-ink3) !important}';
-      css += 'html:not(.dark) .' + CSS.escape('hover:bg-[var(--cf-surface)]') + ':hover{background-color:var(--cf-surface2) !important}';
-      var st = document.createElement('style'); st.setAttribute('data-cmp-light', '1'); st.textContent = css; document.head.appendChild(st);
-      return function () { if (st && st.parentNode) { st.parentNode.removeChild(st); } };
-    } catch (e) {}
-  }, []);
   const searchParams = useSearchParams()
   const router = useRouter()
   const initialPrompt = searchParams.get('q') || ''
@@ -145,11 +133,11 @@ function CompareContent() {
   const latest2025 = (bankId: number) => financials[bankId]?.find(f => f.fiscal_year === 2025)
 
   return (
-    <div className="min-h-screen bg-[var(--cf-bg)] text-white">
+    <div className="min-h-screen bg-[var(--cf-bg)] text-[var(--cf-ink)]">
       <header className="border-b border-[var(--cf-line)] px-6 py-4 flex items-center gap-4">
         
         
-        <div className="font-bold text-white">Compare Banks</div>
+        <div className="font-bold text-[var(--cf-ink)]">Compare Banks</div>
       </header>
 
       <div className="max-w-[1400px] mx-auto px-6 py-8 space-y-8">
@@ -180,7 +168,7 @@ function CompareContent() {
         <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <span className="text-[var(--cf-gold)]">{'\u26A1'}</span>
-            <span className="font-semibold text-white">Generate a chart</span>
+            <span className="font-semibold text-[var(--cf-ink)]">Generate a chart</span>
           </div>
 
           {/* Quick prompts */}
@@ -207,7 +195,7 @@ function CompareContent() {
               onChange={e => setPrompt(e.target.value)}
               placeholder="e.g. Compare deposit rates, Compare credit card fees, Who grew profits fastest?"
               className="flex-1 bg-[var(--cf-bg)] border border-[var(--cf-line)] rounded-lg px-4 py-3
-                         text-[13px] text-white placeholder-[#4A5568]
+                         text-[13px] text-[var(--cf-ink)] placeholder-[#4A5568]
                          focus:outline-none focus:border-[var(--cf-gold)] transition-colors"
             />
             <button type="submit" disabled={loading}
@@ -222,7 +210,7 @@ function CompareContent() {
           {chartData && (
             <div className="mt-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="text-[14px] font-semibold text-white">{chartData.title}</div>
+                <div className="text-[14px] font-semibold text-[var(--cf-ink)]">{chartData.title}</div>
                 <button onClick={exportPDF}
                   className="text-[11px] px-3 py-1.5 rounded-lg border border-[var(--cf-line)]
                              text-[var(--cf-ink2)] hover:border-[var(--cf-gold)] hover:text-[var(--cf-gold)] transition-colors">
@@ -285,7 +273,7 @@ function CompareContent() {
                     const bank = BANKS.find(b => b.id === id)!
                     return (
                       <th key={id} className="text-end px-5 py-3 font-medium">
-                        <span className={bank.isHBTF ? 'text-[var(--cf-gold)]' : 'text-white'}>
+                        <span className={bank.isHBTF ? 'text-[var(--cf-gold)]' : 'text-[var(--cf-ink)]'}>
                           {bank.shortName}
                         </span>
                       </th>
@@ -306,7 +294,7 @@ function CompareContent() {
                         const isMax = val === maxVal && val != null
                         return (
                           <td key={id} className={`px-5 py-3 text-end font-medium
-                            ${isMax ? 'text-[var(--cf-positive)]' : 'text-white'}`}>
+                            ${isMax ? 'text-[var(--cf-positive)]' : 'text-[var(--cf-ink)]'}`}>
                             {val != null ? row.format(val, id) : '\u2014'}
                           </td>
                         )
@@ -325,7 +313,7 @@ function CompareContent() {
 
 export default function ComparePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[var(--cf-bg)] flex items-center justify-center text-white">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[var(--cf-bg)] flex items-center justify-center text-[var(--cf-ink)]">Loading...</div>}>
       <CompareContent />
     </Suspense>
   )
