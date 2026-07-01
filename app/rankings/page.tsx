@@ -54,8 +54,8 @@ export default function RankingsPage() {
 
   const fmtB = (v: any, currency = 'JOD') => {
     if (!v) return '—'
-    const n = Number(v)
-    const prefix = currency === 'USD' ? '$' : (isAr ? 'د.أ ' : 'JOD ')
+    const n = currency === 'USD' ? Number(v) * 0.709 : Number(v)
+    const prefix = (isAr ? 'د.أ ' : 'JOD ')
     if (n >= 1000000) return `${prefix}${(n/1000000).toFixed(1)}B`
     return `${prefix}${(n/1000).toFixed(0)}M`
   }
