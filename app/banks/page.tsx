@@ -13,8 +13,9 @@ const ARAB_BANK_ID = 1
 const USD_TO_JOD = 0.71
 
 function toJOD(n: number | null | undefined, bankId: number): number | null {
+  // Rows are pre-normalized to JOD at load (cfNorm, 0.709) — identity here to avoid double conversion
   if (n == null) return null
-  return bankId === ARAB_BANK_ID ? n * USD_TO_JOD : n
+  return n
 }
 
 function fmtK(n: number | null | undefined, bankId?: number): string {
