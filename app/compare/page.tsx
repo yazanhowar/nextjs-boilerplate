@@ -19,7 +19,7 @@ const CHART_COLORS = ['#004D8F', '#CEBA95', '#2ECC71', '#E05252', '#8B9AB0', '#F
 
 // DB values stored in THOUSANDS. Arab Bank (id=1) = USD thousands, others = JOD thousands.
 const ARAB_BANK_ID = 1
-const USD_TO_JOD = 0.71
+const USD_TO_JOD = 0.709
 function toJOD(n: number | null | undefined, bankId: number): number | null {
   if (n == null) return null
   return bankId === ARAB_BANK_ID ? n * USD_TO_JOD : n
@@ -133,10 +133,10 @@ function CompareContent() {
 
   // Build comparison table rows
   const comparisonRows = [
-    { label: 'Net Profit', key: 'net_profit', format: (v: number) => fmtJOD(v) },
-    { label: 'Total Assets', key: 'total_assets', format: (v: number) => fmtJOD(v) },
-    { label: 'Customer Deposits', key: 'customer_deposits', format: (v: number) => fmtJOD(v) },
-    { label: 'Net Loans', key: 'net_loans', format: (v: number) => fmtJOD(v) },
+    { label: 'Net Profit', key: 'net_profit', format: (v: number, bankId?: number) => fmtJOD(v, bankId) },
+    { label: 'Total Assets', key: 'total_assets', format: (v: number, bankId?: number) => fmtJOD(v, bankId) },
+    { label: 'Customer Deposits', key: 'customer_deposits', format: (v: number, bankId?: number) => fmtJOD(v, bankId) },
+    { label: 'Net Loans', key: 'net_loans', format: (v: number, bankId?: number) => fmtJOD(v, bankId) },
     { label: 'Return on Equity', key: 'roe', format: (v: number) => `${v?.toFixed(1)}%` },
     { label: 'Capital Ratio', key: 'car', format: (v: number) => `${v?.toFixed(1)}%` },
     { label: 'Bad Loan Ratio', key: 'npl_ratio', format: (v: number) => `${v?.toFixed(2)}%` },
@@ -307,7 +307,7 @@ function CompareContent() {
                         return (
                           <td key={id} className={`px-5 py-3 text-end font-medium
                             ${isMax ? 'text-[#2ECC71]' : 'text-white'}`}>
-                            {val != null ? row.format(val) : '\u2014'}
+                            {val != null ? row.format(val, id) : '\u2014'}
                           </td>
                         )
                       })}
