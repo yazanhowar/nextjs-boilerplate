@@ -11,7 +11,8 @@ const TOOLS = [
   { name: 'compare_banks', description: 'Compare reported financials across several banks for a fiscal year, from the knowledge base.', inputSchema: { type: 'object', properties: { banks: { type: 'array', items: { type: 'string' } }, fiscal_year: { type: 'number' } }, required: ['banks'] } },
   { name: 'sector_overview', description: 'Banking-sector aggregates for a fiscal year (Association of Banks in Jordan view): sums and averages computed from the knowledge base. Defaults to the latest year.', inputSchema: { type: 'object', properties: { fiscal_year: { type: 'number' } } } },
   { name: 'cbj_policy_rates', description: 'Central Bank of Jordan policy rates from the knowledge base.', inputSchema: { type: 'object', properties: {} } },
-  { name: 'cbj_submissions', description: 'CBJ regulatory-return submission tracker per bank across months, quarters and years.', inputSchema: { type: 'object', properties: { bank: { type: 'string' } } } }
+  { name: 'cbj_submissions', description: 'CBJ regulatory-return submission tracker per bank across months, quarters and years.', inputSchema: { type: 'object', properties: { bank: { type: 'string' } } } },
+  { name: 'bank_products', description: 'Banking products a bank offers from the knowledge base: current/savings accounts, cards, personal/home/auto loans, deposits, digital and Islamic products. Identify the bank by name or code; omit bank to span all banks. Optional category filter (retail_loan, retail_deposit, retail_card, corporate_loan, digital, investment, insurance).', inputSchema: { type: 'object', properties: { bank: { type: 'string' }, category: { type: 'string' } } } }
 ];
 
 function numericAgg(rows) {
@@ -119,6 +120,14 @@ async function callTool(name, args) {
     return p.data || [];
   }
   if (name === 'cbj_submissions') { return cbjDummy(args.bank); }
+  if (name === 'bank_products') {
+    var pq = supabase.from('bank_products').select('bank_id,category,sub_category,product_name_en,product_name_ar,description_en,currency,is_islamic,target_segment').eq('is_active', true);
+    if (args.bank) { var pids = await resolveBankIds([args.bank]); if (pids.length) pq = pq.in('bank_id', pids); }
+    if (args.category) pq = pq.ilike('category', '%' + args.category + '%');
+    var pr = await pq.order('bank_id').limit(600);
+    if (pr.error) throw new Error(pr.error.message);
+    return pr.data || [];
+  }
   throw new Error('Unknown tool: ' + name);
 }
 
