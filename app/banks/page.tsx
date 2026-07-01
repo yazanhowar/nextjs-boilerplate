@@ -100,13 +100,13 @@ export default function Dashboard() {
   }, [selectedYear])
 
   const t = {
-    bg: dark ? '#1a1a1a' : '#F2F4F7', surface: dark ? '#242424' : '#FFFFFF',
-    surfaceHover: dark ? '#2a2a2a' : '#F0F4FA', border: dark ? '#383838' : '#DDE2EA',
-    text: dark ? '#FFFFFF' : '#0F172A', textSub: dark ? '#9CA3AF' : '#4A5568',
-    textMuted: dark ? '#6B7280' : '#94A3B8', accent: dark ? '#3B82F6' : '#004D8F',
-    green: dark ? '#2ECC71' : '#16A34A', red: dark ? '#E05252' : '#DC2626',
-    inputBg: dark ? '#242424' : '#FFFFFF', pillBg: dark ? '#2a2a2a' : '#EEF2F7',
-    shadow: dark ? 'none' : '0 1px 4px rgba(0,0,0,0.07)',
+    bg: 'var(--cf-bg)', surface: 'var(--cf-surface)',
+    surfaceHover: 'var(--cf-surface2)', border: 'var(--cf-line)',
+    text: 'var(--cf-ink)', textSub: 'var(--cf-ink2)',
+    textMuted: 'var(--cf-ink3)', accent: 'var(--cf-primary)',
+    green: 'var(--cf-positive)', red: 'var(--cf-negative)',
+    inputBg: 'var(--cf-surface)', pillBg: 'var(--cf-primary-soft)',
+    shadow: 'none',
   }
 
   const jodBanks = BANKS.filter(b => b.id !== ARAB_BANK_ID)
