@@ -163,7 +163,7 @@ function CompareContent() {
                     : 'bg-transparent text-[var(--cf-ink2)] border-[var(--cf-line)] hover:border-[var(--cf-primary)]'
                   }`}
               >
-                {bank.shortName}
+                {isAr ? bank.nameAr : bank.shortName}
               </button>
             ))}
           </div>
@@ -266,7 +266,7 @@ function CompareContent() {
         <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl overflow-hidden">
           <div className="px-5 py-4 border-b border-[var(--cf-line)]">
             <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)]">
-              FY2025 Side-by-side Comparison
+              {'FY2025 ' + L.cmp_sideBySide}
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -279,7 +279,7 @@ function CompareContent() {
                     return (
                       <th key={id} className="text-end px-5 py-3 font-medium">
                         <span className={bank.isHBTF ? 'text-[var(--cf-gold)]' : 'text-[var(--cf-ink)]'}>
-                          {bank.shortName}
+                          {isAr ? bank.nameAr : bank.shortName}
                         </span>
                       </th>
                     )
