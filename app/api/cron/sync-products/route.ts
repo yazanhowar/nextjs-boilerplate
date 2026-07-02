@@ -128,12 +128,14 @@ async function runSync(bankId: number, pages: number, dryRun: boolean) {
 }
 
 export async function POST(req: NextRequest) {
+  try {
   const body = await req.json().catch(function(){ return {} as any })
   if (body.secret !== process.env.SEED_SECRET && body.secret !== 'hbtf-seed-2024') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const res = await runSync(Number(body.bankId || 0), Math.min(Number(body.pages || 4), 8), !!body.dryRun)
   return NextResponse.json(res)
+  } catch (e: any) { return NextResponse.json({ crash: String(e && e.message || e), stack: String(e && e.stack || '').slice(0, 400) }, { status: 200 }) }
 }
 
 export async function GET(req: NextRequest) {
