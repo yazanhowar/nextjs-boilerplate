@@ -819,6 +819,9 @@ export default function BankPage() {
                     </div>
                     <div>
                       <div className="text-[13px] font-medium text-[var(--cf-ink)]">{b.full_name_en}</div>
+                      {b.notes && (
+                        <div className="text-[10.5px] text-[var(--cf-gold)] mt-[1px]">{b.notes}</div>
+                      )}
                       <div className="text-[11px] text-[var(--cf-ink2)]">
                         {b.role}
                         {b.is_independent && (
