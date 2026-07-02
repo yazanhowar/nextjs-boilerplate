@@ -62,7 +62,8 @@ async function llmExtract(bankName: string, isIslamicBank: boolean, corpus: stri
   }
   let data = await call('claude-sonnet-4-6')
   if (data && data.error && String(data.error.type || '').indexOf('not_found') >= 0) data = await call('claude-opus-4-6')
-  const txt = (data && data.content && data.content[0] && data.content[0].text) ? data.content[0].text : '[]'
+  const txt = (data && data.content && data.content[0] && data.content[0].text) ? data.content[0].text : JSON.stringify({ apiErr: (data && data.error) ? data.error : 'empty' })
+  ;(globalThis as any).__lastRaw = String(txt).slice(0, 300)
   const clean = txt.replace(/```json/gi, '').replace(/```/g, '').trim()
   try { const arr = JSON.parse(clean); return Array.isArray(arr) ? arr : [] } catch { return [] }
 }
@@ -116,7 +117,7 @@ async function runSync(bankId: number, pages: number, dryRun: boolean, urlsIn?: 
     }
   })
 
-  if (dryRun) return { bank: bank.shortName, urls: urls, pagesFetched: texts.length, extracted: rows.length, newRows: fresh, env: { sr: !!process.env.SUPABASE_SERVICE_ROLE_KEY, sk: !!process.env.SUPABASE_SERVICE_KEY, srk: !!process.env.SUPABASE_SERVICE_ROLE, ssk: !!process.env.SUPABASE_SECRET_KEY, ssrk: !!process.env.SERVICE_ROLE_KEY } }
+  if (dryRun) return { bank: bank.shortName, urls: urls, pagesFetched: texts.length, corpusLen: texts.join('').length, corpusHead: texts.join(' ').slice(0, 260), rawHead: (globalThis as any).__lastRaw, extracted: rows.length, newRows: fresh, env: { sr: !!process.env.SUPABASE_SERVICE_ROLE_KEY, sk: !!process.env.SUPABASE_SERVICE_KEY, srk: !!process.env.SUPABASE_SERVICE_ROLE, ssk: !!process.env.SUPABASE_SECRET_KEY, ssrk: !!process.env.SERVICE_ROLE_KEY } }
 
   let inserted = 0; const errors: string[] = []
   for (let i = 0; i < fresh.length; i += 20) {
