@@ -5,7 +5,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
     if (body.secret !== 'hbtf-seed-2024') return NextResponse.json({ error: 'forbidden' }, { status: 403 })
-    const supa = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, process.env.SUPABASE_SERVICE_ROLE_KEY as string)
+    const supa = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string)
     const [ex, bd, re, bs, es] = await Promise.all([
       supa.from('bank_executives').select('bank_id'),
       supa.from('bank_board_members').select('bank_id'),
