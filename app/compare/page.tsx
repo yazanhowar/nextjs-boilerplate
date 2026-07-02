@@ -1,6 +1,7 @@
 'use client'
 // app/compare/page.tsx - Side-by-side bank comparison + AI chart generation
 
+import { zadMdToHtml, ZAD_MD_CSS } from '@/lib/zad-md'
 import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { BANKS } from '@/lib/banks-config'
@@ -212,7 +213,14 @@ function CompareContent() {
 
           {error && <div className="mt-4 text-[var(--cf-negative)] text-[13px]">{error}</div>}
 
-          {chartData && (
+          {chartData && chartData.kind === 'text' && (
+          <div className="mt-6 p-4 rounded-xl bg-[var(--cf-surface)] border border-[var(--cf-line)]">
+            <style dangerouslySetInnerHTML={{ __html: ZAD_MD_CSS }} />
+            <div className="text-[11px] uppercase tracking-wider text-[var(--cf-ink3)] mb-2">{chartData.title}</div>
+            <div className="text-[13px]" dangerouslySetInnerHTML={{ __html: zadMdToHtml(chartData.text) }} />
+          </div>
+        )}
+        {chartData && chartData.kind !== 'text' && (
             <div className="mt-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="text-[14px] font-semibold text-[var(--cf-ink)]">{chartData.title}</div>
