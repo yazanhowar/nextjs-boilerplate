@@ -35,7 +35,7 @@ const SPECS: Spec[] = [
   ]}
 ]
 
-const PROBE_HOSTS = ['imf.org', 'dos.gov.jo', 'cbj.gov.jo', 'mof.gov.jo', 'abj.org.jo', 'worldbank.org']
+const PROBE_HOSTS = ['imf.org', 'dos.gov.jo', 'cbj.gov.jo', 'mof.gov.jo', 'abj.org.jo', 'worldbank.org', 'nomics.world']
 
 async function fetchJson(url: string, ms: number): Promise<any> {
   const ctl = new AbortController()
