@@ -79,7 +79,23 @@ async function runSync(bankId: number, pages: number, dryRun: boolean, urlsIn?: 
     home = await fetchText(base + '/', 6500)
     let effBase = base
     if (!home) { home = await fetchText('https://' + bank.domain + '/', 6500); effBase = 'https://' + bank.domain }
-    urls = discoverLinks(home, effBase).slice(0, pages)
+    const all = discoverLinks(home, effBase)
+    const buckets: Record<string, string[]> = { loan: [], card: [], deposit: [], digital: [], other: [] }
+    all.forEach(function(u){
+      if (/(loan|finance|tamweel|murabaha|ijara|mortgage|auto|car|housing)/i.test(u)) buckets.loan.push(u)
+      else if (/(card|credit|debit|prepaid)/i.test(u)) buckets.card.push(u)
+      else if (/(deposit|account|saving|wadiah|current)/i.test(u)) buckets.deposit.push(u)
+      else if (/(digital|wallet|online|mobile|app)/i.test(u)) buckets.digital.push(u)
+      else buckets.other.push(u)
+    })
+    const order = ['loan','card','deposit','digital','other']
+    urls = []
+    for (let round = 0; urls.length < pages && round < 6; round++) {
+      for (let b = 0; b < order.length && urls.length < pages; b++) {
+        const u = buckets[order[b]][round]
+        if (u && urls.indexOf(u) < 0) urls.push(u)
+      }
+    }
   }
 
   const fetched = await Promise.all(urls.map(function(u){ return fetchText(u, 6500) }))
