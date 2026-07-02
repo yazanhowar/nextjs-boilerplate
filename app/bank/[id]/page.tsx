@@ -264,6 +264,8 @@ export default function BankPage() {
 
   const [activeTab, setActiveTab] = useState('overview')
   const [imgError, setImgError] = useState(false)
+  const [analystNote, setAnalystNote] = useState('')
+  useEffect(() => { if (!bankId) return; supabase.from('banks').select('analyst_note').eq('id', bankId).single().then(({ data }: any) => { if (data && data.analyst_note) setAnalystNote(data.analyst_note) }) }, [bankId])
 
   // Data states
   const [financials, setFinancials] = useState<any[]>([])
@@ -534,6 +536,12 @@ export default function BankPage() {
                 <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
                   <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '12px' }}>About {bank.name || 'the Bank'}</div>
                   <p style={{ fontSize: '13px', color: 'var(--cf-ink2)', lineHeight: '1.6', margin: 0 }}>{bank.description}</p>
+                  {analystNote && (
+                    <div style={{ marginTop: '14px', padding: '12px 14px', background: 'var(--cf-surface2)', borderRadius: '10px', borderInlineStart: '3px solid var(--cf-primary)' }}>
+                      <div style={{ fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--cf-ink3)', marginBottom: '6px' }}>ZAD Insight</div>
+                      <p style={{ fontSize: '12.5px', color: 'var(--cf-ink2)', lineHeight: '1.65', margin: 0 }}>{analystNote}</p>
+                    </div>
+                  )}
                   <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid var(--cf-line)', display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
                     <span style={{ color: 'var(--cf-ink3)' }}>Type</span>
                     <span style={{ color: 'var(--cf-ink)', fontWeight: 600 }}>{bank.sector === 'islamic' ? 'Islamic Banking' : 'Commercial Banking'}</span>
