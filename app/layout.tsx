@@ -1,4 +1,5 @@
 // app/layout.tsx
+import VersionGuard from '@/components/VersionGuard'
 import type { Metadata } from 'next'
 import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic, IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
@@ -26,7 +27,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           __html: `(function(){try{var s=localStorage.getItem('hbtf-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;if(s==='dark'||((!s)&&d)){document.documentElement.classList.add('dark');}}catch(e){}})();`
         }} />
       </head>
-      <body data-build={(process.env.VERCEL_GIT_COMMIT_SHA || 'dev').slice(0, 7)} className={ibmSans.variable + ' ' + ibmArabic.variable + ' ' + ibmMono.variable + ' ' + ibmSans.className}><LangProvider><PasswordGate><CfHeader />{children}</PasswordGate></LangProvider></body>
+      <body data-build={(process.env.VERCEL_GIT_COMMIT_SHA || 'dev').slice(0, 7)} className={ibmSans.variable + ' ' + ibmArabic.variable + ' ' + ibmMono.variable + ' ' + ibmSans.className}><LangProvider><PasswordGate><CfHeader />{children}
+        <VersionGuard /></PasswordGate></LangProvider></body>
     </html>
   )
 }
