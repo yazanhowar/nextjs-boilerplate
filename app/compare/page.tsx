@@ -289,7 +289,9 @@ function CompareContent() {
               <tbody>
                 {comparisonRows.map(row => {
                   const values = selectedBanks.map(id => latest2025(id)?.[row.key])
-                  const maxVal = Math.max(...values.filter(v => v != null) as number[])
+                  const lowerIsBetter = row.key === 'npl_ratio' || row.key === 'cost_to_income'
+                  const numsBest = values.filter(v => v !== null) as number[]
+                  const maxVal = numsBest.length ? (lowerIsBetter ? Math.min(...numsBest) : Math.max(...numsBest)) : (null as any)
 
                   return (
                     <tr key={row.key} className="border-b border-[var(--cf-line)] hover:bg-[var(--cf-surface)] transition-colors">
