@@ -13,7 +13,7 @@ function fmtM(v, cur){ var j=jod(v,cur); if(j===null) return 'n/a'; var s=(Math.
 async function buildKnowledge(){
   var sb = createClient(SUPA_URL, SUPA_KEY);
   var banksRes = await sb.from('banks').select('id,name_en,name_ar,ticker,bank_type').order('id');
-  var finRes = await sb.from('bank_financials').select('bank_id,fiscal_year,total_assets,customer_deposits,net_loans,total_equity,net_profit,roe,roa,car,npl_ratio,loan_to_deposit,currency').order('bank_id', { ascending: true }).order('fiscal_year', { ascending: true });
+  var finRes = await sb.from('bank_financials').select('bank_id,fiscal_year,total_assets,customer_deposits,net_loans,total_equity,net_profit,roe,roa,car,npl_ratio,loan_to_deposit,net_interest_margin,cost_to_income,currency').order('bank_id', { ascending: true }).order('fiscal_year', { ascending: true });
   var abjRes = await sb.from('abj_sector_indicators').select('metric,data_period,value,unit').eq('category', 'balance_sheet').order('data_period', { ascending: false });
   var prodRes = await sb.from('bank_products').select('bank_id,category,sub_category,product_name_en').eq('is_active', true).order('bank_id');
   var banks = banksRes.data || [];
@@ -36,6 +36,8 @@ async function buildKnowledge(){
     if(f.roa!==null && f.roa!==undefined) parts.push('ROA ' + f.roa + '%');
     if(f.car!==null && f.car!==undefined) parts.push('CAR ' + f.car + '%');
     if(f.npl_ratio!==null && f.npl_ratio!==undefined) parts.push('NPL ' + f.npl_ratio + '%');
+    if(f.net_interest_margin!==null && f.net_interest_margin!==undefined) parts.push('NIM ' + f.net_interest_margin + '%');
+    if(f.cost_to_income!==null && f.cost_to_income!==undefined) parts.push('cost-to-income ' + f.cost_to_income + '%');
     if(f.loan_to_deposit!==null && f.loan_to_deposit!==undefined) parts.push('loan-to-deposit ' + f.loan_to_deposit + '%');
     var nm = b.name_en || ('Bank ' + f.bank_id);
     lines.push('- ' + nm + ' (' + (b.ticker||'') + ', ' + (b.bank_type||'') + ', FY' + f.fiscal_year + '): ' + parts.join(', '));
