@@ -198,7 +198,7 @@ function CompareContent() {
             <input
               value={prompt}
               onChange={e => setPrompt(e.target.value)}
-              placeholder="e.g. Compare deposit rates, Compare credit card fees, Who grew profits fastest?"
+              placeholder={L.cmp_placeholder}
               className="flex-1 bg-[var(--cf-bg)] border border-[var(--cf-line)] rounded-lg px-4 py-3
                          text-[13px] text-[var(--cf-ink)] placeholder-[#4A5568]
                          focus:outline-none focus:border-[var(--cf-gold)] transition-colors"
@@ -206,7 +206,7 @@ function CompareContent() {
             <button type="submit" disabled={loading}
               className="bg-[var(--cf-gold)] text-[var(--cf-ink)] font-semibold text-[13px]
                          px-6 py-3 rounded-lg hover:bg-[var(--cf-gold)] disabled:opacity-50 transition-colors">
-              {loading ? 'Generating...' : 'Generate'}
+              {loading ? L.cmp_generating : L.cmp_generate}
             </button>
           </form>
 
