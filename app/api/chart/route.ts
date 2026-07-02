@@ -80,7 +80,7 @@ export async function POST(req: Request) {
       const txt2 = rows2.length + ' bank-owned properties are listed' + (bankId ? ' for this bank' : ' across the sector') + '. Price range ' + (prices2.length ? fmtJ(prices2[0] as number) + ' \u2013 ' + fmtJ(prices2[prices2.length - 1] as number) + ' (median ' + fmtJ(med2 as number) + ')' : 'n/a') + '. Main types: ' + topT + '. [Browse all listings with details](/real-estate)';
       return NextResponse.json({ kind: 'text', title: 'Real Estate Listings', text: txt2 });
     }
-    else if (prompt && !has(['asset', 'deposit', 'loan', 'profit', 'equity', 'roe', 'roa', 'growth', 'revenue', 'income', 'car', 'npl', 'rate'])) {
+    else if (prompt && !/(asset|deposit|loan|lend|profit|equity|revenue|income|growth)/.test(prompt) && !/\b(roe|roa|car|npl|rate|rates)\b/.test(prompt)) {
       try {
         const org2 = new URL(req.url).origin;
         const zr2 = await fetch(org2 + '/api/zad', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [{ role: 'user', content: (bankId ? '(Regarding the bank with id=' + bankId + ') ' : '') + String(body.prompt || '') }], lang: (body.lang === 'ar' ? 'ar' : 'en') }) });
