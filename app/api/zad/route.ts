@@ -141,7 +141,8 @@ export async function POST(req){
       if(!last || last.role!=='user' || last.content!==input) convo.push({ role:'user', content: input });
     }
     if(convo.length===0) convo.push({ role:'user', content: (lang==='ar'?'مرحبا':'Hello') });
-    var knowledge = await buildKnowledge();
+    var knowledge = await buildKnowledge()
+    try { knowledge += await buildMacroBlock() } catch (e) {};
     var system = buildSystem(knowledge);
     var ares = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
@@ -164,3 +165,37 @@ export async function GET(){ return NextResponse.json({ ok: true, service: 'zad'
 
 // redeploy trigger 1782828567201
 // retrigger
+
+
+async function buildMacroBlock(): Promise<string> {
+  try {
+    var sbc: any = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    var r1 = await sbc.from('macro_indicators').select('category,indicator,period,value,unit,source').order('category', { ascending: true }).order('indicator', { ascending: true }).order('id', { ascending: true })
+    var rows = (r1 && r1.data) || []
+    if (!rows.length) return ''
+    var g: any = {}
+    var order: string[] = []
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i]
+      var k = r.category + ' | ' + r.indicator + (r.unit && r.unit !== '%' ? ' (' + r.unit + ')' : '')
+      if (!g[k]) { g[k] = []; order.push(k) }
+      g[k].push(r.period + '=' + r.value)
+    }
+    var out = '\n\nMACRO AND ECONOMY DATA (Jordan and global; DoS/CBJ/MoF national sources plus IMF WEO/CPI/DOT mirrors; auto-synced weekly):\n'
+    for (var j = 0; j < order.length; j++) {
+      var kk = order[j]
+      var vals = g[kk]
+      if (vals.length > 14) vals = vals.slice(vals.length - 14)
+      out += kk + ': ' + vals.join(', ') + '\n'
+    }
+    var r2 = await sbc.from('credit_ratings').select('agency,rating,outlook,rating_year')
+    var cr = (r2 && r2.data) || []
+    if (cr.length) {
+      out += 'Jordan sovereign ratings: '
+      for (var c = 0; c < cr.length; c++) { out += (c ? '; ' : '') + cr[c].agency + ' ' + cr[c].rating + (cr[c].outlook ? ' (' + cr[c].outlook + ')' : '') }
+      out += '\n'
+    }
+    out += 'Macro data rules: for Jordan actuals prefer DoS/CBJ/MoF rows over IMF rows; IMF is authoritative for global aggregates and forecasts (periods ending in F are forecasts). Monthly periods use Mon-YYYY format. Monthly trade figures are USD millions (IMF DOT); DoS half-year trade figures are JOD millions.\n'
+    return out
+  } catch (e) { return '' }
+}
