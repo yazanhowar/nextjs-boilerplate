@@ -9,6 +9,7 @@ function db() {
 }
 
 const IMF = 'https://www.imf.org/external/datamapper/api/v1'
+const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
 
 type Geo = { geo: string; category: string; indicator: string; indicator_ar: string; forecastIndicator?: string; forecast_ar?: string; unit?: string }
 type Spec = { code: string; geos: Geo[] }
@@ -40,7 +41,7 @@ async function fetchJson(url: string, ms: number): Promise<any> {
   const ctl = new AbortController()
   const t = setTimeout(function(){ ctl.abort() }, ms)
   try {
-    const r = await fetch(url, { signal: ctl.signal, cache: 'no-store', headers: { accept: 'application/json', 'user-agent': 'Mozilla/5.0 (compatible; convofinance-sync/1.0)' } })
+    const r = await fetch(url, { signal: ctl.signal, cache: 'no-store', headers: { accept: 'application/json', 'user-agent': UA, 'accept-language': 'en-US,en;q=0.9', referer: 'https://www.imf.org/external/datamapper/' } })
     if (!r.ok) throw new Error('http ' + r.status)
     return await r.json()
   } finally { clearTimeout(t) }
@@ -120,7 +121,7 @@ export async function GET(req: Request) {
       if (!ok) return NextResponse.json({ error: 'host not allowed' }, { status: 400 })
       const ctl = new AbortController()
       const t = setTimeout(function(){ ctl.abort() }, 20000)
-      const r = await fetch(probe, { signal: ctl.signal, cache: 'no-store', headers: { 'user-agent': 'Mozilla/5.0 (compatible; convofinance-sync/1.0)', accept: '*/*' } })
+      const r = await fetch(probe, { signal: ctl.signal, cache: 'no-store', headers: { 'user-agent': UA, 'accept-language': 'en-US,en;q=0.9', accept: '*/*' } })
       clearTimeout(t)
       const ct = r.headers.get('content-type') || ''
       const body = await r.text()
