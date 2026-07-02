@@ -67,16 +67,9 @@ async function llmExtract(bankName: string, isIslamicBank: boolean, corpus: stri
   try { const arr = JSON.parse(clean); return Array.isArray(arr) ? arr : [] } catch { return [] }
 }
 
-export async function POST(req: NextRequest) {
-  const body = await req.json().catch(function(){ return {} as any })
-  if (body.secret !== process.env.SEED_SECRET && body.secret !== 'hbtf-seed-2024') {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-  const bankId = Number(body.bankId || 0)
+async function runSync(bankId: number, pages: number, dryRun: boolean) {
   const bank = BANKS.find(function(b){ return b.id === bankId })
-  if (!bank) return NextResponse.json({ error: 'unknown bankId' }, { status: 400 })
-  const pages = Math.min(Number(body.pages || 4), 8)
-  const dryRun = !!body.dryRun
+  if (!bank) return { error: 'unknown bankId' }
 
   const base = 'https://www.' + bank.domain
   let urls: string[] = Array.isArray(body.urls) ? body.urls.slice(0, 8) : []
@@ -94,7 +87,7 @@ export async function POST(req: NextRequest) {
     if (h) texts.push('PAGE ' + urls[i] + '\n' + stripHtml(h).slice(0, 6000))
   }
   if (home && texts.length < 2) texts.push('PAGE ' + base + '\n' + stripHtml(home).slice(0, 6000))
-  if (!texts.length) return NextResponse.json({ error: 'no pages fetched', urlsTried: urls }, { status: 200 })
+  if (!texts.length) return { error: 'no pages fetched', urlsTried: urls }
 
   const sb = db()
   const ex = await sb.from('bank_products').select('product_name_en').eq('bank_id', bankId)
@@ -123,7 +116,7 @@ export async function POST(req: NextRequest) {
     }
   })
 
-  if (dryRun) return NextResponse.json({ bank: bank.shortName, urls: urls, pagesFetched: texts.length, extracted: rows.length, newRows: fresh })
+  if (dryRun) return { bank: bank.shortName, urls: urls, pagesFetched: texts.length, extracted: rows.length, newRows: fresh }
 
   let inserted = 0; const errors: string[] = []
   for (let i = 0; i < fresh.length; i += 20) {
@@ -131,5 +124,25 @@ export async function POST(req: NextRequest) {
     const ins = await sb.from('bank_products').insert(chunk)
     if (ins.error) errors.push(ins.error.message); else inserted += chunk.length
   }
-  return NextResponse.json({ bank: bank.shortName, urls: urls, pagesFetched: texts.length, extracted: rows.length, inserted: inserted, skippedExisting: rows.length - fresh.length, errors: errors })
+  return { bank: bank.shortName, urls: urls, pagesFetched: texts.length, extracted: rows.length, inserted: inserted, skippedExisting: rows.length - fresh.length, errors: errors }
+}
+
+export async function POST(req: NextRequest) {
+  const body = await req.json().catch(function(){ return {} as any })
+  if (body.secret !== process.env.SEED_SECRET && body.secret !== 'hbtf-seed-2024') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const res = await runSync(Number(body.bankId || 0), Math.min(Number(body.pages || 4), 8), !!body.dryRun)
+  return NextResponse.json(res)
+}
+
+export async function GET(req: NextRequest) {
+  const auth = req.headers.get('authorization') || ''
+  if (!process.env.CRON_SECRET || auth !== 'Bearer ' + process.env.CRON_SECRET) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const day = Math.floor(Date.now() / 86400000)
+  const bankId = (day % 13) + 1
+  const res = await runSync(bankId, 4, false)
+  return NextResponse.json({ cron: true, bankId: bankId, result: res })
 }
