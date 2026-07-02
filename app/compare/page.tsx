@@ -318,7 +318,7 @@ function CompareContent() {
 
 export default function ComparePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[var(--cf-bg)] flex items-center justify-center text-[var(--cf-ink)]">{L.cmp_loading}</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[var(--cf-bg)] flex items-center justify-center text-[var(--cf-ink)]">Loading...</div>}>
       <CompareContent />
     </Suspense>
   )
