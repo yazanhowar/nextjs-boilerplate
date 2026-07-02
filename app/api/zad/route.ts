@@ -16,7 +16,7 @@ async function buildKnowledge(){
   var finRes = await sb.from('bank_financials').select('bank_id,fiscal_year,total_assets,customer_deposits,net_loans,total_equity,net_profit,roe,roa,car,npl_ratio,loan_to_deposit,net_interest_margin,cost_to_income,currency').order('bank_id', { ascending: true }).order('fiscal_year', { ascending: true });
   var abjRes = await sb.from('abj_sector_indicators').select('metric,data_period,value,unit').eq('category', 'balance_sheet').order('data_period', { ascending: false });
   var prodRes = await sb.from('bank_products').select('bank_id,category,sub_category,product_name_en').eq('is_active', true).order('bank_id');
-  var reRes = await sb.from('bank_real_estate').select('bank_id');
+  var reRes = await createClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string).from('bank_real_estate').select('bank_id');
   var banks = banksRes.data || [];
   var fins = finRes.data || [];
   var abj = abjRes.data || [];
