@@ -19,6 +19,7 @@ export function LangProvider({ children }: { children: ReactNode }) {
   const setLang = (l: Lang) => {
     setLangState(l)
     localStorage.setItem('lang', l)
+    try { window.dispatchEvent(new CustomEvent('cf-lang', { detail: l })) } catch {}
     document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'
     document.documentElement.lang = l
   }
