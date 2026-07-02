@@ -14,7 +14,8 @@ export async function POST(req: Request) {
     try { body = await req.json(); } catch (e) { return NextResponse.json({ error: 'Invalid request.' }, { status: 400 }); }
     const prompt: string = (body && body.prompt ? String(body.prompt) : '').toLowerCase();
     const bankId = (body && body.bankId !== undefined && body.bankId !== null) ? body.bankId : null;
-    if (bankId === null || bankId === '') return NextResponse.json({ error: 'No bank specified.' }, { status: 400 });
+    const bankIds: number[] = Array.isArray(body.bankIds) ? body.bankIds.map(function (x: any) { return Number(x); }).filter(function (x: number) { return x > 0; }) : [];
+    if ((bankId === null || bankId === '') && !bankIds.length) return NextResponse.json({ error: 'No bank specified.' }, { status: 400 });
 
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -91,6 +92,29 @@ export async function POST(req: Request) {
     }
     else spec = { title: 'Assets, Deposits and Loans (JOD billions)', type: 'bar', series: ['Total Assets', 'Customer Deposits', 'Net Loans'], cols: [['Total Assets', 'total_assets'], ['Customer Deposits', 'customer_deposits'], ['Net Loans', 'net_loans']], kind: 'bil' };
 
+    if (bankIds.length > 1 && spec && spec.cols && spec.cols.length) {
+      const colM = spec.cols[0][1];
+      const metricName = spec.cols[0][0];
+      const bk = await supabase.from('banks').select('id,name_en').in('id', bankIds);
+      const nmap: any = {}; ((bk && bk.data) || []).forEach(function (b: any) { nmap[b.id] = b.name_en || ('Bank ' + b.id); });
+      const finM = await supabase.from('bank_financials').select('bank_id,fiscal_year,' + colM).in('bank_id', bankIds).order('fiscal_year', { ascending: true });
+      if (finM.error) return NextResponse.json({ error: 'Could not load financial data.' }, { status: 200 });
+      const rowsM: any[] = finM.data || [];
+      const yearsM: string[] = []; rowsM.forEach(function (r: any) { const y = fy(r.fiscal_year); if (yearsM.indexOf(y) < 0) yearsM.push(y); });
+      const scaleM = (spec.kind === 'bil') ? BIL : MIL;
+      const dataM = yearsM.map(function (y) {
+        const p: any = { name: y };
+        rowsM.forEach(function (r: any) {
+          if (fy(r.fiscal_year) !== y) return;
+          const nm = nmap[r.bank_id] || ('Bank ' + r.bank_id);
+          if (spec.kind === 'pct') { p[nm] = pct(r[colM]); }
+          else { let n = num(r[colM]); if (n !== null && r.bank_id === 1) n = n * PEG; p[nm] = (n === null) ? null : Math.round((n / scaleM) * 100) / 100; }
+        });
+        return p;
+      });
+      const seriesM = bankIds.map(function (id) { return nmap[id] || ('Bank ' + id); });
+      return NextResponse.json({ title: metricName + ' \u2014 ' + seriesM.length + ' banks ' + (spec.kind === 'pct' ? '(%)' : (spec.kind === 'bil' ? '(JOD billions)' : '(JOD millions)')), type: 'line', data: dataM, series: seriesM, insight: 'Side-by-side ' + metricName.toLowerCase() + ' by fiscal year. Arab Bank converted from USD at ' + PEG + '.' });
+    }
     const scale = (spec.kind === 'bil') ? BIL : MIL;
     const data = rows.map(function (row: any) {
       const p: any = { name: fy(row.fiscal_year) };
