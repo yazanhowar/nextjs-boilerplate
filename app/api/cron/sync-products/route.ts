@@ -49,6 +49,29 @@ function discoverLinks(html: string, base: string): string[] {
   return out
 }
 
+async function sitemapUrls(base: string): Promise<string[]> {
+  const out: string[] = []
+  const seen: string[] = []
+  async function ingest(u: string, depth: number) {
+    if (depth > 1 || seen.indexOf(u) >= 0 || seen.length > 5) return
+    seen.push(u)
+    const x = await fetchText(u, 6500)
+    if (!x) return
+    const re = /<loc>\s*([^<\s]+)\s*<\/loc>/gi
+    let m: RegExpExecArray | null
+    const subs: string[] = []
+    while ((m = re.exec(x))) {
+      const loc = m[1]
+      if (/\.xml(\?|$)/i.test(loc)) { if (subs.length < 3) subs.push(loc) }
+      else if (loc.indexOf(base) === 0 && PRODUCT_PATH.test(loc) && !/\.(pdf|jpg|jpeg|png|gif|svg|zip|docx?|xlsx?)$/i.test(loc) && out.length < 300 && out.indexOf(loc) < 0) out.push(loc)
+    }
+    for (let s = 0; s < subs.length; s++) await ingest(subs[s], depth + 1)
+  }
+  await ingest(base + '/sitemap.xml', 0)
+  if (!out.length) await ingest(base + '/sitemap_index.xml', 0)
+  return out
+}
+
 async function llmExtract(bankName: string, isIslamicBank: boolean, corpus: string, existing: string[]): Promise<any[]> {
   const sys = 'You extract banking product catalogs. Output ONLY a JSON array, no prose, no markdown fences. Each element: {"category": one of ' + JSON.stringify(CATS) + ', "sub_category": short string, "product_name_en": string, "product_name_ar": string or null, "description_en": one factual sentence, "min_amount": number or null, "max_amount": number or null, "min_tenor_months": integer or null, "max_tenor_months": integer or null, "currency": "JOD" unless stated otherwise, "is_islamic": boolean}. Only include REAL products explicitly present in the text. Do NOT include products from this existing list (already in our database): ' + JSON.stringify(existing.slice(0, 200)) + '. If nothing new, output [].'
   const usr = 'Bank: ' + bankName + (isIslamicBank ? ' (Islamic bank - products are Sharia-compliant by default)' : '') + '. Website text follows.\n\n' + corpus
@@ -80,8 +103,13 @@ async function runSync(bankId: number, pages: number, dryRun: boolean, urlsIn?: 
     let effBase = base
     if (!home) { home = await fetchText('https://' + bank.domain + '/', 6500); effBase = 'https://' + bank.domain }
     const all = discoverLinks(home, effBase)
+    let candidates = all
+    if (candidates.length < pages * 2) {
+      const smUrls = await sitemapUrls(effBase)
+      for (let s = 0; s < smUrls.length; s++) { if (candidates.indexOf(smUrls[s]) < 0) candidates.push(smUrls[s]) }
+    }
     const buckets: Record<string, string[]> = { loan: [], card: [], deposit: [], digital: [], other: [] }
-    all.forEach(function(u){
+    candidates.forEach(function(u){
       if (/(loan|finance|tamweel|murabaha|ijara|mortgage|auto|car|housing)/i.test(u)) buckets.loan.push(u)
       else if (/(card|credit|debit|prepaid)/i.test(u)) buckets.card.push(u)
       else if (/(deposit|account|saving|wadiah|current)/i.test(u)) buckets.deposit.push(u)
