@@ -549,7 +549,7 @@ export default function BankPage() {
                       const byCat: any = {}
                       products.forEach((p: any) => { const c = (p.category || 'other').replace(/_/g, ' '); byCat[c] = (byCat[c] || 0) + 1 })
                       return Object.keys(byCat).sort((a: any, b: any) => byCat[b] - byCat[a]).slice(0, 6).map((c: any, i: number) => (
-                        <div key={i} style={{ background: 'var(--cf-surface2)', borderRadius: '10px', padding: '11px 13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div key={i} onClick={() => { setActiveTab('products'); setTimeout(() => { const el = document.getElementById('cat-' + String(c).replace(/ /g, '_')); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }, 150) }} title="View products" style={{ background: 'var(--cf-surface2)', borderRadius: '10px', padding: '11px 13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
                           <span style={{ fontSize: '12px', color: 'var(--cf-ink2)', textTransform: 'capitalize' }}>{c}</span>
                           <span style={{ fontSize: '17px', fontWeight: 800, color: 'var(--cf-primary)' }}>{byCat[c]}</span>
                         </div>
@@ -703,7 +703,7 @@ export default function BankPage() {
         {activeTab === 'products' && (
           <div className="space-y-4">
             {productCategories.map(cat => (
-              <div key={cat} className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
+              <div key={cat} id={'cat-' + cat} className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
                 <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">{cat.split('_').join(' ')}</div>
                 <div className="grid grid-cols-2 gap-3">
                   {products.filter(p => p.category === cat).map((p, i) => (
