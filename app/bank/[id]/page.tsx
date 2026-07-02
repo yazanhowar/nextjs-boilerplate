@@ -144,7 +144,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
                      px-5 py-3 rounded-lg hover:bg-[var(--cf-gold)] disabled:opacity-50
                      transition-colors whitespace-nowrap"
         >
-          {loading ? 'Generating...' : 'Generate chart'}
+          {loading ? 'Thinking...' : 'Ask ZAD'}
         </button>
       </form>
 
@@ -152,7 +152,25 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
         <div className="mt-4 text-[var(--cf-negative)] text-[13px]">{error}</div>
       )}
 
-      {chartData && (
+      {chartData && chartData.kind === 'text' && (
+        <div className="mt-6 p-4 rounded-xl bg-[var(--cf-surface2)] border border-[var(--cf-line)]">
+          <div className="text-[11px] uppercase tracking-wider text-[var(--cf-ink3)] mb-2">{chartData.title}</div>
+          <div className="text-[13px] leading-relaxed text-[var(--cf-ink)]">
+            {String(chartData.text || '').split('\n').map((ln: string, li: number) => (
+              <p key={li} style={{ margin: '0 0 8px 0' }}>
+                {ln.split(/(\[[^\]]+\]\([^)]+\)|\*\*[^*]+\*\*)/g).map((seg: string, si: number) => {
+                  const lm = seg.match(/^\[([^\]]+)\]\(([^)]+)\)$/)
+                  if (lm) return <a key={si} href={lm[2]} style={{ color: 'var(--cf-primary)', fontWeight: 600 }}>{lm[1]}</a>
+                  const bm = seg.match(/^\*\*([^*]+)\*\*$/)
+                  if (bm) return <strong key={si}>{bm[1]}</strong>
+                  return seg
+                })}
+              </p>
+            ))}
+          </div>
+        </div>
+      )}
+      {chartData && chartData.kind !== 'text' && (
         <div className="mt-6">
           <div className="flex items-center justify-between mb-4">
             <div className="text-[14px] font-semibold text-[var(--cf-ink)]">{chartData.title}</div>
