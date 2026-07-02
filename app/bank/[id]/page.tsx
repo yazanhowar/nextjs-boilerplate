@@ -496,9 +496,9 @@ export default function BankPage() {
               </div>
               <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
                 <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>Profitability Trend</div>
-                <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>Return ratios (%), by fiscal year</div>
+                <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>ROE, ROA + net interest margin (%), by fiscal year</div>
                 <ResponsiveContainer width="100%" height={240}>
-                  <LineChart data={financials.map((f: any) => ({ name: 'FY' + f.fiscal_year, ROE: f.roe, ROA: f.roa }))} margin={{ top: 4, right: 8, left: -12, bottom: 0 }}>
+                  <LineChart data={financials.map((f: any) => ({ name: 'FY' + f.fiscal_year, ROE: f.roe, ROA: f.roa, NIM: f.net_interest_margin }))} margin={{ top: 4, right: 8, left: -12, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" vertical={false} />
                     <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--cf-ink2)' }} axisLine={{ stroke: 'var(--cf-line)' }} tickLine={false} />
                     <YAxis tick={{ fontSize: 11, fill: 'var(--cf-ink2)' }} axisLine={false} tickLine={false} />
@@ -506,6 +506,7 @@ export default function BankPage() {
                     <Legend wrapperStyle={{ fontSize: 11 }} />
                     <Line type="monotone" dataKey="ROE" stroke="var(--cf-primary)" strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
                     <Line type="monotone" dataKey="ROA" stroke="var(--cf-teal)" strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
+                    <Line type="monotone" dataKey="NIM" stroke="var(--cf-gold)" strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} connectNulls={true} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
