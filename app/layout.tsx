@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           __html: `(function(){try{var s=localStorage.getItem('hbtf-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;if(s==='dark'||((!s)&&d)){document.documentElement.classList.add('dark');}}catch(e){}})();`
         }} />
       </head>
-      <body className={ibmSans.variable + ' ' + ibmArabic.variable + ' ' + ibmMono.variable + ' ' + ibmSans.className}><LangProvider><PasswordGate><CfHeader />{children}</PasswordGate></LangProvider></body>
+      <body data-build={(process.env.VERCEL_GIT_COMMIT_SHA || 'dev').slice(0, 7)} className={ibmSans.variable + ' ' + ibmArabic.variable + ' ' + ibmMono.variable + ' ' + ibmSans.className}><LangProvider><PasswordGate><CfHeader />{children}</PasswordGate></LangProvider></body>
     </html>
   )
 }
