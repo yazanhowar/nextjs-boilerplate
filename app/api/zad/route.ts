@@ -18,10 +18,6 @@ async function buildKnowledge(){
   var prodRes = await sb.from('bank_products').select('bank_id,category,sub_category,product_name_en').eq('is_active', true).order('bank_id');
   var reRes = await createClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string).from('bank_real_estate').select('bank_id');
   var stockRes = await createClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string).from('bank_stock_data').select('bank_id,price,day_high,day_low,change_pct,volume,price_date').order('bank_id');
-  var stRows = (stockRes && stockRes.data) || [];
-  var stLines: string[] = [];
-  stRows.forEach(function(r: any){ var nm = (bmap[r.bank_id] && bmap[r.bank_id].name_en) || ('Bank ' + r.bank_id); stLines.push('- ' + nm + ' (id=' + r.bank_id + '): JOD ' + r.price + ' (' + (Number(r.change_pct) >= 0 ? '+' : '') + r.change_pct + '%), day range ' + r.day_low + '-' + r.day_high + ', volume ' + r.volume); });
-  var stStr = stRows.length ? ('ASE SHARE PRICES (Amman Stock Exchange, price in JOD per share, as of ' + (stRows[0].price_date || 'latest available') + '):\n' + stLines.join('\n')) : '';
   var banks = banksRes.data || [];
   var fins = finRes.data || [];
   var abj = abjRes.data || [];
@@ -81,6 +77,10 @@ async function buildKnowledge(){
   var reBy = {}; reRows.forEach(function(r){ reBy[r.bank_id] = (reBy[r.bank_id]||0)+1; });
   var reLines = []; Object.keys(reBy).sort(function(a,b){ return reBy[b]-reBy[a]; }).forEach(function(id){ var nm = (bmap[id] && bmap[id].name_en) || ('Bank ' + id); reLines.push(nm + ' (id=' + id + '): ' + reBy[id]); });
   var reStr = reRows.length ? ('BANK-OWNED REAL ESTATE FOR SALE (all listings are browsable in this product at /real-estate): total ' + reRows.length + ' listings. Listings per bank: ' + reLines.join('; ') + '.') : '';
+    var stRows = (stockRes && stockRes.data) || [];
+  var stLines: string[] = [];
+  stRows.forEach(function(r: any){ var nm = (bmap[r.bank_id] && bmap[r.bank_id].name_en) || ('Bank ' + r.bank_id); stLines.push('- ' + nm + ' (id=' + r.bank_id + '): JOD ' + r.price + ' (' + (Number(r.change_pct) >= 0 ? '+' : '') + r.change_pct + '%), day range ' + r.day_low + '-' + r.day_high + ', volume ' + r.volume); });
+  var stStr = stRows.length ? ('ASE SHARE PRICES (Amman Stock Exchange, price in JOD per share, as of ' + (stRows[0].price_date || 'latest available') + '):\n' + stLines.join('\n')) : '';
   return perBank + '\n\n' + abjStr + (prodStr ? ('\n\n' + prodStr) : '') + (reStr ? ('\n\n' + reStr) : '') + (stStr ? ('\n\n' + stStr) : '');
 }
 
