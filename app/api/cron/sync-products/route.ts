@@ -75,16 +75,16 @@ async function runSync(bankId: number, pages: number, dryRun: boolean, urlsIn?: 
   let urls: string[] = Array.isArray(urlsIn) ? urlsIn.slice(0, 8) : []
   let home = ''
   if (!urls.length) {
-    home = await fetchText(base + '/', 9000)
+    home = await fetchText(base + '/', 6500)
     let effBase = base
-    if (!home) { home = await fetchText('https://' + bank.domain + '/', 9000); effBase = 'https://' + bank.domain }
+    if (!home) { home = await fetchText('https://' + bank.domain + '/', 6500); effBase = 'https://' + bank.domain }
     urls = discoverLinks(home, effBase).slice(0, pages)
   }
 
+  const fetched = await Promise.all(urls.map(function(u){ return fetchText(u, 6500) }))
   const texts: string[] = []
   for (let i = 0; i < urls.length; i++) {
-    const h = await fetchText(urls[i], 9000)
-    if (h) texts.push('PAGE ' + urls[i] + '\n' + stripHtml(h).slice(0, 6000))
+    if (fetched[i]) texts.push('PAGE ' + urls[i] + '\n' + stripHtml(fetched[i]).slice(0, 6000))
   }
   if (home && texts.length < 2) texts.push('PAGE ' + base + '\n' + stripHtml(home).slice(0, 6000))
   if (!texts.length) return { error: 'no pages fetched', urlsTried: urls }
