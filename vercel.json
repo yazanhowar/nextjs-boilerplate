@@ -1,6 +1,10 @@
 {
   "crons": [
     {
+      "path": "/api/cron/sync-products",
+      "schedule": "30 4 * * *"
+    },
+    {
       "path": "/api/cron/sync-announcements",
       "schedule": "0 6 * * *"
     }
