@@ -70,13 +70,13 @@ export async function POST(req: Request) {
       if (bankId) q2 = q2.eq('bank_id', bankId);
       const { data: re2 } = await q2;
       const rows2: any[] = re2 || [];
-      if (!rows2.length) return NextResponse.json({ kind: 'text', title: 'Real Estate Listings', text: 'No listings are recorded for this bank in the current dataset. **[Browse all bank listings](/real-estate)**' });
+      if (!rows2.length) return NextResponse.json({ kind: 'text', title: 'Real Estate Listings', text: 'No listings are recorded for this bank in the current dataset. [Browse all bank listings](/real-estate)' });
       const prices2 = rows2.map((r: any) => num(r.price_jod)).filter((v: any) => v && v > 0).sort((a: any, b: any) => a - b);
       const types2: any = {}; rows2.forEach((r: any) => { const ty = String(r.property_type || 'Other'); types2[ty] = (types2[ty] || 0) + 1 });
       const topT = Object.keys(types2).sort((a, b) => types2[b] - types2[a]).slice(0, 4).map(k => k + ' (' + types2[k] + ')').join(', ');
       const fmtJ = (v: number) => 'JOD ' + Math.round(v).toLocaleString('en-US');
       const med2 = prices2.length ? prices2[Math.floor(prices2.length / 2)] : 0;
-      const txt2 = rows2.length + ' bank-owned properties are listed' + (bankId ? ' for this bank' : ' across the sector') + '. Price range ' + (prices2.length ? fmtJ(prices2[0] as number) + ' \u2013 ' + fmtJ(prices2[prices2.length - 1] as number) + ' (median ' + fmtJ(med2 as number) + ')' : 'n/a') + '. Main types: ' + topT + '. **[Browse all listings with details](/real-estate)**';
+      const txt2 = rows2.length + ' bank-owned properties are listed' + (bankId ? ' for this bank' : ' across the sector') + '. Price range ' + (prices2.length ? fmtJ(prices2[0] as number) + ' \u2013 ' + fmtJ(prices2[prices2.length - 1] as number) + ' (median ' + fmtJ(med2 as number) + ')' : 'n/a') + '. Main types: ' + topT + '. [Browse all listings with details](/real-estate)';
       return NextResponse.json({ kind: 'text', title: 'Real Estate Listings', text: txt2 });
     }
     else if (prompt && !has(['asset', 'deposit', 'loan', 'profit', 'equity', 'roe', 'roa', 'growth', 'revenue', 'income', 'car', 'npl', 'rate', 'fee', 'margin'])) {
@@ -87,7 +87,7 @@ export async function POST(req: Request) {
         const tx2 = String((zj2 && zj2.text) || '').replace(/```chart[\s\S]*?```/g, '').trim();
         if (tx2) return NextResponse.json({ kind: 'text', title: 'ZAD', text: tx2 });
       } catch (e2) {}
-      return NextResponse.json({ kind: 'text', title: 'ZAD', text: 'I could not answer that from chart data. **[Open the full ZAD chat](/chat' + (bankId ? '?bank=' + bankId : '') + ')**' });
+      return NextResponse.json({ kind: 'text', title: 'ZAD', text: 'I could not answer that from chart data. [Open the full ZAD chat](/chat' + (bankId ? '?bank=' + bankId : '') + ')' });
     }
     else spec = { title: 'Assets, Deposits and Loans (JOD billions)', type: 'bar', series: ['Total Assets', 'Customer Deposits', 'Net Loans'], cols: [['Total Assets', 'total_assets'], ['Customer Deposits', 'customer_deposits'], ['Net Loans', 'net_loans']], kind: 'bil' };
 
