@@ -170,6 +170,9 @@ export const t = {
     nw_allCategories: 'All Categories',
     nw_noAnnouncements: 'No announcements found.',
     nw_verified: '\u2713 Verified',
+    cmp_placeholder: 'e.g. Compare deposit rates, Compare credit card fees, Who grew profits fastest?',
+    cmp_generating: 'Generating...',
+    nw_count: 'announcements',
   },
   ar: {
     // Nav & Header
@@ -340,5 +343,8 @@ export const t = {
     nw_allCategories: 'كل الفئات',
     nw_noAnnouncements: 'لا توجد إعلانات.',
     nw_verified: '\u2713 موثّق',
+    cmp_placeholder: 'مثال: قارن أسعار الودائع، قارن رسوم البطاقات، من الأسرع نمواً في الأرباح؟',
+    cmp_generating: 'جارٍ الإنشاء...',
+    nw_count: 'إعلاناً',
   },
 } as const
