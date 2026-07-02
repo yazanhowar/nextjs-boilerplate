@@ -285,8 +285,8 @@ export default function BankPage() {
         supabase.from('bank_rates').select('*').eq('bank_id', bankId).limit(1).single(),
         supabase.from('bank_products').select('*').eq('bank_id', bankId),
         supabase.from('bank_ownership').select('*').eq('bank_id', bankId).order('ownership_pct', { ascending: false }),
-        supabase.from('bank_board_members').select('*').eq('bank_id', bankId).order('fiscal_year', { ascending: false }).limit(20),
-        supabase.from('bank_executives').select('*').eq('bank_id', bankId).order('fiscal_year', { ascending: false }).limit(10),
+        supabase.from('bank_board_members').select('*').eq('bank_id', bankId).order('fiscal_year', { ascending: false }).limit(30),
+        supabase.from('bank_executives').select('*').eq('bank_id', bankId).order('fiscal_year', { ascending: false }).limit(40),
         supabase.from('bank_announcements').select('*').eq('bank_id', bankId).order('announcement_date', { ascending: false }).limit(15),
       ])
       setFinancials(fins.data || [])
