@@ -124,7 +124,7 @@ export default function RealEstatePage() {
                     <div style={{ fontSize: 20, fontWeight: 700, color: t.text, marginBottom: 4 }}>
                       {listing.price_jod ? `JOD ${listing.price_jod.toLocaleString()}` : 'Price on request'}
                     </div>
-                    {listing.location && <div style={{ fontSize: 13, color: t.textSub, marginBottom: 8 }}>&var(--cf-positive); {listing.location}</div>}
+                    {listing.location && <div style={{ fontSize: 13, color: t.textSub, marginBottom: 8 }}>📍 {listing.location}</div>}
                     {listing.area_sqm && <div style={{ fontSize: 12, color: t.textMuted, marginBottom: 8 }}>{listing.area_sqm.toLocaleString()} m&sup2;</div>}
                     {listing.description_en && <p style={{ fontSize: 13, color: t.textSub, margin: '0 0 12px', lineHeight: 1.5 }}>{listing.description_en.slice(0, 120)}{listing.description_en.length > 120 ? '...' : ''}</p>}
                     {listing.listing_url && (
