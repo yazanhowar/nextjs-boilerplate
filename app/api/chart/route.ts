@@ -65,7 +65,7 @@ export async function POST(req: Request) {
     else if (has(['loan', 'lending']) && !has(['asset', 'deposit', 'growth'])) spec = { title: 'Net Loans (JOD billions)', type: 'bar', series: ['Net Loans'], cols: [['Net Loans', 'net_loans']], kind: 'bil' };
     else if (has(['equity']) && !has(['adequacy'])) spec = { title: 'Shareholders Equity (JOD billions)', type: 'bar', series: ['Equity'], cols: [['Equity', 'shareholders_equity']], kind: 'bil' };
     else if (/real ?estate|propert|listing|apartment|villa|land|\u0639\u0642\u0627\u0631|\u0634\u0642\u0629|\u0623\u0631\u0636/.test(prompt)) {
-      const supa2 = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) as string);
+      const supa2 = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string);
       let q2: any = supa2.from('bank_real_estate').select('price_jod, property_type, location');
       if (bankId) q2 = q2.eq('bank_id', bankId);
       const { data: re2 } = await q2;
