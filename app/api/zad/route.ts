@@ -17,6 +17,11 @@ async function buildKnowledge(){
   var abjRes = await sb.from('abj_sector_indicators').select('metric,data_period,value,unit').eq('category', 'balance_sheet').order('data_period', { ascending: false });
   var prodRes = await sb.from('bank_products').select('bank_id,category,sub_category,product_name_en').eq('is_active', true).order('bank_id');
   var reRes = await createClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string).from('bank_real_estate').select('bank_id');
+  var stockRes = await createClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string).from('bank_stock_data').select('bank_id,price,day_high,day_low,change_pct,volume,price_date').order('bank_id');
+  var stRows = (stockRes && stockRes.data) || [];
+  var stLines: string[] = [];
+  stRows.forEach(function(r: any){ var nm = (bmap[r.bank_id] && bmap[r.bank_id].name_en) || ('Bank ' + r.bank_id); stLines.push('- ' + nm + ' (id=' + r.bank_id + '): JOD ' + r.price + ' (' + (Number(r.change_pct) >= 0 ? '+' : '') + r.change_pct + '%), day range ' + r.day_low + '-' + r.day_high + ', volume ' + r.volume); });
+  var stStr = stRows.length ? ('ASE SHARE PRICES (Amman Stock Exchange, price in JOD per share, as of ' + (stRows[0].price_date || 'latest available') + '):\n' + stLines.join('\n')) : '';
   var banks = banksRes.data || [];
   var fins = finRes.data || [];
   var abj = abjRes.data || [];
@@ -76,7 +81,7 @@ async function buildKnowledge(){
   var reBy = {}; reRows.forEach(function(r){ reBy[r.bank_id] = (reBy[r.bank_id]||0)+1; });
   var reLines = []; Object.keys(reBy).sort(function(a,b){ return reBy[b]-reBy[a]; }).forEach(function(id){ var nm = (bmap[id] && bmap[id].name_en) || ('Bank ' + id); reLines.push(nm + ' (id=' + id + '): ' + reBy[id]); });
   var reStr = reRows.length ? ('BANK-OWNED REAL ESTATE FOR SALE (all listings are browsable in this product at /real-estate): total ' + reRows.length + ' listings. Listings per bank: ' + reLines.join('; ') + '.') : '';
-  return perBank + '\n\n' + abjStr + (prodStr ? ('\n\n' + prodStr) : '') + (reStr ? ('\n\n' + reStr) : '');
+  return perBank + '\n\n' + abjStr + (prodStr ? ('\n\n' + prodStr) : '') + (reStr ? ('\n\n' + reStr) : '') + (stStr ? ('\n\n' + stStr) : '');
 }
 
 function buildSystem(knowledge){
@@ -87,6 +92,7 @@ function buildSystem(knowledge){
     'If the user asks to create, build or see a dashboard for a bank, never say you cannot build dashboards - every bank already has a live dashboard in this product. Respond with a compact summary of the latest key metrics (assets, deposits, loans, net profit, ROE, CAR), one chart of a single key metric over the last 3 fiscal years (prefer net profit), and a markdown link to the dashboard page in the form [Open the Housing Bank dashboard](/bank/2), using the numeric bank id exactly as shown in the id= field of the DATA (a bank listed with id=5 links to /bank/5) - never guess the id. If the user reports a UI bug or app issue, acknowledge briefly that the product team has been notified and answer any analytical part of the message.',
     'If asked for a dashboard for all banks or the whole market: produce a markdown table of all 15 banks with total assets, deposits, net profit and ROE for the latest FY, one chart of a single metric (e.g. FY2025 net profit by bank, or the 3-year sector asset trend), a growth paragraph comparing the last 3 fiscal years (who grew fastest, who lagged), and end with the links [Open the banks directory](/banks) and [Compare banks](/compare).',
     'For real-estate questions, use the BANK-OWNED REAL ESTATE data (listing counts per bank) and always include the markdown link [Browse all listings](/real-estate). Only chart listing counts per bank if the user asks for a comparison.',
+    'For share-price or market questions, use the ASE SHARE PRICES data (price, daily change, day range, volume) and always state the as-of date. Market cap and P/E are not tracked in the data - say so plainly if asked, never invent them.',
     'For questions about real estate, properties or listings: use the BANK-OWNED REAL ESTATE counts from the DATA, NEVER answer with balance-sheet, assets, deposits or loans charts, and always include the link [Browse all property listings](/real-estate). If asked about one bank, give its listing count with the same link. Real estate questions are about physical properties for sale, not financial statements.',
     'The product catalogue lists availability only, not pricing. If asked for a product interest rate, fee, or amount, state that specific pricing is not in the knowledge base rather than estimating.',
     'No filler, no flattery, no preamble. Lead with the direct answer, then brief supporting detail.',
