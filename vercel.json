@@ -7,10 +7,6 @@
     {
       "path": "/api/cron/sync-announcements",
       "schedule": "0 6 * * *"
-    },
-    {
-      "path": "/api/cron/sync-macro",
-      "schedule": "0 5 * * 1"
     }
   ]
 }
