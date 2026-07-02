@@ -67,7 +67,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
 
   const examples = [
     `Show ${bankName} profit trend over 3 years`,
-    `Compare ${bankName} credit card fees vs Housing Bank`,
+    `Compare ${bankName} credit card fees vs ${bankName === 'HBTF' ? 'Arab Bank' : 'Housing Bank'}`,
     `What deposit rates does ${bankName} offer?`,
     `${bankName} revenue breakdown by year`,
   ]
