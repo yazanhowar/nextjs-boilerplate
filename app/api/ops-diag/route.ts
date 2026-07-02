@@ -14,6 +14,6 @@ export async function POST(req: Request) {
       supa.from('bank_executives').select('*').eq('bank_id', Number(body.sampleBank || 2)).limit(30)
     ])
     function cnt(rows: any) { const m: any = {}; (rows.data || []).forEach((r: any) => { m[r.bank_id] = (m[r.bank_id] || 0) + 1 }); return m }
-    return NextResponse.json({ execCounts: cnt(ex), boardCounts: cnt(bd), reCounts: cnt(re), boardCols: bs.data && bs.data[0] ? Object.keys(bs.data[0]) : [], boardSample: (bs.data || []).map((r: any) => ({ n: r.full_name_en, p: r.position_en || r.title_en, rep: r.representing_en || r.representing || r.represents || null, fy: r.fiscal_year })), execSample: (es.data || []).map((r: any) => ({ n: r.full_name_en, t: r.title_en, fy: r.fiscal_year })) })
+    return NextResponse.json({ execCounts: cnt(ex), boardCounts: cnt(bd), reCounts: cnt(re), boardCols: bs.data && bs.data[0] ? Object.keys(bs.data[0]) : [], boardSample: (bs.data || []).map((r: any) => ({ n: r.full_name_en, role: r.role, ind: r.is_independent, com: r.committee, nat: r.nationality, notes: r.notes, fy: r.fiscal_year })), execSample: (es.data || []).map((r: any) => ({ n: r.full_name_en, t: r.title_en, fy: r.fiscal_year })) })
   } catch (e: any) { return NextResponse.json({ error: String(e && e.message || e) }, { status: 500 }) }
 }
