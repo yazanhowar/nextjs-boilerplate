@@ -16,6 +16,7 @@ async function buildKnowledge(){
   var finRes = await sb.from('bank_financials').select('bank_id,fiscal_year,total_assets,customer_deposits,net_loans,total_equity,net_profit,roe,roa,car,npl_ratio,loan_to_deposit,net_interest_margin,cost_to_income,currency').order('bank_id', { ascending: true }).order('fiscal_year', { ascending: true });
   var abjRes = await sb.from('abj_sector_indicators').select('metric,data_period,value,unit').eq('category', 'balance_sheet').order('data_period', { ascending: false });
   var prodRes = await sb.from('bank_products').select('bank_id,category,sub_category,product_name_en').eq('is_active', true).order('bank_id');
+  var reRes = await sb.from('bank_real_estate').select('bank_id');
   var banks = banksRes.data || [];
   var fins = finRes.data || [];
   var abj = abjRes.data || [];
@@ -71,7 +72,11 @@ async function buildKnowledge(){
   var prodLines = [];
   Object.keys(pByBank).forEach(function(id){ var b = bmap[id] || {}; var nm = b.name_en || ('Bank ' + id); prodLines.push('- ' + nm + ' (' + pByBank[id].length + ' products): ' + pByBank[id].join('; ')); });
   var prodStr = prodLines.length ? ('BANKING PRODUCTS PER BANK (source: each bank official website; product availability/catalogue only, no pricing or interest rates): ' + prodLines.join('\n')) : '';
-  return perBank + '\n\n' + abjStr + (prodStr ? ('\n\n' + prodStr) : '');
+  var reRows = (reRes && reRes.data) || [];
+  var reBy = {}; reRows.forEach(function(r){ reBy[r.bank_id] = (reBy[r.bank_id]||0)+1; });
+  var reLines = []; Object.keys(reBy).sort(function(a,b){ return reBy[b]-reBy[a]; }).forEach(function(id){ var nm = (bmap[id] && bmap[id].name_en) || ('Bank ' + id); reLines.push(nm + ' (id=' + id + '): ' + reBy[id]); });
+  var reStr = reRows.length ? ('BANK-OWNED REAL ESTATE FOR SALE (all listings are browsable in this product at /real-estate): total ' + reRows.length + ' listings. Listings per bank: ' + reLines.join('; ') + '.') : '';
+  return perBank + '\n\n' + abjStr + (prodStr ? ('\n\n' + prodStr) : '') + (reStr ? ('\n\n' + reStr) : '');
 }
 
 function buildSystem(knowledge){
@@ -81,6 +86,7 @@ function buildSystem(knowledge){
     'Every FIGURE you state must come from the DATA below - never invent or estimate numbers. You ARE the analyst: when asked for drivers, causes, outlook or implications, give sharp qualitative analysis from your banking expertise. Never write disclaimers like "not available in the provided data" in analytical answers - analyze or omit.',
     'If the user asks to create, build or see a dashboard for a bank, never say you cannot build dashboards - every bank already has a live dashboard in this product. Respond with a compact summary of the latest key metrics (assets, deposits, loans, net profit, ROE, CAR), one chart of a single key metric over the last 3 fiscal years (prefer net profit), and a markdown link to the dashboard page in the form [Open the Housing Bank dashboard](/bank/2), using the numeric bank id exactly as shown in the id= field of the DATA (a bank listed with id=5 links to /bank/5) - never guess the id. If the user reports a UI bug or app issue, acknowledge briefly that the product team has been notified and answer any analytical part of the message.',
     'If asked for a dashboard for all banks or the whole market: produce a markdown table of all 15 banks with total assets, deposits, net profit and ROE for the latest FY, one chart of a single metric (e.g. FY2025 net profit by bank, or the 3-year sector asset trend), a growth paragraph comparing the last 3 fiscal years (who grew fastest, who lagged), and end with the links [Open the banks directory](/banks) and [Compare banks](/compare).',
+    'For questions about real estate, properties or listings: use the BANK-OWNED REAL ESTATE counts from the DATA, NEVER answer with balance-sheet, assets, deposits or loans charts, and always include the link [Browse all property listings](/real-estate). If asked about one bank, give its listing count with the same link. Real estate questions are about physical properties for sale, not financial statements.',
     'The product catalogue lists availability only, not pricing. If asked for a product interest rate, fee, or amount, state that specific pricing is not in the knowledge base rather than estimating.',
     'No filler, no flattery, no preamble. Lead with the direct answer, then brief supporting detail.',
     'Tag every figure with its basis (for example: ABJ sector, group consolidated, FY2025).',
