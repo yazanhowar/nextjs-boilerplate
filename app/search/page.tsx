@@ -86,10 +86,7 @@ export default function SearchPage() {
           </div>
           <div className="hbtf-logo-title">{T.search}</div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <a href="/" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textDecoration: 'none' }}>{isAr ? 'الرئيسية ←' : '← Dashboard'}</a>
-          <LangToggle /><ThemeToggle />
-        </div>
+        
       </header>
 
       <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
