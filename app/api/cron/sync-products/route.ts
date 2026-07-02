@@ -67,12 +67,12 @@ async function llmExtract(bankName: string, isIslamicBank: boolean, corpus: stri
   try { const arr = JSON.parse(clean); return Array.isArray(arr) ? arr : [] } catch { return [] }
 }
 
-async function runSync(bankId: number, pages: number, dryRun: boolean) {
+async function runSync(bankId: number, pages: number, dryRun: boolean, urlsIn?: string[]) {
   const bank = BANKS.find(function(b){ return b.id === bankId })
   if (!bank) return { error: 'unknown bankId' }
 
   const base = 'https://www.' + bank.domain
-  let urls: string[] = Array.isArray(body.urls) ? body.urls.slice(0, 8) : []
+  let urls: string[] = Array.isArray(urlsIn) ? urlsIn.slice(0, 8) : []
   let home = ''
   if (!urls.length) {
     home = await fetchText(base + '/', 9000)
@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
   if (body.secret !== process.env.SEED_SECRET && body.secret !== 'hbtf-seed-2024') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const res = await runSync(Number(body.bankId || 0), Math.min(Number(body.pages || 4), 8), !!body.dryRun)
+  const res = await runSync(Number(body.bankId || 0), Math.min(Number(body.pages || 4), 8), !!body.dryRun, Array.isArray(body.urls) ? body.urls : undefined)
   return NextResponse.json(res)
   } catch (e: any) { return NextResponse.json({ crash: String(e && e.message || e), stack: String(e && e.stack || '').slice(0, 400) }, { status: 200 }) }
 }
