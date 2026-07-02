@@ -181,7 +181,7 @@ export default function Dashboard() {
             const fin = financials[bank.id]
             const prev = prevFinancials[bank.id]
             const delta = fin?.net_profit&&prev?.net_profit ? pctDelta(fin.net_profit,prev.net_profit) : null
-            return <BankCard key={bank.id} bank={bank} fin={fin} delta={delta} loading={loading} dark={dark} t={t} dataYear={dataYear} hovered={hovered===bank.id} onMouseEnter={() => setHovered(bank.id)} onMouseLeave={() => setHovered(null)} onClick={() => router.push(`/chat?bank=${bank.id}`)} />
+            return <BankCard key={bank.id} bank={bank} fin={fin} delta={delta} loading={loading} dark={dark} t={t} dataYear={dataYear} hovered={hovered===bank.id} onMouseEnter={() => setHovered(bank.id)} onMouseLeave={() => setHovered(null)} onClick={() => router.push(`/bank/${bank.id}`)} onAsk={() => router.push(`/chat?bank=${bank.id}`)} />
           })}
         </div>
         {filtered.length===0 && <div style={{ textAlign:'center', padding:'60px 0', color:t.textSub }}>{L.bk_noMatch}</div>}
@@ -190,7 +190,7 @@ export default function Dashboard() {
   )
 }
 
-function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMouseEnter, onMouseLeave, onClick }: any) {
+function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMouseEnter, onMouseLeave, onClick, onAsk }: any) {
   const { lang } = useLang()
   const L = i18nDict[lang]
   const isAr = lang === 'ar'
@@ -222,7 +222,7 @@ function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMou
       </div>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
         <span style={{ fontSize:12, color:t.textSub }}>{bank.description.slice(0,52)}...</span>
-        <span style={{ backgroundColor:hovered?t.accent:('var(--cf-surface2)'), color:hovered?'#fff':t.textSub, borderRadius:8, padding:'5px 12px', fontSize:12, fontWeight:500, transition:'all 0.15s', whiteSpace:'nowrap', marginLeft:8 }}>{L.bk_askAI}</span>
+        <span onClick={(e: any) => { e.stopPropagation(); if (onAsk) onAsk() }} style={{ backgroundColor:hovered?t.accent:('var(--cf-surface2)'), color:hovered?'#fff':t.textSub, borderRadius:8, padding:'5px 12px', fontSize:12, fontWeight:500, transition:'all 0.15s', whiteSpace:'nowrap', marginLeft:8 }}>{L.bk_askAI}</span>
       </div>
     </div>
   )
