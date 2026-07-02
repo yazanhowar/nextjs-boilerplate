@@ -100,7 +100,7 @@ export default function NewsPage() {
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
         <div style={{ marginBottom: 24 }}>
           <h1 style={{ fontSize: 26, fontWeight: 700, margin: '0 0 6px', color: t.text }}>{L.nw_title}</h1>
-          <p style={{ fontSize: 14, color: t.textSub, margin: 0 }}>{filtered.length} announcements</p>
+          <p style={{ fontSize: 14, color: t.textSub, margin: 0 }}>{filtered.length} {L.nw_count}</p>
         </div>
 
         {/* Filters */}
@@ -140,7 +140,7 @@ export default function NewsPage() {
                       {a.summary_en && <div style={{ fontSize: 13, color: t.textSub, lineHeight: 1.5 }}>{a.summary_en}</div>}
                     </div>
                     <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <div style={{ fontSize: 12, color: t.textMuted }}>{a.announcement_date ? new Date(a.announcement_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
+                      <div style={{ fontSize: 12, color: t.textMuted }}>{a.announcement_date ? new Date(a.announcement_date).toLocaleDateString(isAr ? 'ar-JO' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
                       {a.source_url && (
                         <a href={a.source_url} target="_blank" rel="noopener noreferrer"
                           style={{ fontSize: 11, color: t.accent, textDecoration: 'none', marginTop: 4, display: 'block' }}>
