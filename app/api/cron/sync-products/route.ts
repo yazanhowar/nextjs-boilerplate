@@ -116,7 +116,7 @@ async function runSync(bankId: number, pages: number, dryRun: boolean, urlsIn?: 
     }
   })
 
-  if (dryRun) return { bank: bank.shortName, urls: urls, pagesFetched: texts.length, extracted: rows.length, newRows: fresh }
+  if (dryRun) return { bank: bank.shortName, urls: urls, pagesFetched: texts.length, extracted: rows.length, newRows: fresh, env: { sr: !!process.env.SUPABASE_SERVICE_ROLE_KEY, sk: !!process.env.SUPABASE_SERVICE_KEY, srk: !!process.env.SUPABASE_SERVICE_ROLE, ssk: !!process.env.SUPABASE_SECRET_KEY, ssrk: !!process.env.SERVICE_ROLE_KEY } }
 
   let inserted = 0; const errors: string[] = []
   for (let i = 0; i < fresh.length; i += 20) {
