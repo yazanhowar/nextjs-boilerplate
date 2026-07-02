@@ -69,7 +69,7 @@ async function llmExtract(bankName: string, isIslamicBank: boolean, corpus: stri
 
 async function runSync(bankId: number, pages: number, dryRun: boolean, urlsIn?: string[]) {
   const bank = BANKS.find(function(b){ return b.id === bankId })
-  if (!bank) return { error: 'unknown bankId' }
+  if (!bank) return { error: 'unknown bankId', env: { sr: !!process.env.SUPABASE_SERVICE_ROLE_KEY, sk: !!process.env.SUPABASE_SERVICE_KEY, srk: !!process.env.SUPABASE_SERVICE_ROLE, ssk: !!process.env.SUPABASE_SECRET_KEY } }
 
   const base = 'https://www.' + bank.domain
   let urls: string[] = Array.isArray(urlsIn) ? urlsIn.slice(0, 8) : []
