@@ -166,13 +166,14 @@ export default function ZadChat() {
   var e = useState(false); var errd = e[0]; var setErr = e[1];
   var endRef = useRef(null);
 
-  useEffect(function () { try { var l = localStorage.getItem('cf_lang'); if (l === 'ar' || l === 'en') setLang(l); } catch (x) {} }, []);
+  useEffect(function () { try { var l = localStorage.getItem('lang'); if (l === 'ar' || l === 'en') setLang(l); } catch (x) {} }, []);
+  React.useEffect(function () { function syncLang() { try { var l2 = localStorage.getItem('lang'); if (l2 === 'ar' || l2 === 'en') setLang(l2); } catch (x) {} } window.addEventListener('cf-lang', syncLang); return function () { window.removeEventListener('cf-lang', syncLang); }; }, []);
   useEffect(function () { try { document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'; document.documentElement.lang = lang; } catch (x) {} }, [lang]);
   useEffect(function () { try { if (endRef.current) endRef.current.scrollIntoView({ behavior: 'smooth' }); } catch (x) {} }, [msgs, busy]);
 
   var t = T[lang];
 
-  function toggleLang() { var n = lang === 'en' ? 'ar' : 'en'; setLang(n); try { localStorage.setItem('cf_lang', n); } catch (x) {} }
+  function toggleLang() { var n = lang === 'en' ? 'ar' : 'en'; setLang(n); try { localStorage.setItem('lang', n); } catch (x) {} }
 
   function ask(q) {
     var text = (q != null ? q : input).trim();
@@ -228,7 +229,7 @@ export default function ZadChat() {
 
   return React.createElement('div', { className: 'zc-wrap' },
     React.createElement('style', { dangerouslySetInnerHTML: { __html: CSS } }),
-    headerEl,
+
     React.createElement('div', { className: 'zc-main' }, content),
     inputBar);
 }
