@@ -1,4 +1,5 @@
 'use client';
+import { zadMdToHtml, ZAD_MD_CSS } from '@/lib/zad-md'
 import React, { useState, useEffect, useRef } from 'react';
 import { BANKS } from '@/lib/banks-config';
 
@@ -96,7 +97,7 @@ function stripChartBlock(text) {
   return o.trim();
 }
 function renderRich(text) {
-  return <div className="cf-md" dangerouslySetInnerHTML={{ __html: mdToHtml(stripChartBlock(text)).split('<code></code>').join('') }} />
+  return <div className="cf-md" dangerouslySetInnerHTML={{ __html: zadMdToHtml(text) }} />
 }
 
 function parseChart(text) {
@@ -233,7 +234,7 @@ export default function ZadChat() {
       React.createElement('button', { className: 'zc-send', onClick: function () { ask(); }, disabled: busy || !input.trim() }, t.send)));
 
   return React.createElement('div', { className: 'zc-wrap' },
-    React.createElement('style', { dangerouslySetInnerHTML: { __html: CSS } }),
+    React.createElement('style', { dangerouslySetInnerHTML: { __html: CSS + ZAD_MD_CSS } }),
 
     React.createElement('div', { className: 'zc-main' }, content),
     inputBar);
