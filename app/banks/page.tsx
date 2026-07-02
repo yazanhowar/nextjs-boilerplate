@@ -191,6 +191,9 @@ export default function Dashboard() {
 }
 
 function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMouseEnter, onMouseLeave, onClick }: any) {
+  const { lang } = useLang()
+  const L = i18nDict[lang]
+  const isAr = lang === 'ar'
   return (
     <div onClick={onClick} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={{ backgroundColor:hovered?t.surfaceHover:t.surface, border:`1px solid ${hovered?t.accent+'55':t.border}`, borderRadius:14, padding:20, cursor:'pointer', transition:'all 0.15s ease', transform:hovered?'translateY(-2px)':'none', boxShadow:hovered?`0 8px 24px ${dark?'rgba(0,0,0,0.5)':'rgba(0,0,0,0.1)'}`:t.shadow }}>
  <div style={{ minHeight:22, display:'flex', justifyContent:'flex-end', marginBottom:4 }}>
