@@ -45,7 +45,7 @@ function CompareContent() {
   const initialBank = searchParams.get('bank') ? parseInt(searchParams.get('bank')!) : null
 
   const [selectedBanks, setSelectedBanks] = useState<number[]>(
-    initialBank ? [2, initialBank] : [2, 3] // Default: HBTF vs JKB
+    initialBank ? (initialBank === 2 ? [2, 3] : [2, initialBank]) : [2, 3] // Default: HBTF vs JKB
   )
   const [prompt, setPrompt] = useState(initialPrompt)
   const [chartData, setChartData] = useState<any>(null)
@@ -90,7 +90,7 @@ function CompareContent() {
       const res = await fetch('/api/chart', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: q, bankId: selectedBanks[0] }),
+        body: JSON.stringify({ prompt: q, bankId: selectedBanks[0], bankIds: selectedBanks }),
       })
       const data = await res.json()
       if (data.error) setError(data.error)
