@@ -785,7 +785,7 @@ export default function BankPage() {
             <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
               <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">Executive Management</div>
               <div className="space-y-3">
-                {executives.slice(0, 8).map((e, i) => (
+                {executives.map((e, i) => (
                   <div key={i} className="flex items-start gap-3 py-2 border-b border-[var(--cf-line)] last:border-0">
                     <div className="w-8 h-8 rounded-full bg-[var(--cf-primary)]/20 border border-[var(--cf-primary)]/30
                                     flex items-center justify-center flex-shrink-0">
