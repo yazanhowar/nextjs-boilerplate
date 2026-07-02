@@ -1,4 +1,5 @@
 'use client';
+import { zadMdToHtml, ZAD_MD_CSS } from '@/lib/zad-md'
 import React, { useState, useEffect } from 'react';
 
 const CSS = "*{box-sizing:border-box}.sk-wrap{min-height:100vh;background:var(--cf-bg);color:var(--cf-ink);font-family:var(--cf-font-sans)}.sk-wrap[dir=rtl]{font-family:var(--cf-font-ar)}.sk-main{max-width:1200px;margin:0 auto;padding:26px 26px 64px}.sk-head{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:40px}.sk-brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}.sk-mark{width:42px;height:42px;border-radius:11px;background:var(--cf-grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;letter-spacing:.04em;flex-shrink:0}.sk-bname{font-weight:700;font-size:17px;color:var(--cf-ink);letter-spacing:-.01em;line-height:1.15}.sk-bsub{font-size:11.5px;color:var(--cf-ink3)}.sk-hnav{display:flex;align-items:center;gap:22px}.sk-nav{display:flex;gap:20px}.sk-navlink{font-size:13.5px;font-weight:500;color:var(--cf-primary);text-decoration:none;transition:color .15s;white-space:nowrap}.sk-navlink:hover{color:var(--cf-primary-strong)}.sk-navlink.on{color:var(--cf-ink);font-weight:600}.sk-tools{display:flex;align-items:center;gap:8px}.sk-tbtn{border:1px solid var(--cf-line);background:var(--cf-surface);color:var(--cf-ink2);border-radius:9px;padding:7px 12px;font-size:12.5px;font-weight:500;cursor:pointer;transition:all .15s;font-family:inherit}.sk-tbtn:hover{border-color:var(--cf-primary);color:var(--cf-primary)}.sk-eyebrow{font-size:12px;font-weight:600;letter-spacing:.14em;color:var(--cf-ink3);text-transform:uppercase;margin-bottom:9px}.sk-title{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:0 0 9px;color:var(--cf-ink)}.sk-sub{font-size:15px;color:var(--cf-ink2);max-width:640px;margin:0 0 15px;line-height:1.55}.sk-asof{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:500;color:var(--cf-ink2);background:var(--cf-surface);border:1px solid var(--cf-line);border-radius:20px;padding:5px 13px}.sk-live{width:7px;height:7px;border-radius:50%;background:var(--cf-positive);box-shadow:0 0 0 3px rgba(30,138,90,.14)}.sk-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:24px 0}.sk-kpi{background:var(--cf-surface);border:1px solid var(--cf-line);border-radius:14px;padding:16px 18px 13px;position:relative;overflow:hidden}.sk-kpi::before{content:'';position:absolute;top:0;inset-inline-start:0;inset-inline-end:0;height:3px;background:var(--kc,var(--cf-primary))}.sk-kl{font-size:11.5px;font-weight:600;color:var(--cf-ink3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}.sk-kv{display:flex;align-items:baseline;gap:6px}.sk-kvn{font-size:27px;font-weight:800;letter-spacing:-.02em;color:var(--cf-ink);font-variant-numeric:tabular-nums}.sk-ku{font-size:12px;font-weight:500;color:var(--cf-ink3)}.sk-kd{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;margin-top:8px}.sk-up{color:var(--cf-positive)}.sk-down{color:var(--cf-negative)}.sk-ksp{margin-top:9px;height:30px}.sk-grid{display:grid;grid-template-columns:1.85fr 1fr;gap:14px;margin-bottom:14px}.sk-g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}.sk-card{background:var(--cf-surface);border:1px solid var(--cf-line);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column}.sk-ch{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}.sk-ct{font-size:15px;font-weight:700;margin:0;color:var(--cf-ink)}.sk-cs{font-size:12px;color:var(--cf-ink3);margin-top:3px}.sk-cb{text-align:end;flex-shrink:0}.sk-cbn{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:var(--cf-ink)}.sk-cbd{font-size:12px;font-weight:700;margin-top:2px}.sk-chart{width:100%;height:150px;position:relative}.sk-chart svg{display:block;width:100%;height:100%}.sk-chart.tall{height:212px}.sk-xax{display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:var(--cf-ink3);font-weight:500}.sk-leg{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px}.sk-li{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:500;color:var(--cf-ink2)}.sk-ld{width:11px;height:11px;border-radius:3px}.sk-bars{display:flex;flex-direction:column;gap:16px;margin-top:8px}.sk-br{display:flex;flex-direction:column;gap:7px}.sk-brt{display:flex;align-items:center;justify-content:space-between}.sk-brl{font-size:13px;font-weight:500;color:var(--cf-ink2)}.sk-brv{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}.sk-brk{height:8px;border-radius:5px;background:var(--cf-surface2);overflow:hidden}.sk-brf{height:100%;border-radius:5px;transition:width .7s cubic-bezier(.2,.8,.2,1)}.sk-chat{background:var(--cf-surface);border:1px solid var(--cf-line);border-radius:14px;padding:22px;margin-top:6px}.sk-chq{display:flex;align-items:center;gap:12px;margin-bottom:16px}.sk-chi{width:40px;height:40px;border-radius:11px;background:var(--cf-grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;letter-spacing:.04em;flex-shrink:0}.sk-cht{font-size:16px;font-weight:700;margin:0;color:var(--cf-ink)}.sk-chs{font-size:12px;color:var(--cf-ink3);margin-top:2px}.sk-pr{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}.sk-prb{border:1px solid var(--cf-line);background:var(--cf-bg);color:var(--cf-ink2);border-radius:20px;padding:8px 14px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;text-align:start;font-family:inherit}.sk-prb:hover{border-color:var(--cf-primary);color:var(--cf-primary);background:var(--cf-primary-soft)}.sk-ms{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}.sk-m{max-width:88%;padding:12px 16px;border-radius:14px;font-size:14px;line-height:1.6}.sk-mu{align-self:flex-end;background:var(--cf-primary);color:#fff;border-bottom-right-radius:4px}.sk-mb{align-self:flex-start;background:var(--cf-bg);border:1px solid var(--cf-line);color:var(--cf-ink);border-bottom-left-radius:4px}.sk-mb strong{font-weight:700}.sk-tblw{overflow-x:auto;margin:10px 0}.sk-tbl{border-collapse:collapse;width:100%;font-size:12px}.sk-tbl th{background:var(--cf-surface2);color:var(--cf-ink2);text-align:start;padding:6px 9px;border:1px solid var(--cf-line);font-weight:600;white-space:nowrap}.sk-tbl td{padding:6px 9px;border:1px solid var(--cf-line);color:var(--cf-ink)}.sk-hr{border:none;border-top:1px solid var(--cf-line);margin:12px 0}.sk-h{font-weight:800;color:var(--cf-ink);margin:8px 0 6px}.sk-hh1{font-size:15px}.sk-hh2{font-size:14px}.sk-hh3{font-size:13px}.sk-p{margin:0 0 8px}.sk-li{margin:0 0 4px}.sk-lnk{color:var(--cf-primary);font-weight:600;text-decoration:none;border-bottom:1px solid var(--cf-line)}.sk-mb .sk-h{display:block;font-size:14.5px;margin:2px 0 4px;color:var(--cf-ink)}.sk-typ{display:inline-flex;gap:4px;align-items:center;padding:4px 2px}.sk-typ span{width:7px;height:7px;border-radius:50%;background:var(--cf-ink3);animation:skb 1.2s infinite}.sk-typ span:nth-child(2){animation-delay:.2s}.sk-typ span:nth-child(3){animation-delay:.4s}@keyframes skb{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}.sk-ir{display:flex;gap:10px;align-items:flex-end}.sk-in{flex:1;border:1px solid var(--cf-line);background:var(--cf-bg);color:var(--cf-ink);border-radius:11px;padding:13px 15px;font-size:14px;font-family:inherit;resize:none;outline:none;transition:border-color .15s;max-height:120px}.sk-in:focus{border-color:var(--cf-primary)}.sk-in::placeholder{color:var(--cf-ink3)}.sk-snd{border:none;background:var(--cf-primary);color:#fff;border-radius:11px;padding:13px 22px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s;flex-shrink:0;font-family:inherit}.sk-snd:hover{background:var(--cf-primary-strong)}.sk-snd:disabled{opacity:.5;cursor:not-allowed}.sk-ft{text-align:center;font-size:12px;color:var(--cf-ink3);margin-top:30px;padding-top:20px;border-top:1px solid var(--cf-line)}.sk-sk{background:var(--cf-surface2);border-radius:14px;animation:skp 1.5s infinite}@keyframes skp{0%,100%{opacity:.55}50%{opacity:.85}}@media(max-width:960px){.sk-kpis{grid-template-columns:repeat(2,1fr)}.sk-grid{grid-template-columns:1fr}.sk-g2{grid-template-columns:1fr}.sk-nav{display:none}}@media(max-width:560px){.sk-kpis{grid-template-columns:1fr}.sk-title{font-size:24px}.sk-main{padding:20px 16px 48px}.sk-head{margin-bottom:28px}}";
@@ -104,35 +105,8 @@ function svgMulti(seriesArr: any[], cvars: string[]) {
   }
   return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">' + grid + paths + '</svg>';
 }
-function mdLite(text: any) {
-  var t = String(text || '');
-  t = t.replace(/```[\s\S]*?```/g, '');
-  function esc0(x: string) { return x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-  function inl(x: string) {
-    x = esc0(x);
-    x = x.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    x = x.replace(/\[([^\]]+)\]\((\/[^)\s]+|https?:\/\/[^)\s]+)\)/g, '<a href="$2" class="sk-lnk">$1</a>');
-    return x;
-  }
-  var lines = t.split('\n'); var html = ''; var i = 0;
-  function isSep(l: string) { return /^\s*\|?[\s:|-]+$/.test(l || '') && (l || '').indexOf('-') >= 0 && (l || '').indexOf('|') >= 0; }
-  function cells(l: string) { var p = l.split('|'); if (p.length && !p[0].trim()) p.shift(); if (p.length && !p[p.length - 1].trim()) p.pop(); return p.map(function (x) { return x.trim(); }); }
-  while (i < lines.length) {
-    var ln = lines[i]; var tr = ln.trim();
-    if (!tr) { i++; continue; }
-    if (tr === '---' || tr === '***') { html += '<hr class="sk-hr">'; i++; continue; }
-    if (tr.indexOf('|') >= 0 && i + 1 < lines.length && isSep(lines[i + 1])) {
-      var head = cells(ln); var body: any[] = []; var j = i + 2;
-      while (j < lines.length && lines[j].indexOf('|') >= 0 && lines[j].trim() !== '') { body.push(cells(lines[j])); j++; }
-      html += '<div class="sk-tblw"><table class="sk-tbl"><thead><tr>' + head.map(function (h) { return '<th>' + inl(h) + '</th>'; }).join('') + '</tr></thead><tbody>' + body.map(function (r) { return '<tr>' + r.map(function (cx) { return '<td>' + inl(cx) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>';
-      i = j; continue;
-    }
-    if (tr.charAt(0) === '#') { var hl = 0; while (hl < tr.length && tr.charAt(hl) === '#') hl++; html += '<div class="sk-h sk-hh' + Math.min(hl, 3) + '">' + inl(tr.slice(hl).trim()) + '</div>'; i++; continue; }
-    if (/^[-*]\s+/.test(tr)) { html += '<div class="sk-li">\u2022 ' + inl(tr.replace(/^[-*]\s+/, '')) + '</div>'; i++; continue; }
-    html += '<p class="sk-p">' + inl(tr) + '</p>'; i++;
-  }
-  return html;
-}
+function mdLite(text: any) { return zadMdToHtml(text) }
+
 
 
 var CA = '--cf-primary', CD = '--cf-teal', CC = '--cf-iris', CR = '--cf-primary-strong';
@@ -186,7 +160,7 @@ export default function SectorPage() {
 
   if (loading) {
     return React.createElement('div', { className: 'sk-wrap', dir: isAr ? 'rtl' : 'ltr' },
-      React.createElement('style', { dangerouslySetInnerHTML: { __html: CSS } }),
+      React.createElement('style', { dangerouslySetInnerHTML: { __html: CSS + ZAD_MD_CSS } }),
       React.createElement('div', { className: 'sk-main' }, header,
         React.createElement('div', { className: 'sk-sk', style: { height: '40px', width: '320px', marginBottom: '18px' } }),
         React.createElement('div', { className: 'sk-kpis' }, React.createElement('div', { className: 'sk-sk', style: { height: '124px' } }), React.createElement('div', { className: 'sk-sk', style: { height: '124px' } }), React.createElement('div', { className: 'sk-sk', style: { height: '124px' } }), React.createElement('div', { className: 'sk-sk', style: { height: '124px' } })),
@@ -196,7 +170,7 @@ export default function SectorPage() {
   }
   if (errd) {
     return React.createElement('div', { className: 'sk-wrap', dir: isAr ? 'rtl' : 'ltr' },
-      React.createElement('style', { dangerouslySetInnerHTML: { __html: CSS } }),
+      React.createElement('style', { dangerouslySetInnerHTML: { __html: CSS + ZAD_MD_CSS } }),
       React.createElement('div', { className: 'sk-main' }, header, React.createElement('p', { style: { color: 'var(--cf-ink2)', padding: '40px 0' } }, t.loadErr)));
   }
 
@@ -286,7 +260,7 @@ export default function SectorPage() {
   );
 
   return React.createElement('div', { className: 'sk-wrap', dir: isAr ? 'rtl' : 'ltr' },
-    React.createElement('style', { dangerouslySetInnerHTML: { __html: CSS } }),
+    React.createElement('style', { dangerouslySetInnerHTML: { __html: CSS + ZAD_MD_CSS } }),
     React.createElement('div', { className: 'sk-main' },
       header,
       React.createElement('div', { className: 'sk-hero' },
