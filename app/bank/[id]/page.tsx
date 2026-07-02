@@ -1,6 +1,7 @@
 'use client'
 // app/bank/[id]/page.tsx — Individual bank intelligence page
 
+import { zadMdToHtml, ZAD_MD_CSS } from '@/lib/zad-md'
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { BANKS, getBank } from '@/lib/banks-config'
@@ -155,19 +156,8 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
       {chartData && chartData.kind === 'text' && (
         <div className="mt-6 p-4 rounded-xl bg-[var(--cf-surface2)] border border-[var(--cf-line)]">
           <div className="text-[11px] uppercase tracking-wider text-[var(--cf-ink3)] mb-2">{chartData.title}</div>
-          <div className="text-[13px] leading-relaxed text-[var(--cf-ink)]">
-            {String(chartData.text || '').split('\n').map((ln: string, li: number) => (
-              <p key={li} style={{ margin: '0 0 8px 0' }}>
-                {ln.split(/(\[[^\]]+\]\([^)]+\)|\*\*[^*]+\*\*)/g).map((seg: string, si: number) => {
-                  const lm = seg.match(/^\[([^\]]+)\]\(([^)]+)\)$/)
-                  if (lm) return <a key={si} href={lm[2]} style={{ color: 'var(--cf-primary)', fontWeight: 600 }}>{lm[1]}</a>
-                  const bm = seg.match(/^\*\*([^*]+)\*\*$/)
-                  if (bm) return <strong key={si}>{bm[1]}</strong>
-                  return seg
-                })}
-              </p>
-            ))}
-          </div>
+          <style dangerouslySetInnerHTML={{ __html: ZAD_MD_CSS }} />
+          <div className="text-[13px]" dangerouslySetInnerHTML={{ __html: zadMdToHtml(chartData.text) }} />
         </div>
       )}
       {chartData && chartData.kind !== 'text' && (
