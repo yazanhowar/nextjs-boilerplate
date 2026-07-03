@@ -528,7 +528,9 @@ export default function EconomyPage() {
         <CfSection t={lang === 'ar' ? 'الجهاز المصرفي' : 'BANKING SYSTEM'} n='7' open={true} topic='banking' lang={lang}>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))', gap: 12, marginTop: 14 }}>
           <div style={card}><div style={h2}>{t.sector} — {t.s_bs}</div><LineChart labels={D.bs.labels} series={D.bs.series} endLabels />{legend(D.bs.series)}</div>
+          <div style={{ fontSize: 10, color: 'var(--cf-ink3, #7d8ea3)', marginTop: 2 }}>{lang === 'ar' ? 'السنة المالية ٢٠٢٤ — أحدث تقرير سنوي منشور' : 'FY2024 · latest published annual data'}</div>
           <div style={card}><div style={h2}>{t.sector} — {t.s_prof}</div><LineChart labels={D.prof.labels} series={D.prof.series} endLabels zero />{legend(D.prof.series)}</div>
+          <div style={{ fontSize: 10, color: 'var(--cf-ink3, #7d8ea3)', marginTop: 2 }}>{lang === 'ar' ? 'السنة المالية ٢٠٢٤ — أحدث تقرير سنوي منشور' : 'FY2024 · latest published annual data'}</div>
           <div style={card}><div style={h2}>{t.sector} — {t.s_rates}</div><LineChart labels={D.rates.labels} series={D.rates.series} endLabels />{legend(D.rates.series)}</div>
           <div style={card}>
             <div style={h2}>{t.epay}</div>
