@@ -16,6 +16,47 @@ const T: any = {
 function monthTime(p: string): number { var d = new Date(p.replace('-', ' 1, ')); return isNaN(d.getTime()) ? 0 : d.getTime() }
 function yearKey(p: string): number { var n = parseInt(p, 10); return isNaN(n) ? 0 : n + (p.indexOf('F') >= 0 ? 0.5 : 0) }
 
+function MarketShareInner(props: any) {
+  var lang = props.lang
+  var ms = useState<any>(null)
+  var msRows = ms[0], setMsRows = ms[1]
+  useEffect(function () {
+    var ok = true
+    ;(async function () {
+      try {
+        var bf: any = await supabase.from('bank_financials').select('bank_id,total_assets,currency').eq('fiscal_year', 2024)
+        var bn: any = await supabase.from('banks').select('id,name_en,name_ar,short_name')
+        if (!ok || bf.error || bn.error || !bf.data || !bn.data) return
+        var names: any = {}
+        bn.data.forEach(function (b: any) { names[b.id] = b })
+        var list = bf.data.map(function (r: any) {
+          var jod = Number(r.total_assets) || 0
+          if (String(r.currency || '').toUpperCase() === 'USD') jod = jod * 0.709
+          var nm = names[r.bank_id] || {}
+          return { en: nm.short_name || nm.name_en || ('#' + r.bank_id), ar: nm.name_ar || nm.name_en || ('#' + r.bank_id), v: jod }
+        }).filter(function (r: any) { return r.v > 0 })
+        list.sort(function (a: any, b: any) { return b.v - a.v })
+        if (ok) setMsRows(list)
+      } catch (e) { }
+    })()
+    return function () { ok = false }
+  }, [])
+  if (!msRows || !msRows.length) return <div style={{ fontSize: 11, color: 'var(--cf-ink3)' }}>{lang === 'ar' ? 'جارٍ تحميل بيانات 2024…' : 'Loading FY2024 balance sheets…'}</div>
+  var total = 0
+  msRows.forEach(function (r: any) { total += r.v })
+  var COLORS = ['var(--cf-primary-strong, #0f4c81)', '#3f7cac', 'var(--cf-gold, #c9a227)', 'var(--cf-teal, #2a9d8f)', '#7ea8c9', '#8b9bb0']
+  var top = msRows.slice(0, 6).map(function (r: any, i: number) { return { name: lang === 'ar' ? r.ar : r.en, v: Math.round(r.v / 1000), c: COLORS[i] } })
+  var othersV = 0
+  msRows.slice(6).forEach(function (r: any) { othersV += r.v })
+  if (othersV > 0) top.push({ name: lang === 'ar' ? 'بقية البنوك' : 'Other banks', v: Math.round(othersV / 1000), c: '#d3dbe6' })
+  return (
+    <div>
+      <PieChart data={top} center={(total / 1000000).toFixed(0) + 'B'} centerSub={lang === 'ar' ? 'دينار · 2024' : 'JOD · FY2024'} h={272} />
+      <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{lang === 'ar' ? 'بيانات 2024 · على مستوى المجموعة · البنك العربي محوّل من الدولار (0.709)' : 'bank_financials FY2024 · group-level · Arab Bank converted USD→JOD @ 0.709'}</div>
+    </div>
+  )
+}
+
 var JO_NAMES: any = {
   'Amman': 'عمّان', 'Irbid': 'إربد', 'Zarqa': 'الزرقاء', 'Balqa': 'البلقاء',
   'Mafraq': 'المفرق', 'Karak': 'الكرك', 'Madaba': 'مأدبا', 'Jerash': 'جرش',
@@ -373,6 +414,10 @@ export default function EconomyPage() {
             {D.mDepTot ? <LineChart labels={D.mDepTot.labels} series={[{ name: 'Deposits', color: 'var(--cf-primary-strong)', w: 2.4, pts: D.mDepTot.pts }]} endLabels /> : null}
             <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{'CBJ statistical DB'}</div>
           </div>
+        </div>
+        <div style={card} data-cf='mktshare'>
+          <div style={h2}>{lang === 'ar' ? 'الحصص السوقية — إجمالي الموجودات 2024' : 'MARKET SHARE — FY2024 TOTAL ASSETS'}</div>
+          <MarketShareInner lang={lang} />
         </div>
         <div style={card} data-cf='govmap'>
           <div style={h2}>{(lang === 'ar' ? 'فروع البنوك حسب المحافظة' : 'BANK BRANCHES BY GOVERNORATE') + (D.govTotal ? ' · ' + D.govTotal + (lang === 'ar' ? ' فرع' : ' branches') : '')}</div>
