@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { useLang } from '@/lib/LangContext'
 import { zadMdToHtml, ZAD_MD_CSS } from '@/lib/zad-md'
 import { JO_VIEWBOX, JO_WATER, JO_GOVS } from '@/lib/jordan-map'
-import { CfSignals } from '@/lib/cf-signals'
+import { CfSignals, CfSectionRead } from '@/lib/cf-signals'
 
 type Row = { category: string; indicator: string; indicator_ar: string | null; period: string; value: any; unit: string | null; source: string | null; note?: string | null }
 
@@ -28,6 +28,7 @@ function CfSection(props: any) {
         <span style={{ fontSize: 10.5, color: 'var(--cf-ink3, #7d8ea3)' }}>{props.n ? '\u00b7 ' + props.n : ''}</span>
         <span style={{ fontSize: 10, color: 'var(--cf-ink3, #7d8ea3)', marginInlineStart: 'auto' }}>{on ? '' : '\u2022\u2022\u2022'}</span>
       </div>
+      {props.topic ? <CfSectionRead topic={props.topic} lang={props.lang} /> : null}
       {on ? props.children : null}
     </div>
   )
@@ -477,16 +478,19 @@ export default function EconomyPage() {
             </div>) })}
         </div>
         <div style={card} data-cf='signals'>
-          <div style={h2}>{lang === 'ar' ? 'لوحة إشارات زاد' : 'ZAD SIGNAL BOARD'}</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+            <div style={h2}>{lang === 'ar' ? 'لوحة إشارات زاد' : 'ZAD SIGNAL BOARD'}</div>
+            <button onClick={function () { setAskOpen(true) }} style={{ border: 'none', background: 'var(--cf-gold, #c9a227)', color: '#1a2436', borderRadius: 999, padding: '5px 14px', fontSize: 11, fontWeight: 900, cursor: 'pointer', letterSpacing: 0.4 }}>{lang === 'ar' ? 'اسأل زاد' : 'ASK ZAD'}</button>
+          </div>
           <CfSignals lang={lang} />
         </div>
-                <CfSection t={lang === 'ar' ? 'الخلفية العالمية' : 'GLOBAL BACKDROP'} n='2' open={false}>
+                <CfSection t={lang === 'ar' ? 'الخلفية العالمية' : 'GLOBAL BACKDROP'} n='2' open={false} topic='global' lang={lang}>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))', gap: 12, marginTop: 14 }}>
           <div style={card}><div style={h2}>{t.global} — {t.g_growth}</div><LineChart labels={D.gg.labels} series={D.gg.series} endLabels />{legend(D.gg.series)}</div>
           <div style={card}><div style={h2}>{t.global} — {t.g_infl}</div><LineChart labels={D.gi.labels} series={D.gi.series} endLabels />{legend(D.gi.series)}</div>
         </div>
         </CfSection>
-        <CfSection t={lang === 'ar' ? 'الاقتصاد الأردني الكلي' : 'JORDAN MACRO'} n='5' open={false}>
+        <CfSection t={lang === 'ar' ? 'الاقتصاد الأردني الكلي' : 'JORDAN MACRO'} n='5' open={false} topic='jordan' lang={lang}>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))', gap: 12, marginTop: 14 }}>
           <div style={card}><div style={h2}>{t.jordan} — {t.j_growth}</div><LineChart labels={D.jg.labels} series={D.jg.series} endLabels zero />{legend(D.jg.series)}</div>
           <div style={card}><div style={h2}>{t.jordan} — {t.monthly_cpi}</div><LineChart labels={D.cpiLabels} series={[{ name: 'YoY', color: 'var(--cf-primary-strong)', w: 2.4, pts: D.cpiPts }]} endLabels zero /></div>
@@ -495,7 +499,7 @@ export default function EconomyPage() {
           <div style={card}><div style={h2}>{t.debt}</div><LineChart labels={D.debt.labels} series={D.debt.series} endLabels />{legend(D.debt.series)}</div>
         </div>
         </CfSection>
-        <CfSection t={lang === 'ar' ? 'الجهاز المصرفي' : 'BANKING SYSTEM'} n='7' open={true}>
+        <CfSection t={lang === 'ar' ? 'الجهاز المصرفي' : 'BANKING SYSTEM'} n='7' open={true} topic='banking' lang={lang}>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))', gap: 12, marginTop: 14 }}>
           <div style={card}><div style={h2}>{t.sector} — {t.s_bs}</div><LineChart labels={D.bs.labels} series={D.bs.series} endLabels />{legend(D.bs.series)}</div>
           <div style={card}><div style={h2}>{t.sector} — {t.s_prof}</div><LineChart labels={D.prof.labels} series={D.prof.series} endLabels zero />{legend(D.prof.series)}</div>
@@ -515,7 +519,7 @@ export default function EconomyPage() {
           <div style={card}><div style={h2}>{t.m_rates}</div><LineChart labels={D.mLend.labels} series={[{ name: t.lend, color: 'var(--cf-primary-strong)', w: 2.4, pts: D.mLend.pts }, { name: t.dep, color: 'var(--cf-teal)', w: 2, pts: D.mDep.pts }]} endLabels />{legend([{ name: t.lend, color: 'var(--cf-primary-strong)' }, { name: t.dep, color: 'var(--cf-teal)' }])}</div>
         </div>
         </CfSection>
-                <CfSection t={lang === 'ar' ? 'التوزيع الإقليمي وهيكل السوق' : 'REGIONAL & MARKET STRUCTURE'} n='4' open={true}>
+                <CfSection t={lang === 'ar' ? 'التوزيع الإقليمي وهيكل السوق' : 'REGIONAL & MARKET STRUCTURE'} n='4' open={true} topic='regional' lang={lang}>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 14, marginTop: 14 }}>
           <div style={card} data-cf='depmix'>
             <div style={h2}>{lang === 'ar' ? 'ودائع العملاء — التوزيع حسب المودع' : 'CUSTOMER DEPOSITS — MIX BY DEPOSITOR'}</div>
@@ -542,9 +546,9 @@ export default function EconomyPage() {
           <div>{t.src}{syncs.length ? ' · ' + t.lastSync + ': ' + String(syncs[0].at).slice(0, 16).replace('T', ' ') + ' UTC' : ''}</div>
         </div>
       </div>
-      <button onClick={function () { setAskOpen(!askOpen) }} style={{ position: 'fixed', insetInlineEnd: 22, bottom: 22, zIndex: 50, background: 'var(--cf-grad)', color: '#fff', border: 'none', borderRadius: 999, padding: '12px 20px', fontSize: 13.5, fontWeight: 800, cursor: 'pointer', boxShadow: '0 8px 24px rgba(11,31,59,0.35)' }}>{t.ask}</button>
+      <button onClick={function () { setAskOpen(!askOpen) }} style={{ position: 'fixed', insetInlineEnd: 22, bottom: 22, zIndex: 96, background: 'var(--cf-grad)', color: '#fff', border: 'none', borderRadius: 999, padding: '12px 20px', fontSize: 13.5, fontWeight: 800, cursor: 'pointer', boxShadow: '0 8px 24px rgba(11,31,59,0.35)' }}>{t.ask}</button>
       {askOpen ? (
-        <div style={{ position: 'fixed', insetInlineEnd: 22, bottom: 74, zIndex: 50, width: 'min(400px, calc(100vw - 44px))', maxHeight: '64vh', display: 'flex', flexDirection: 'column', background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: 14, boxShadow: '0 18px 48px rgba(11,31,59,0.25)', overflow: 'hidden' }} dir={isAr ? 'rtl' : 'ltr'}>
+        <div style={{ position: 'fixed', insetInlineEnd: 22, bottom: 74, zIndex: 95, width: 'min(400px, calc(100vw - 44px))', maxHeight: '64vh', display: 'flex', flexDirection: 'column', background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: 14, boxShadow: '0 18px 48px rgba(11,31,59,0.25)', overflow: 'hidden' }} dir={isAr ? 'rtl' : 'ltr'}>
           <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--cf-line)', fontWeight: 800, fontSize: 13, color: 'var(--cf-ink)', background: 'var(--cf-surface2)' }}>{t.ask}</div>
           <div style={{ flex: 1, overflowY: 'auto', padding: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
             {msgs.map(function (m: any, i: number) { return m.role === 'user' ? (
