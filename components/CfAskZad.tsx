@@ -62,7 +62,7 @@ export default function CfAskZad() {
           </div>
         </div>
       ) : null}
-      <button onClick={function () { setOpen(!open) }} style={{ position: 'fixed', insetInlineEnd: 22, bottom: 22, zIndex: 96, border: 'none', borderRadius: 999, padding: '11px 18px', background: 'var(--cf-gold, #c9a227)', color: '#1a2436', fontWeight: 900, fontSize: 12.5, letterSpacing: 0.4, cursor: 'pointer', boxShadow: '0 10px 28px rgba(11,31,59,0.30)' }}>{ar ? 'اسأل زاد' : 'ASK ZAD'}</button>
+      <button onClick={function () { setOpen(!open) }} style={{ position: 'fixed', insetInlineEnd: 22, bottom: 22, zIndex: 96, border: 'none', borderRadius: 999, padding: '11px 18px', background: 'var(--cf-gold, #c9a227)', color: '#1a2436', fontWeight: 900, fontSize: 12.5, letterSpacing: 0.4, cursor: 'pointer', boxShadow: '0 10px 28px rgba(11,31,59,0.30)' }}>{open ? '✕ ' + (ar ? 'إغلاق' : 'CLOSE') : (ar ? 'اسأل زاد' : 'ASK ZAD')}</button>
     </div>
   )
 }
