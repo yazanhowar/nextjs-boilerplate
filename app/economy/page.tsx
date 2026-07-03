@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { useLang } from '@/lib/LangContext'
 import { zadMdToHtml, ZAD_MD_CSS } from '@/lib/zad-md'
 import { JO_VIEWBOX, JO_WATER, JO_GOVS } from '@/lib/jordan-map'
+import { CfSignals } from '@/lib/cf-signals'
 
 type Row = { category: string; indicator: string; indicator_ar: string | null; period: string; value: any; unit: string | null; source: string | null; note?: string | null }
 
@@ -15,6 +16,33 @@ const T: any = {
 
 function monthTime(p: string): number { var d = new Date(p.replace('-', ' 1, ')); return isNaN(d.getTime()) ? 0 : d.getTime() }
 function yearKey(p: string): number { var n = parseInt(p, 10); return isNaN(n) ? 0 : n + (p.indexOf('F') >= 0 ? 0.5 : 0) }
+
+function CfZoom(props: any) {
+  var ex = useState<any>(null)
+  var open = ex[0], setOpen = ex[1]
+  var onClick = function (ev: any) {
+    var card = null
+    try {
+      var p = ev.currentTarget.parentElement
+      for (var i = 0; p && i < 6; i++) {
+        var cs = window.getComputedStyle(p)
+        if (parseFloat(cs.borderRadius) >= 10 && cs.backgroundColor && cs.backgroundColor !== 'rgba(0, 0, 0, 0)') { card = p; break }
+        p = p.parentElement
+      }
+    } catch (e) { }
+    setOpen({ html: card ? card.outerHTML : '' })
+  }
+  return (
+    <div>
+      <div onClick={onClick} style={{ cursor: 'zoom-in' }} title='Click to expand'>{props.children}</div>
+      {open ? <div onClick={function () { setOpen(null) }} style={{ position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(11,31,59,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out', padding: 20 }}>
+        <div style={{ width: 'min(980px, 94vw)', maxHeight: '92vh', overflow: 'auto', borderRadius: 16, boxShadow: '0 24px 64px rgba(11,31,59,0.35)', background: 'var(--cf-surface, #ffffff)', padding: '10px 12px' }}>
+          {open.html ? <div style={{ zoom: props.zoom || 1.45 }} dangerouslySetInnerHTML={{ __html: open.html }} /> : <div style={{ zoom: props.zoom || 1.45 }}>{props.children}</div>}
+        </div>
+      </div> : null}
+    </div>
+  )
+}
 
 function GeoMapCard(props: any) {
   var D = props.D || {}
@@ -40,70 +68,6 @@ function GeoMapCard(props: any) {
       </div>
       <JordanMap data={data} lang={lang} />
       {count ? <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{ar ? 'القيم بملايين الدنانير · البنك المركزي الأردني' : 'Values in JOD millions · CBJ statistical DB'}</div> : <div style={{ fontSize: 11, color: 'var(--cf-ink3)', marginTop: 8 }}>{ar ? 'التوزيع الإقليمي قيد المزامنة من البنك المركزي' : 'Regional split syncing from CBJ'}</div>}
-    </div>
-  )
-}
-
-function CfSignalBoard(props: any) {
-  var D = props.D || {}
-  var ar = props.lang === 'ar'
-  var yoy = function (o: any, step: number) {
-    if (!o || !o.pts || o.pts.length < step + 1) return null
-    var a = Number(o.pts[o.pts.length - 1]), b = Number(o.pts[o.pts.length - 1 - step])
-    if (!isFinite(a) || !isFinite(b) || !b) return null
-    return (a / b - 1) * 100
-  }
-  var lastPt = function (o: any) { if (!o || !o.pts || !o.pts.length) return null; var v = Number(o.pts[o.pts.length - 1]); return isFinite(v) ? v : null }
-  var lastOf = function (s: any) { if (!s || !s.pts) return null; for (var i = s.pts.length - 1; i >= 0; i--) { var v = Number(s.pts[i]); if (s.pts[i] != null && isFinite(v)) return { v: v, i: i } } return null }
-  var rows: any[] = []
-  var add = function (sec: number, l: string, la: string, val: string, d: number, ven: string, var2: string, src: string) { rows.push({ sec: sec, l: ar ? la : l, v: val, d: d, t: ar ? var2 : ven, s: src }) }
-  var dep = D.depYoY != null ? Number(D.depYoY) : null
-  if (dep != null) add(0, 'Deposit growth', 'نمو الودائع', dep.toFixed(1) + '% YoY', dep > 0.5 ? 1 : dep < -0.5 ? -1 : 0, dep >= 5 ? 'Funding base expanding briskly — liquidity supportive' : dep >= 0 ? 'Funding growth moderate' : 'Deposit base contracting — funding pressure', dep >= 5 ? 'قاعدة التمويل تتوسع بقوة' : dep >= 0 ? 'نمو معتدل للودائع' : 'انكماش في الودائع', 'CBJ')
-  var cr = yoy(D.mCredit, 4)
-  if (cr != null) add(0, 'Credit growth', 'نمو الائتمان', cr.toFixed(1) + '% YoY', cr > 0.5 ? 1 : cr < -0.5 ? -1 : 0, cr >= 6 ? 'Credit engine accelerating — private demand firm' : cr >= 2 ? 'Healthy credit expansion' : cr >= 0 ? 'Credit growth soft — transmission lagging' : 'Credit contracting', cr >= 6 ? 'تسارع في الائتمان' : cr >= 2 ? 'توسع ائتماني صحي' : cr >= 0 ? 'نمو ائتماني بطيء' : 'انكماش ائتماني', 'CBJ')
-  var asg = yoy(D.mAssets, 12)
-  if (asg != null) add(0, 'Sector assets', 'موجودات القطاع', asg.toFixed(1) + '% YoY', asg > 0.5 ? 1 : asg < -0.5 ? -1 : 0, asg >= 4 ? 'Balance sheets scaling steadily' : asg >= 0 ? 'Sector expanding modestly' : 'Sector balance sheet shrinking', asg >= 4 ? 'نمو ثابت في الميزانيات' : asg >= 0 ? 'توسع متواضع' : 'تراجع في الموجودات', 'CBJ')
-  var sp = (lastPt(D.mLend) != null && lastPt(D.mDep) != null) ? (lastPt(D.mLend) as any) - (lastPt(D.mDep) as any) : null
-  var spThen = (D.mLend && D.mDep && D.mLend.pts && D.mDep.pts && D.mLend.pts.length > 12 && D.mDep.pts.length > 12) ? Number(D.mLend.pts[D.mLend.pts.length - 13]) - Number(D.mDep.pts[D.mDep.pts.length - 13]) : null
-  if (sp != null) add(0, 'Lending–deposit spread', 'هامش الفائدة', sp.toFixed(2) + ' pp', spThen != null ? (sp - spThen > 0.05 ? 1 : sp - spThen < -0.05 ? -1 : 0) : 0, spThen != null && sp - spThen > 0.05 ? 'Margins widening — NIM tailwind for banks' : spThen != null && sp - spThen < -0.05 ? 'Margins compressing — watch NIM' : 'Margins broadly stable', spThen != null && sp - spThen > 0.05 ? 'اتساع الهوامش' : spThen != null && sp - spThen < -0.05 ? 'انضغاط الهوامش' : 'هوامش مستقرة', 'CBJ')
-  var amm = D.govData ? Number(D.govData['Amman']) : null
-  var share = (amm && D.govTotal) ? amm / D.govTotal * 100 : null
-  if (share != null && isFinite(share)) add(0, 'Capital concentration', 'تركز الودائع', share.toFixed(0) + '% Amman', 0, share >= 80 ? 'Deposits heavily concentrated in the Capital — regional depth thin' : 'Regionally diversified funding', share >= 80 ? 'تركز مرتفع في العاصمة' : 'توزع إقليمي متوازن', 'CBJ · Q1 2026')
-  var ldr = (D.credTotal && D.govTotal) ? D.credTotal / D.govTotal * 100 : null
-  if (ldr != null && isFinite(ldr)) add(0, 'System LDR (regional)', 'نسبة الإقراض إلى الودائع', ldr.toFixed(0) + '%', 0, ldr >= 90 ? 'Loan book stretched against deposits' : 'Loans fully deposit-funded — ample lending headroom', ldr >= 90 ? 'توظيف مرتفع للودائع' : 'سيولة وافرة وقدرة إقراض متاحة', 'CBJ · Q1 2026 (LDR)')
-  var w = D.gg && D.gg.series && D.gg.series[0] ? lastOf(D.gg.series[0]) : null
-  if (w) add(1, 'Global growth', 'النمو العالمي', w.v.toFixed(1) + '% · ' + String(D.gg.labels[w.i]), w.v >= 3 ? 1 : w.v >= 2.5 ? 0 : -1, w.v >= 3.2 ? 'Global backdrop supportive' : w.v >= 2.5 ? 'Global growth steady but unspectacular' : 'Global headwinds building', w.v >= 3.2 ? 'بيئة عالمية داعمة' : w.v >= 2.5 ? 'نمو عالمي معتدل' : 'رياح عالمية معاكسة', 'IMF WEO')
-  var em = D.gg && D.gg.series && D.gg.series[2] ? lastOf(D.gg.series[2]) : null
-  if (em) add(1, 'EM & developing', 'الأسواق الناشئة', em.v.toFixed(1) + '% · ' + String(D.gg.labels[em.i]), em.v >= 4 ? 1 : 0, em.v >= 4 ? 'EM demand firm — regional trade tailwind' : 'EM growth moderate', em.v >= 4 ? 'طلب قوي في الأسواق الناشئة' : 'نمو معتدل للأسواق الناشئة', 'IMF WEO')
-  if (!rows.length) return null
-  var secTitle = function (i: number) { return i === 0 ? (ar ? 'النبض المحلي' : 'DOMESTIC PULSE') : (ar ? 'الخلفية الخارجية' : 'EXTERNAL BACKDROP') }
-  var glyph = function (d: number) { return d > 0 ? '\u25b2' : d < 0 ? '\u25bc' : '\u25a0' }
-  var gcol = function (d: number) { return d > 0 ? '#1a7f4f' : d < 0 ? '#b3382c' : '#7d8ea3' }
-  var cell = function (r: any, i: number) {
-    return (
-      <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '9px 10px', border: '1px solid var(--cf-line, #e5eaf2)', borderRadius: 10, background: 'var(--cf-surface2, #f7f9fc)' }}>
-        <div style={{ color: gcol(r.d), fontSize: 13, lineHeight: '18px' }}>{glyph(r.d)}</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--cf-ink2, #3d4f66)' }}>{r.l} <span style={{ fontWeight: 900, color: 'var(--cf-ink, #14243a)' }} dir='ltr'>{r.v}</span></div>
-          <div style={{ fontSize: 11, color: 'var(--cf-ink3, #7d8ea3)', marginTop: 2 }}>{r.t}</div>
-        </div>
-        <div style={{ fontSize: 9.5, fontWeight: 800, color: 'var(--cf-ink3, #7d8ea3)', border: '1px solid var(--cf-line, #e5eaf2)', borderRadius: 999, padding: '2px 8px', whiteSpace: 'nowrap' }} dir='ltr'>{r.s}</div>
-      </div>
-    )
-  }
-  return (
-    <div>
-      {[0, 1].map(function (sec: number) {
-        var list = rows.filter(function (r: any) { return r.sec === sec })
-        if (!list.length) return null
-        return (
-          <div key={sec} style={{ marginTop: sec ? 10 : 0 }}>
-            <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: 1.2, color: 'var(--cf-ink3, #7d8ea3)', marginBottom: 6 }}>{secTitle(sec)}</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: 8 }}>{list.map(cell)}</div>
-          </div>
-        )
-      })}
-      <div style={{ fontSize: 10, color: 'var(--cf-ink3, #7d8ea3)', marginTop: 8 }}>{ar ? 'إشارات محتسبة آلياً من سلاسل البنك المركزي وصندوق النقد — قواعد ثابتة، ليست توليدية' : 'Deterministic signals computed live from CBJ & IMF series — rule-based, not generative. IMF rows carry the WEO vintage of the chip above.'}</div>
     </div>
   )
 }
@@ -156,13 +120,10 @@ var JO_NAMES: any = {
 }
 
 function JordanMap(props: any) {
-  var ex = useState(false)
-  var big = ex[0], setBig = ex[1]
   return (
-    <div>
-      <div onClick={function () { setBig(true) }} style={{ cursor: 'zoom-in' }} title='Click to expand'><JordanMapInner {...props} /></div>
-      {big ? <div onClick={function () { setBig(false) }} style={{ position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(11,31,59,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out', padding: 20 }}><div style={{ background: 'var(--cf-surface, #ffffff)', border: '1px solid var(--cf-line, #e5eaf2)', borderRadius: 16, padding: '20px 22px', width: 'min(960px, 94vw)', maxHeight: '92vh', overflow: 'auto', boxShadow: '0 24px 64px rgba(11,31,59,0.35)' }}><div style={{ zoom: 2.1 }}><JordanMapInner {...props} /></div></div></div> : null}
-    </div>
+    <CfZoom zoom={1.5}>
+      <JordanMapInner {...props} />
+    </CfZoom>
   )
 }
 function JordanMapInner(props: any) {
@@ -209,13 +170,10 @@ function JordanMapInner(props: any) {
 }
 
 function PieChart(props: any) {
-  var ex = useState(false)
-  var big = ex[0], setBig = ex[1]
   return (
-    <div>
-      <div onClick={function () { setBig(true) }} style={{ cursor: 'zoom-in' }} title='Click to expand'><PieChartInner {...props} /></div>
-      {big ? <div onClick={function () { setBig(false) }} style={{ position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(11,31,59,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out', padding: 20 }}><div style={{ background: 'var(--cf-surface, #ffffff)', border: '1px solid var(--cf-line, #e5eaf2)', borderRadius: 16, padding: '20px 22px', width: 'min(960px, 94vw)', maxHeight: '92vh', overflow: 'auto', boxShadow: '0 24px 64px rgba(11,31,59,0.35)' }}><PieChartInner {...props} /></div></div> : null}
-    </div>
+    <CfZoom zoom={1.5}>
+      <PieChartInner {...props} />
+    </CfZoom>
   )
 }
 function PieChartInner(props: any) {
@@ -258,13 +216,10 @@ function PieChartInner(props: any) {
 }
 
 function LineChart(props: any) {
-  var ex = useState(false)
-  var big = ex[0], setBig = ex[1]
   return (
-    <div>
-      <div onClick={function () { setBig(true) }} style={{ cursor: 'zoom-in' }} title='Click to expand'><LineChartInner {...props} /></div>
-      {big ? <div onClick={function () { setBig(false) }} style={{ position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(11,31,59,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out', padding: 20 }}><div style={{ background: 'var(--cf-surface, #ffffff)', border: '1px solid var(--cf-line, #e5eaf2)', borderRadius: 16, padding: '20px 22px', width: 'min(960px, 94vw)', maxHeight: '92vh', overflow: 'auto', boxShadow: '0 24px 64px rgba(11,31,59,0.35)' }}><LineChartInner {...props} /></div></div> : null}
-    </div>
+    <CfZoom zoom={1.5}>
+      <LineChartInner {...props} />
+    </CfZoom>
   )
 }
 function LineChartInner(props: any) {
@@ -507,7 +462,7 @@ export default function EconomyPage() {
         </div>
         <div style={card} data-cf='signals'>
           <div style={h2}>{lang === 'ar' ? 'لوحة إشارات زاد' : 'ZAD SIGNAL BOARD'}</div>
-          <CfSignalBoard D={D} lang={lang} />
+          <CfSignals lang={lang} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))', gap: 12, marginTop: 14 }}>
           <div style={card}><div style={h2}>{t.global} — {t.g_growth}</div><LineChart labels={D.gg.labels} series={D.gg.series} endLabels />{legend(D.gg.series)}</div>
