@@ -297,7 +297,7 @@ export default function BankPage() {
         supabase.from('bank_executives').select('*').eq('bank_id', bankId).order('fiscal_year', { ascending: false }).limit(40),
         supabase.from('bank_announcements').select('*').eq('bank_id', bankId).order('announcement_date', { ascending: false }).limit(15),
       ])
-      setFinancials(fins.data || [])
+      setFinancials((fins.data || []).map(function (f: any) { if (String((f && f.currency) || '').toUpperCase() !== 'USD') return f; var g: any = Object.assign({}, f); ['total_assets','net_loans','customer_deposits','shareholders_equity','total_equity','paid_up_capital','net_interest_income','net_fee_income','total_income','operating_expenses','provision_expense','net_profit'].forEach(function (k) { if (g[k] != null) g[k] = Math.round(Number(g[k]) * 0.709) }); g._fx = 'USD to JOD @ 0.709'; return g }))
       setRates(rts.data || null)
       setProducts(prods.data || [])
       setOwnership(own.data || [])
@@ -490,7 +490,7 @@ export default function BankPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
                 <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>Balance Sheet Trend</div>
-                <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>JOD billions, by fiscal year</div>
+                <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>{'JOD billions, by fiscal year' + ((financials || []).some(function (f: any) { return f._fx }) ? ' · converted from USD @ 0.709' : '')}</div>
                 <ResponsiveContainer width="100%" height={240}>
                   <BarChart data={financials.map((f: any) => ({ name: 'FY' + f.fiscal_year, Assets: Number(((f.total_assets || 0) / 1000000).toFixed(2)), Deposits: Number(((f.customer_deposits || 0) / 1000000).toFixed(2)), Loans: (f.net_loans == null ? null : Number((f.net_loans / 1000000).toFixed(2))) }))} margin={{ top: 4, right: 8, left: -12, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" vertical={false} />
