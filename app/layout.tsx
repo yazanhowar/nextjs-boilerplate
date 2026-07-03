@@ -7,6 +7,7 @@ import PasswordGate from '@/components/PasswordGate'
 import { LangProvider } from '@/lib/LangContext'
 import CfHeader from '@/components/CfHeader'
 import CfAskZad from '@/components/CfAskZad'
+import CfDir from '@/components/CfDir'
 
 const ibmSans = IBM_Plex_Sans({ subsets: ['latin'], weight: ['400','500','600','700'], display: 'swap', variable: '--font-ibm-sans' })
 const ibmArabic = IBM_Plex_Sans_Arabic({ subsets: ['arabic'], weight: ['400','500','600','700'], display: 'swap', variable: '--font-ibm-ar' })
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body data-build={(process.env.VERCEL_GIT_COMMIT_SHA || 'dev').slice(0, 7)} className={ibmSans.variable + ' ' + ibmArabic.variable + ' ' + ibmMono.variable + ' ' + ibmSans.className}><LangProvider><PasswordGate><CfHeader />{children}
         <CfAskZad />
+        <CfDir />
         <VersionGuard /></PasswordGate></LangProvider></body>
     </html>
   )
