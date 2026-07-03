@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useLang } from '@/lib/LangContext'
 import { zadMdToHtml, ZAD_MD_CSS } from '@/lib/zad-md'
+import { JO_VIEWBOX, JO_WATER, JO_GOVS } from '@/lib/jordan-map'
 
 type Row = { category: string; indicator: string; indicator_ar: string | null; period: string; value: any; unit: string | null; source: string | null; note?: string | null }
 
@@ -14,6 +15,55 @@ const T: any = {
 
 function monthTime(p: string): number { var d = new Date(p.replace('-', ' 1, ')); return isNaN(d.getTime()) ? 0 : d.getTime() }
 function yearKey(p: string): number { var n = parseInt(p, 10); return isNaN(n) ? 0 : n + (p.indexOf('F') >= 0 ? 0.5 : 0) }
+
+var JO_NAMES: any = {
+  'Amman': 'عمّان', 'Irbid': 'إربد', 'Zarqa': 'الزرقاء', 'Balqa': 'البلقاء',
+  'Mafraq': 'المفرق', 'Karak': 'الكرك', 'Madaba': 'مأدبا', 'Jerash': 'جرش',
+  'Ajloun': 'عجلون', "Ma'an": 'معان', 'Tafilah': 'الطفيلة', 'Aqaba': 'العقبة'
+}
+
+function JordanMap(props: any) {
+  var data = props.data || {}
+  var vals: number[] = []
+  JO_GOVS.forEach(function (g: any) { var v = data[g.key]; if (v) vals.push(Number(v)) })
+  var max = vals.length ? Math.max.apply(null, vals) : 0
+  var fill = function (v: any) {
+    if (!max || !v) return 'var(--cf-line, #e5eaf2)'
+    var q = Math.sqrt(Number(v) / max)
+    if (q > 0.72) return 'var(--cf-primary-strong, #0f4c81)'
+    if (q > 0.45) return '#3f7cac'
+    if (q > 0.28) return '#7ea8c9'
+    return '#c9d9e8'
+  }
+  var ranked = JO_GOVS.slice().sort(function (a: any, b: any) { return (Number(data[b.key]) || 0) - (Number(data[a.key]) || 0) })
+  return (
+    <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      <svg viewBox={JO_VIEWBOX} style={{ width: 250, maxWidth: '100%', height: 'auto', flex: '0 0 auto' }}>
+        {JO_GOVS.map(function (g: any) {
+          return (
+            <path key={g.key} d={g.d} fill={fill(data[g.key])} stroke='var(--cf-bg, #ffffff)' strokeWidth='2.5'>
+              <title>{(props.lang === 'ar' ? (JO_NAMES[g.key] || g.key) : g.key) + (data[g.key] ? ': ' + data[g.key] : '')}</title>
+            </path>
+          )
+        })}
+        <path d={JO_WATER} fill='#b7d3e8' opacity='0.85' />
+      </svg>
+      {max ? (
+        <div style={{ flex: 1, minWidth: 190 }}>
+          {ranked.map(function (g: any) {
+            var v = Number(data[g.key]) || 0
+            return (
+              <div key={g.key} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, padding: '3px 0', borderBottom: '1px solid var(--cf-line, #edf1f7)' }}>
+                <span style={{ color: 'var(--cf-ink2, #243b53)' }}>{props.lang === 'ar' ? (JO_NAMES[g.key] || g.key) : g.key}</span>
+                <span style={{ fontWeight: 600, color: 'var(--cf-ink, #0f2a4a)' }}>{v}</span>
+              </div>
+            )
+          })}
+        </div>
+      ) : null}
+    </div>
+  )
+}
 
 function PieChart(props: any) {
   var data = props.data || []
@@ -204,6 +254,11 @@ export default function EconomyPage() {
     }).filter(function (d) { return d.v > 0 })
     var depTotVal = mDepTot.pts.length ? mDepTot.pts[mDepTot.pts.length - 1] : 0
     var depYoY = mDepTot.pts.length > 12 ? (mDepTot.pts[mDepTot.pts.length - 1] / mDepTot.pts[mDepTot.pts.length - 13] - 1) * 100 : null
+    var govRows = rows.filter(function (r) { return r.category === 'branch_network_governorate' })
+    var govData: any = {}
+    govRows.forEach(function (r) { govData[String(r.indicator)] = Number(r.value) })
+    var govTotal = 0
+    govRows.forEach(function (r) { govTotal += Number(r.value) || 0 })
     var toBn = function (o: any) { return { labels: o.labels, pts: o.pts.map(function (v: any) { return Math.round(v / 10) / 100 }) } }
     var ep = function (ind: string) { var r = last(yearly(pick('banking_epayments', ind))); return r ? { v: Number(r.value), u: r.unit || '' } : null }
     return {
@@ -218,6 +273,8 @@ export default function EconomyPage() {
       h1: { x: (pick('jo_trade', 'Total exports').filter(function (r) { return r.period === 'H1-2025' })[0] || {}).value, m: (pick('jo_trade', 'Total imports').filter(function (r) { return r.period === 'H1-2025' })[0] || {}).value, b: (pick('jo_trade', 'Trade balance').filter(function (r) { return r.period === 'H1-2025' })[0] || {}).value },
       vint: (function () { for (var i2 = 0; i2 < rows.length; i2++) { var nt = rows[i2].note; if (nt && String(nt).indexOf('WEO') >= 0) { var mm = String(nt).match(/([0-9][0-9][0-9][0-9]-[0-9][0-9])/); if (mm) return mm[1] } } return null })(),
       mAssets: toBn(mAssets), mCredit: toBn(mCredit), mLend: mLend, mDep: mDep,
+      mDepTot: toBn(mDepTot), depMix: depMix, depPer: depPerRaw, depTotVal: depTotVal, depYoY: depYoY,
+      govData: govData, govCount: govRows.length, govTotal: govTotal,
       eShare: ep('Electronic channel share of payments'), eUsers: ep('Digital banking users'), eVal: ep('Digital payment value'), eAtm: ep('ATMs in Kingdom')
     }
   }, [rows, lang])
@@ -308,14 +365,20 @@ export default function EconomyPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 14, marginTop: 14 }}>
           <div style={card} data-cf='depmix'>
             <div style={h2}>{lang === 'ar' ? 'ودائع العملاء — التوزيع حسب المودع' : 'CUSTOMER DEPOSITS — MIX BY DEPOSITOR'}</div>
-            <PieChart data={D.depMix} center={(D.depTotVal / 1000).toFixed(1) + 'B'} centerSub={'JOD · ' + (D.depPer || '')} />
+            <PieChart data={D.depMix} center={(Number(D.depTotVal || 0) / 1000).toFixed(1) + 'B'} centerSub={'JOD · ' + (D.depPer || '')} />
             <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{'CBJ statistical DB · ' + (D.depPer || '')}</div>
           </div>
           <div style={card} data-cf='deptrend'>
             <div style={h2}>{(lang === 'ar' ? 'إجمالي ودائع العملاء، شهري (مليار دينار)' : 'TOTAL CUSTOMER DEPOSITS, MONTHLY (JOD BN)') + (D.depYoY === null || D.depYoY === undefined ? '' : ' · ' + (D.depYoY >= 0 ? '+' : '') + D.depYoY.toFixed(1) + '% YoY')}</div>
-            <LineChart labels={D.mDepTot.labels} series={[{ name: 'Deposits', color: 'var(--cf-primary-strong)', w: 2.4, pts: D.mDepTot.pts }]} endLabels />
+            {D.mDepTot ? <LineChart labels={D.mDepTot.labels} series={[{ name: 'Deposits', color: 'var(--cf-primary-strong)', w: 2.4, pts: D.mDepTot.pts }]} endLabels /> : null}
             <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{'CBJ statistical DB'}</div>
           </div>
+        </div>
+        <div style={card} data-cf='govmap'>
+          <div style={h2}>{(lang === 'ar' ? 'فروع البنوك حسب المحافظة' : 'BANK BRANCHES BY GOVERNORATE') + (D.govTotal ? ' · ' + D.govTotal + (lang === 'ar' ? ' فرع' : ' branches') : '')}</div>
+          <JordanMap data={D.govData || {}} lang={lang} />
+          {D.govCount ? null : <div style={{ fontSize: 11, color: 'var(--cf-ink3)', marginTop: 8 }}>{lang === 'ar' ? 'التوزيع الإقليمي قيد المزامنة من البنك المركزي' : 'Regional split syncing from CBJ'}</div>}
+          <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{'Map: Wikimedia Commons (CC BY-SA 2.5)'}</div>
         </div>
         <div style={{ marginTop: 14, fontSize: 11, color: 'var(--cf-ink3)', lineHeight: 1.6 }}>
           <div>{t.forecast} · {t.y2564}</div>
