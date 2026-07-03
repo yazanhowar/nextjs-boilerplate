@@ -95,7 +95,7 @@ async function buildKnowledge(){
   annRows.forEach(function(r: any){ if(!r.pdf_url) return; var nm = (bmap[r.bank_id] && bmap[r.bank_id].name_en) || ('Bank ' + r.bank_id); annBy[nm] = annBy[nm] || []; annBy[nm].push('FY'+r.fiscal_year+' [PDF]('+r.pdf_url+')'+(r.auditor?(' audited by '+r.auditor):'')); });
   var annLines: string[] = []; Object.keys(annBy).forEach(function(nm){ annLines.push('- '+nm+': '+annBy[nm].join('; ')); });
   var annStr = annLines.length ? ('OFFICIAL ANNUAL REPORTS (downloadable PDFs):\n' + annLines.join('\n')) : '';
-  return perBank + '\n\n' + abjStr + (prodStr ? ('\n\n' + prodStr) : '') + (reStr ? ('\n\n' + reStr) : '') + (stStr ? ('\n\n' + stStr) : '') + (rtStr ? ('\n\n' + rtStr) : '') + (feStr ? ('\n\n' + feStr) : '') + (annStr ? ('\n\n' + annStr) : '') + '\n\nSTRATEGIC ANSWER MANDATE: You advise C-suite banking executives and the Central Bank of Jordan. For every question: (1) ground each figure in the knowledge base and tag it with its period and source. (2) Compute derived measures - growth rates, shares, loan-to-deposit ratios, spreads, regional splits - from the series instead of saying data is unavailable. (3) Close every answer with a short line starting with Decision angle: (in Arabic answers start it with \u0632\u0627\u0648\u064a\u0629 \u0627\u0644\u0642\u0631\u0627\u0631:) giving one or two sentences on what the finding implies for a concrete decision a bank executive could take. (4) If a needed series is genuinely absent, name the exact missing series in one line and answer with the closest available proxy, labeled as such. (5) Avoid unexplained acronyms - spell terms out on first use. Be decision-grade, never padded.';
+  return perBank + '\n\n' + abjStr + (prodStr ? ('\n\n' + prodStr) : '') + (reStr ? ('\n\n' + reStr) : '') + (stStr ? ('\n\n' + stStr) : '') + (rtStr ? ('\n\n' + rtStr) : '') + (feStr ? ('\n\n' + feStr) : '') + (annStr ? ('\n\n' + annStr) : '') + '\n\nSTRATEGIC ANSWER MANDATE: You advise C-suite banking executives and the Central Bank of Jordan. For every question: (1) ground each figure in the knowledge base and tag it with its period and source. (2) Compute derived measures - growth rates, shares, loan-to-deposit ratios, spreads, regional splits - from the series instead of saying data is unavailable. (3) Close every answer with a short line starting with Decision angle: (in Arabic answers start it with \u0632\u0627\u0648\u064a\u0629 \u0627\u0644\u0642\u0631\u0627\u0631:) giving one or two sentences on what the finding implies for a concrete decision a bank executive could take. (4) If a needed series is genuinely absent, name the exact missing series in one line and answer with the closest available proxy, labeled as such. (5) Avoid unexplained acronyms - spell terms out on first use. Be decision-grade, never padded.\n\nTONE LAW: analytical, neutral, firm, concrete. Never open with pleasantries, praise of the question, or meta commentary. Lead with the finding and the number. Present what the data supports and the trade-offs; do not issue directives - the executive decides. No exclamation marks. No filler.\n\nCHART PROTOCOL: When a comparison, ranking, trend or distribution is central to the answer, include exactly one fenced block: a line with ```chart then a single JSON object with keys type (bar, line or donut), title, unit, labels (array of strings, max 8), series (array of objects with keys name and values), then a line with ``` to close. Values must come from the knowledge base. Place the block where the chart belongs in the answer.';
 }
 
 function buildSystem(knowledge){
@@ -144,11 +144,39 @@ export async function POST(req){
     var knowledge = await buildKnowledge()
     try { knowledge += await buildMacroBlock() } catch (e) {};
     var system = buildSystem(knowledge);
+    var wantStream = false; try { wantStream = req.headers.get('x-cf-stream') === '1' } catch (eS) { wantStream = false }
     var ares = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{ 'x-api-key': ANTHROPIC_KEY, 'anthropic-version':'2023-06-01', 'content-type':'application/json' },
-      body: JSON.stringify({ model:'claude-opus-4-6', max_tokens:4096, system: system, messages: convo })
+      body: JSON.stringify({ model:'claude-opus-4-6', max_tokens:4096, system: system, messages: convo, stream: wantStream })
     });
+        if (wantStream && ares.ok && ares.body) {
+      var enc2 = new TextEncoder();
+      var outStream = new ReadableStream({
+        async start(controller) {
+          var reader = (ares.body as any).getReader();
+          var dec2 = new TextDecoder();
+          var buf2 = '';
+          while (true) {
+            var ch2 = await reader.read();
+            if (ch2.done) break;
+            buf2 += dec2.decode(ch2.value, { stream: true });
+            var nl2 = -1;
+            while ((nl2 = buf2.indexOf(String.fromCharCode(10))) > -1) {
+              var ln2 = buf2.slice(0, nl2); buf2 = buf2.slice(nl2 + 1);
+              if (ln2.indexOf('data: ') === 0) {
+                try {
+                  var ev2 = JSON.parse(ln2.slice(6));
+                  if (ev2 && ev2.type === 'content_block_delta' && ev2.delta && ev2.delta.text) controller.enqueue(enc2.encode(ev2.delta.text));
+                } catch (e3) {}
+              }
+            }
+          }
+          controller.close();
+        }
+      });
+      return new Response(outStream, { headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-cache' } });
+    }
     var data = await ares.json();
     var reply = '';
     if(data && Array.isArray(data.content)){
