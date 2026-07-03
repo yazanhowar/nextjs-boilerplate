@@ -24,6 +24,9 @@ var T = {
   c2d:{ en:'Sector aggregates per Association of Banks in Jordan figures.', ar:'2YXYpNi02ZHYsdin2Kog2KfZhNmC2LfYp9i5INin2YTZhdis2YXZkdi52Kkg2YjZgdmCINij2LHZgtin2YUg2KzZhdi52YrYqSDYp9mE2KjZhtmI2YMg2YHZiiDYp9mE2KPYsdiv2YYu' },
   c3t:{ en:'CBJ Reports', ar:'2KrZgtin2LHZitixINin2YTYqNmG2YMg2KfZhNmF2LHZg9iy2Yo=' },
   c3d:{ en:'Upload regulatory returns and auto-generate dashboards.', ar:'2KfYsdmB2Lkg2KfZhNiq2YLYp9ix2YrYsSDYp9mE2LHZgtin2KjZitipINmI2K/YuSDYp9mE2YXZhti12ZHYqSDYqtio2YbZiiDZhNmI2K3Yp9iq2YfYpyDYqtmE2YLYp9im2YrYp9mLLg==' },
+  navEco:{ en:'Economy', ar:'2KfZhNin2YLYqti12KfYrw==' },
+  c4t:{ en:'Economy & Macro', ar:'2KfZhNin2YLYqti12KfYryDZiNin2YTZhdik2LTYsdin2Kog2KfZhNmD2YTZitip' },
+  c4d:{ en:'Jordan macro, CBJ series and the regional map - with ZAD signal analytics.', ar:'2YXYpNi02LHYp9iqINin2YTYo9ix2K/ZhiDYp9mE2YPZhNmK2Kkg2YjYs9mE2KfYs9mEINin2YTYqNmG2YMg2KfZhNmF2LHZg9iy2Yog2YjYp9mE2K7YsdmK2LfYqSDYp9mE2KXZgtmE2YrZhdmK2Kkg4oCUINmF2Lkg2KrYrdmE2YrZhNin2Kog2LLYp9ivLg==' },
   open:{ en:'Open', ar:'2KfZgdiq2K0=' },
   cta:{ en:'Ask ZAD anything about Jordanian banking', ar:'2KfYs9ij2YQg2LLYp9ivINij2Yog2LTZitihINi52YYg2KfZhNmC2LfYp9i5INin2YTZhdi12LHZgdmKINin2YTYo9ix2K/ZhtmK' },
   footer:{ en:'convo.finance - ZAD proprietary banking intelligence', ar:'Y29udm8uZmluYW5jZSDCtyDYstin2K8g4oCUINiw2YPYp9ihINmF2LXYsdmB2Yog2YXZhdmE2YjZgw==' },
@@ -38,6 +41,7 @@ export default function Home(){
     { t:'c1t', d:'c1d', href:'/banks', accent:'var(--cf-primary)' },
     { t:'c2t', d:'c2d', href:'/sector', accent:'var(--cf-teal)' },
     { t:'c3t', d:'c3d', href:'/cbj', accent:'var(--cf-iris)' }
+    , { t:'c4t', d:'c4d', href:'/economy', accent:'var(--cf-iris)' }
   ]
   var stats = [
     { v:'75.43', u:'JOD bn', l:'stAssets' },
@@ -64,6 +68,7 @@ export default function Home(){
               <a className='cf-link' href='/banks' style={{ fontSize:'13.5px' }}>{ t('navFin') }</a>
               <a className='cf-link' href='/sector' style={{ fontSize:'13.5px' }}>{ t('navSector') }</a>
               <a className='cf-link' href='/cbj' style={{ fontSize:'13.5px' }}>{ t('navCbj') }</a>
+              <a className='cf-link' href='/economy' style={{ fontSize:'13.5px' }}>{ t('navEco') }</a>
             </nav>
             <button onClick={function(){ setLang(ar ? 'en' : 'ar') }} className='cf-btn cf-btn-secondary' style={{ fontSize:'12.5px', padding:'7px 14px' }}>{ ar ? 'English' : dec(T.langWord.ar) }</button>
           </div>
