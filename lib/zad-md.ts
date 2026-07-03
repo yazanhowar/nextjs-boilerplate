@@ -1,8 +1,83 @@
 // Canonical ZAD markdown renderer - the single source of truth for EVERY ZAD answer surface.
 // Any surface that shows ZAD output must render through zadMdToHtml and include ZAD_MD_CSS once.
+function cfEsc(x: any) { return String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') }
+function cfChartSvg(body: string): string {
+  try {
+    var spec = JSON.parse(String(body).trim())
+    var type = String(spec.type || 'bar')
+    var labels: any[] = Array.isArray(spec.labels) ? spec.labels.slice(0, 10) : []
+    var series: any[] = Array.isArray(spec.series) ? spec.series.slice(0, 4) : []
+    var title = cfEsc(spec.title || '')
+    var unit = cfEsc(spec.unit || '')
+    var CLR = ['#0f4c81', '#c9a227', '#2a9d8f', '#7ea8c9', '#8b9bb0', '#b3382c']
+    var W = 460, H = 210, padT = title ? 26 : 10, padB = 24, padL = 6, padR = 6
+    var body2 = ''
+    var head = title ? '<text x="6" y="15" font-size="11.5" font-weight="800" fill="#3d4f66">' + title + '</text>' : ''
+    if (type === 'donut') {
+      var vals: any[] = (series.length && Array.isArray(series[0].values)) ? series[0].values : []
+      var tot = 0; vals.forEach(function (v: any) { tot += Math.max(0, Number(v) || 0) })
+      if (!tot) throw new Error('empty')
+      var cx = 105, cy = padT + 82, R = 66, r0 = 40, a = -Math.PI / 2
+      for (var i = 0; i < vals.length && i < 8; i++) {
+        var frac = Math.max(0, Number(vals[i]) || 0) / tot
+        var a2 = a + frac * Math.PI * 2
+        var large = (a2 - a) > Math.PI ? 1 : 0
+        var x1 = cx + R * Math.cos(a), y1 = cy + R * Math.sin(a), x2 = cx + R * Math.cos(a2), y2 = cy + R * Math.sin(a2)
+        var x3 = cx + r0 * Math.cos(a2), y3 = cy + r0 * Math.sin(a2), x4 = cx + r0 * Math.cos(a), y4 = cy + r0 * Math.sin(a)
+        body2 += '<path d="M ' + x1.toFixed(1) + ' ' + y1.toFixed(1) + ' A ' + R + ' ' + R + ' 0 ' + large + ' 1 ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + ' L ' + x3.toFixed(1) + ' ' + y3.toFixed(1) + ' A ' + r0 + ' ' + r0 + ' 0 ' + large + ' 0 ' + x4.toFixed(1) + ' ' + y4.toFixed(1) + ' Z" fill="' + CLR[i % CLR.length] + '"/>'
+        var ly = padT + 14 + i * 20
+        body2 += '<rect x="210" y="' + (ly - 9) + '" width="10" height="10" rx="2" fill="' + CLR[i % CLR.length] + '"/>'
+        body2 += '<text x="226" y="' + ly + '" font-size="10.5" fill="#3d4f66">' + cfEsc(labels[i] != null ? labels[i] : 'Item ' + (i + 1)) + ' \u00b7 ' + (frac * 100).toFixed(1) + '%</text>'
+      }
+    } else {
+      var mx = 0
+      series.forEach(function (s: any) { (s.values || []).forEach(function (v: any) { var n = Number(v); if (isFinite(n) && n > mx) mx = n }) })
+      if (!mx) throw new Error('empty')
+      var plotW = W - padL - padR, plotH = H - padT - padB
+      for (var gI = 1; gI <= 3; gI++) {
+        var gy = padT + plotH - plotH * gI / 3
+        body2 += '<line x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + (W - padR) + '" y2="' + gy.toFixed(1) + '" stroke="#e5eaf2" stroke-width="1"/>'
+        body2 += '<text x="' + padL + '" y="' + (gy - 3).toFixed(1) + '" font-size="9" fill="#9fb0c3">' + (mx * gI / 3 >= 100 ? Math.round(mx * gI / 3).toLocaleString() : (mx * gI / 3).toFixed(1)) + '</text>'
+      }
+      var n = Math.max(labels.length, (series[0] && series[0].values || []).length)
+      var step = plotW / Math.max(n, 1)
+      if (type === 'line') {
+        series.forEach(function (s: any, si: number) {
+          var pts = ''
+          ;(s.values || []).forEach(function (v: any, vi: number) { var y = padT + plotH - Math.max(0, Number(v) || 0) / mx * plotH; pts += (padL + step * (vi + 0.5)).toFixed(1) + ',' + y.toFixed(1) + ' ' })
+          body2 += '<polyline points="' + pts + '" fill="none" stroke="' + CLR[si % CLR.length] + '" stroke-width="2"/>'
+        })
+      } else {
+        var bw = Math.min(26, step / Math.max(series.length, 1) * 0.7)
+        for (var li = 0; li < n; li++) {
+          series.forEach(function (s: any, si: number) {
+            var v = Math.max(0, Number((s.values || [])[li]) || 0)
+            var bh = v / mx * plotH
+            var bx = padL + step * li + step / 2 - (bw * series.length) / 2 + si * bw
+            body2 += '<rect x="' + bx.toFixed(1) + '" y="' + (padT + plotH - bh).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + bh.toFixed(1) + '" rx="2" fill="' + CLR[si % CLR.length] + '"/>'
+          })
+        }
+      }
+      var every = Math.ceil(n / 7)
+      for (var xi = 0; xi < n; xi += every) {
+        body2 += '<text x="' + (padL + step * (xi + 0.5)).toFixed(1) + '" y="' + (H - 7) + '" font-size="9.5" fill="#7d8ea3" text-anchor="middle">' + cfEsc(labels[xi] != null ? labels[xi] : xi + 1) + '</text>'
+      }
+      if (series.length > 1) {
+        series.forEach(function (s: any, si: number) {
+          body2 += '<rect x="' + (padL + si * 110) + '" y="' + (padT - 8) + '" width="9" height="9" rx="2" fill="' + CLR[si % CLR.length] + '"/>'
+          body2 += '<text x="' + (padL + 13 + si * 110) + '" y="' + padT + '" font-size="9.5" fill="#3d4f66">' + cfEsc(s.name || 'Series ' + (si + 1)) + '</text>'
+        })
+      }
+    }
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">' + head + body2 + '</svg>'
+    return '<div style="margin:10px 0;border:1px solid #e5eaf2;border-radius:10px;padding:10px 8px;background:#fbfcfe">' + svg + (unit ? '<div style="font-size:10px;color:#7d8ea3;margin-top:4px">' + unit + '</div>' : '') + '</div>'
+  } catch (e) {
+    return '<pre style="font-size:10.5px;overflow:auto">' + cfEsc(body) + '</pre>'
+  }
+}
 export function zadMdToHtml(md: any): string {
   var t = String(md == null ? '' : md)
-  t = t.replace(/```chart[\s\S]*?```/g, '')
+  t = t.replace(/```chart([\s\S]*?)```/g, function (_m: any, b: string) { return cfChartSvg(b) })
   t = t.replace(/```[\s\S]*?```/g, '')
   function esc(x: string) { return x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }
   function inline(x: string) {
