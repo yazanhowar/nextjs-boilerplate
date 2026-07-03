@@ -13,7 +13,7 @@ export default function CfHeader() {
   if (pathname === '/' || pathname === '/sector') return null;
   const isAr = lang === 'ar';
   const t = isAr ? NAV.ar : NAV.en;
-  const active = pathname.indexOf('/cbj') === 0 ? 'cbj' : 'financials';
+  const active = pathname.indexOf('/cbj') === 0 ? 'cbj' : pathname.indexOf('/economy') === 0 ? 'economy' : pathname.indexOf('/sector') === 0 ? 'sector' : 'financials';
   const toggleLang = () => setLang(isAr ? 'en' : 'ar');
   const toggleTheme = () => { try { const d = document.documentElement.classList.toggle('dark'); localStorage.setItem('hbtf-theme', d ? 'dark' : 'light'); localStorage.setItem('theme', d ? 'dark' : 'light'); } catch (e) {} };
   const navLink = (key: string, href: string, label: string) => (
