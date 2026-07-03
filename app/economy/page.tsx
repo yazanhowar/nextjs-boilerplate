@@ -15,6 +15,45 @@ const T: any = {
 function monthTime(p: string): number { var d = new Date(p.replace('-', ' 1, ')); return isNaN(d.getTime()) ? 0 : d.getTime() }
 function yearKey(p: string): number { var n = parseInt(p, 10); return isNaN(n) ? 0 : n + (p.indexOf('F') >= 0 ? 0.5 : 0) }
 
+function PieChart(props: any) {
+  var data = props.data || []
+  var total = 0
+  data.forEach(function (d: any) { total += Number(d.v) || 0 })
+  if (!total) return null
+  var W = 620, H = props.h || 190
+  var cx = 118, cy = H / 2, r = 64, ir = 38
+  var a0 = -Math.PI / 2
+  var segs = data.map(function (d: any) {
+    var frac = (Number(d.v) || 0) / total
+    var a1 = a0 + frac * Math.PI * 2
+    var large = a1 - a0 > Math.PI ? 1 : 0
+    var x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0)
+    var x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1)
+    var xi1 = cx + ir * Math.cos(a1), yi1 = cy + ir * Math.sin(a1)
+    var xi0 = cx + ir * Math.cos(a0), yi0 = cy + ir * Math.sin(a0)
+    var dp = 'M ' + x0.toFixed(2) + ' ' + y0.toFixed(2) + ' A ' + r + ' ' + r + ' 0 ' + large + ' 1 ' + x1.toFixed(2) + ' ' + y1.toFixed(2) + ' L ' + xi1.toFixed(2) + ' ' + yi1.toFixed(2) + ' A ' + ir + ' ' + ir + ' 0 ' + large + ' 0 ' + xi0.toFixed(2) + ' ' + yi0.toFixed(2) + ' Z'
+    a0 = a1
+    return { d: dp, c: d.c, name: d.name, pct: frac * 100, v: Number(d.v) }
+  })
+  return (
+    <svg viewBox={'0 0 ' + W + ' ' + H} style={{ width: '100%', height: 'auto', display: 'block' }}>
+      {segs.map(function (s: any, i: number) { return <path key={i} d={s.d} fill={s.c} stroke='var(--cf-bg, #fff)' strokeWidth='1.5' /> })}
+      <text x={cx} y={cy - 3} textAnchor='middle' style={{ fontSize: 15, fontWeight: 700, fill: 'var(--cf-ink)' }}>{props.center}</text>
+      <text x={cx} y={cy + 13} textAnchor='middle' style={{ fontSize: 9, fill: 'var(--cf-ink3)' }}>{props.centerSub}</text>
+      {segs.map(function (s: any, i: number) {
+        var ly = 34 + i * 34
+        return (
+          <g key={'l' + i}>
+            <rect x={236} y={ly - 9} width={11} height={11} rx={2} fill={s.c} />
+            <text x={254} y={ly} style={{ fontSize: 11, fill: 'var(--cf-ink2, #243b53)' }}>{s.name}</text>
+            <text x={W - 12} y={ly} textAnchor='end' style={{ fontSize: 11, fontWeight: 600, fill: 'var(--cf-ink)' }}>{s.v.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' · ' + s.pct.toFixed(1) + '%'}</text>
+          </g>
+        )
+      })}
+    </svg>
+  )
+}
+
 function LineChart(props: any) {
   var series = props.series, labels = props.labels
   var H = props.h || 168, W = 620, P = { l: 40, r: 10, t: 10, b: 22 }
@@ -150,6 +189,21 @@ export default function EconomyPage() {
     var mCredit = mseries('banking_sector_quarterly', 'ODC credit facilities (quarterly)')
     var mLend = mseries('banking_rates_monthly', 'Weighted avg lending rate (monthly)')
     var mDep = mseries('banking_rates_monthly', 'Weighted avg time deposit rate (monthly)')
+    var mDepTot = mseries('banking_sector_monthly', 'Total customer deposits (monthly)')
+    var mixDef = [
+      { ind: 'Deposits: private sector resident (monthly)', en: 'Private sector — resident', ar: 'القطاع الخاص المقيم', c: 'var(--cf-primary-strong)' },
+      { ind: 'Deposits: private sector non-resident (monthly)', en: 'Private sector — non-resident', ar: 'القطاع الخاص غير المقيم', c: 'var(--cf-teal)' },
+      { ind: 'Deposits: public sector (monthly)', en: 'Public sector', ar: 'القطاع العام', c: 'var(--cf-gold, #c9a227)' },
+      { ind: 'Deposits: other financial corporations (monthly)', en: 'Other financial corporations', ar: 'الشركات المالية الأخرى', c: 'var(--cf-ink3)' }
+    ]
+    var depPerRaw: any = null
+    ;(function () { var l = rows.filter(function (r) { return r.indicator === 'Total customer deposits (monthly)' }); l = l.slice().sort(function (a, b) { return monthTime(a.period) - monthTime(b.period) }); if (l.length) depPerRaw = l[l.length - 1].period })()
+    var depMix = mixDef.map(function (m) {
+      var r0 = rows.filter(function (r) { return r.indicator === m.ind && r.period === depPerRaw })[0]
+      return { name: lang === 'ar' ? m.ar : m.en, v: r0 ? Number(r0.value) : 0, c: m.c }
+    }).filter(function (d) { return d.v > 0 })
+    var depTotVal = mDepTot.pts.length ? mDepTot.pts[mDepTot.pts.length - 1] : 0
+    var depYoY = mDepTot.pts.length > 12 ? (mDepTot.pts[mDepTot.pts.length - 1] / mDepTot.pts[mDepTot.pts.length - 13] - 1) * 100 : null
     var toBn = function (o: any) { return { labels: o.labels, pts: o.pts.map(function (v: any) { return Math.round(v / 10) / 100 }) } }
     var ep = function (ind: string) { var r = last(yearly(pick('banking_epayments', ind))); return r ? { v: Number(r.value), u: r.unit || '' } : null }
     return {
@@ -250,6 +304,18 @@ export default function EconomyPage() {
           <div style={card}><div style={h2}>{t.m_assets}</div><LineChart labels={D.mAssets.labels} series={[{ name: t.assets, color: 'var(--cf-primary-strong)', w: 2.4, pts: D.mAssets.pts }]} endLabels />{D.mAssets.labels.length ? <div style={{ fontSize: 9.5, color: 'var(--cf-ink3)', marginTop: 3 }}>{t.cbjLive}</div> : null}</div>
           <div style={card}><div style={h2}>{t.m_credit}</div><LineChart labels={D.mCredit.labels} series={[{ name: t.credit, color: 'var(--cf-teal)', w: 2.4, pts: D.mCredit.pts }]} endLabels />{D.mCredit.labels.length ? <div style={{ fontSize: 9.5, color: 'var(--cf-ink3)', marginTop: 3 }}>{t.cbjLive}</div> : null}</div>
           <div style={card}><div style={h2}>{t.m_rates}</div><LineChart labels={D.mLend.labels} series={[{ name: t.lend, color: 'var(--cf-primary-strong)', w: 2.4, pts: D.mLend.pts }, { name: t.dep, color: 'var(--cf-teal)', w: 2, pts: D.mDep.pts }]} endLabels />{legend([{ name: t.lend, color: 'var(--cf-primary-strong)' }, { name: t.dep, color: 'var(--cf-teal)' }])}</div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 14, marginTop: 14 }}>
+          <div style={card} data-cf='depmix'>
+            <div style={h2}>{lang === 'ar' ? 'ودائع العملاء — التوزيع حسب المودع' : 'CUSTOMER DEPOSITS — MIX BY DEPOSITOR'}</div>
+            <PieChart data={D.depMix} center={(D.depTotVal / 1000).toFixed(1) + 'B'} centerSub={'JOD · ' + (D.depPer || '')} />
+            <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{'CBJ statistical DB · ' + (D.depPer || '')}</div>
+          </div>
+          <div style={card} data-cf='deptrend'>
+            <div style={h2}>{(lang === 'ar' ? 'إجمالي ودائع العملاء، شهري (مليار دينار)' : 'TOTAL CUSTOMER DEPOSITS, MONTHLY (JOD BN)') + (D.depYoY === null || D.depYoY === undefined ? '' : ' · ' + (D.depYoY >= 0 ? '+' : '') + D.depYoY.toFixed(1) + '% YoY')}</div>
+            <LineChart labels={D.mDepTot.labels} series={[{ name: 'Deposits', color: 'var(--cf-primary-strong)', w: 2.4, pts: D.mDepTot.pts }]} endLabels />
+            <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{'CBJ statistical DB'}</div>
+          </div>
         </div>
         <div style={{ marginTop: 14, fontSize: 11, color: 'var(--cf-ink3)', lineHeight: 1.6 }}>
           <div>{t.forecast} · {t.y2564}</div>
