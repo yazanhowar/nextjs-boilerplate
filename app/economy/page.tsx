@@ -423,10 +423,25 @@ export default function EconomyPage() {
     if (!q.trim() || busy) return
     var next = msgs.concat([{ role: 'user', content: q.trim() }])
     setMsgs(next); setQ(''); setBusy(true)
-    fetch('/api/zad', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: next.map(function (m) { return { role: m.role, content: m.content } }), lang: lang }) })
-      .then(function (r) { return r.json() })
-      .then(function (d) { setMsgs(next.concat([{ role: 'assistant', content: (d && d.text) ? d.text : t.err }])); setBusy(false) })
-      .catch(function () { setMsgs(next.concat([{ role: 'assistant', content: t.err }])); setBusy(false) })
+    setMsgs(next.concat([{ role: 'assistant', content: '' }]))
+    ;(async function () {
+      try {
+        var r = await fetch('/api/zad', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-cf-stream': '1' }, body: JSON.stringify({ messages: next.map(function (m) { return { role: m.role, content: m.content } }), lang: lang, stream: true }) })
+        if (!r.ok || !r.body) throw new Error('bad response')
+        var reader = r.body.getReader()
+        var dec = new TextDecoder()
+        var acc = ''
+        while (true) {
+          var ch = await reader.read()
+          if (ch.done) break
+          acc += dec.decode(ch.value, { stream: true })
+          var snap = acc
+          setMsgs(next.concat([{ role: 'assistant', content: snap }]))
+        }
+        if (!acc) setMsgs(next.concat([{ role: 'assistant', content: t.err }]))
+      } catch (e) { setMsgs(next.concat([{ role: 'assistant', content: t.err }])) }
+      setBusy(false)
+    })()
   }
 
   var card: any = { background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: 12, padding: '14px 16px' }
@@ -548,7 +563,7 @@ export default function EconomyPage() {
       </div>
       <button onClick={function () { setAskOpen(!askOpen) }} style={{ position: 'fixed', insetInlineEnd: 22, bottom: 22, zIndex: 96, background: 'var(--cf-grad)', color: '#fff', border: 'none', borderRadius: 999, padding: '12px 20px', fontSize: 13.5, fontWeight: 800, cursor: 'pointer', boxShadow: '0 8px 24px rgba(11,31,59,0.35)' }}>{t.ask}</button>
       {askOpen ? (
-        <div style={{ position: 'fixed', insetInlineEnd: 22, bottom: 74, zIndex: 95, width: 'min(400px, calc(100vw - 44px))', maxHeight: '64vh', display: 'flex', flexDirection: 'column', background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: 14, boxShadow: '0 18px 48px rgba(11,31,59,0.25)', overflow: 'hidden' }} dir={isAr ? 'rtl' : 'ltr'}>
+        <div style={{ position: 'fixed', insetInlineEnd: 0, top: 0, bottom: 0, zIndex: 95, width: 'min(560px, 96vw)', display: 'flex', flexDirection: 'column', background: 'var(--cf-surface)', borderInlineStart: '1px solid var(--cf-line)', borderRadius: 0, boxShadow: '-18px 0 48px rgba(11,31,59,0.25)', overflow: 'hidden' }} dir={isAr ? 'rtl' : 'ltr'}>
           <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--cf-line)', fontWeight: 800, fontSize: 13, color: 'var(--cf-ink)', background: 'var(--cf-surface2)' }}>{t.ask}</div>
           <div style={{ flex: 1, overflowY: 'auto', padding: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
             {msgs.map(function (m: any, i: number) { return m.role === 'user' ? (
