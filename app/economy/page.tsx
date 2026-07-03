@@ -70,6 +70,8 @@ function GeoMapCard(props: any) {
   var isDep = mode === 'dep'
   var data = isDep ? (D.govData || {}) : (D.credData || {})
   var total = isDep ? D.govTotal : D.credTotal
+  var zs = useState(false)
+  var big = zs[0], setBig = zs[1]
   var count = 0
   Object.keys(data).forEach(function (k) { if (isFinite(Number(data[k]))) count++ })
   var title = isDep ? (ar ? 'ودائع العملاء حسب المحافظات' : 'CUSTOMER DEPOSITS BY GOVERNORATE') : (ar ? 'التسهيلات الائتمانية حسب المحافظات' : 'CREDIT FACILITIES BY GOVERNORATE')
@@ -81,9 +83,18 @@ function GeoMapCard(props: any) {
     <div>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
         <div style={props.h2}>{title + (total ? ' · ' + (total / 1000).toFixed(1) + (ar ? ' مليار دينار · الربع الأول 2026' : 'B JOD · Q1 2026') : '')}</div>
-        <div style={{ display: 'flex', gap: 6 }}>{[pill('dep', 'Deposits', 'الودائع'), pill('cred', 'Credit', 'الائتمان')]}</div>
+        <div style={{ display: 'flex', gap: 6 }}>{[pill('dep', 'Deposits', 'الودائع'), pill('cred', 'Credit', 'الائتمان'), <button key='xp' onClick={function () { setBig(true) }} title='Expand' style={{ border: '1px solid var(--cf-line, #e5eaf2)', background: 'transparent', color: 'var(--cf-ink2, #3d4f66)', borderRadius: 8, padding: '3px 9px', fontSize: 12, cursor: 'pointer' }}>⤢</button>]}</div>
       </div>
-      <JordanMap data={data} lang={lang} />
+      <JordanMapInner data={data} lang={lang} />
+      {big ? <div onClick={function () { setBig(false) }} style={{ position: 'fixed', inset: 0, zIndex: 92, background: 'rgba(11,31,59,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, cursor: 'zoom-out' }}>
+        <div onClick={function (e: any) { e.stopPropagation() }} style={{ background: 'var(--cf-surface, #ffffff)', border: '1px solid var(--cf-line, #e5eaf2)', borderRadius: 16, padding: '18px 20px', width: 'min(860px, 94vw)', maxHeight: '92vh', overflow: 'auto', cursor: 'default' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
+            <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--cf-ink, #14243a)' }}>{title}</div>
+            <div style={{ display: 'flex', gap: 6 }}>{[pill('dep', 'Deposits', 'الودائع'), pill('cred', 'Credit', 'الائتمان'), <button key='cl' onClick={function () { setBig(false) }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 15, color: 'var(--cf-ink3, #7d8ea3)' }}>✕</button>]}</div>
+          </div>
+          <div style={{ zoom: 1.55, marginTop: 8 }}><JordanMapInner data={data} lang={lang} /></div>
+        </div>
+      </div> : null}
       {count ? <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{ar ? 'القيم بملايين الدنانير · البنك المركزي الأردني' : 'Values in JOD millions · CBJ statistical DB'}</div> : <div style={{ fontSize: 11, color: 'var(--cf-ink3)', marginTop: 8 }}>{ar ? 'التوزيع الإقليمي قيد المزامنة من البنك المركزي' : 'Regional split syncing from CBJ'}</div>}
     </div>
   )
