@@ -6,8 +6,8 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   const key = req.headers.get('x-cf-key') || '';
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
-  const { data: sec } = await sb.from('_cf_secrets').select('value').eq('name', 'ingest_key').single();
-  if (!sec || !key || key !== sec.value) {
+  const { data: okv } = await sb.rpc('_cf_guard', { p: key });
+  if (!okv) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
   const { data, error } = await sb.from('_cf_scratch').select('k,v');
