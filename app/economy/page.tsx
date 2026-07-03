@@ -17,6 +17,22 @@ const T: any = {
 function monthTime(p: string): number { var d = new Date(p.replace('-', ' 1, ')); return isNaN(d.getTime()) ? 0 : d.getTime() }
 function yearKey(p: string): number { var n = parseInt(p, 10); return isNaN(n) ? 0 : n + (p.indexOf('F') >= 0 ? 0.5 : 0) }
 
+function CfSection(props: any) {
+  var ex = useState(!!props.open)
+  var on = ex[0], setOn = ex[1]
+  return (
+    <div style={{ marginTop: 16 }}>
+      <div onClick={function () { setOn(!on) }} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none', padding: '8px 2px', borderBottom: '1px solid var(--cf-line, #e5eaf2)' }}>
+        <span style={{ fontSize: 11, color: 'var(--cf-ink3, #7d8ea3)', transform: on ? 'rotate(90deg)' : 'none', transition: 'transform .15s', display: 'inline-block' }}>{'\u25b6'}</span>
+        <span style={{ fontSize: 12, fontWeight: 900, letterSpacing: 1.1, color: 'var(--cf-ink2, #3d4f66)' }}>{props.t}</span>
+        <span style={{ fontSize: 10.5, color: 'var(--cf-ink3, #7d8ea3)' }}>{props.n ? '\u00b7 ' + props.n : ''}</span>
+        <span style={{ fontSize: 10, color: 'var(--cf-ink3, #7d8ea3)', marginInlineStart: 'auto' }}>{on ? '' : '\u2022\u2022\u2022'}</span>
+      </div>
+      {on ? props.children : null}
+    </div>
+  )
+}
+
 function CfZoom(props: any) {
   var ex = useState<any>(null)
   var open = ex[0], setOpen = ex[1]
@@ -464,14 +480,23 @@ export default function EconomyPage() {
           <div style={h2}>{lang === 'ar' ? 'لوحة إشارات زاد' : 'ZAD SIGNAL BOARD'}</div>
           <CfSignals lang={lang} />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))', gap: 12, marginTop: 14 }}>
+                <CfSection t={lang === 'ar' ? 'الخلفية العالمية' : 'GLOBAL BACKDROP'} n='2' open={false}>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))', gap: 12, marginTop: 14 }}>
           <div style={card}><div style={h2}>{t.global} — {t.g_growth}</div><LineChart labels={D.gg.labels} series={D.gg.series} endLabels />{legend(D.gg.series)}</div>
           <div style={card}><div style={h2}>{t.global} — {t.g_infl}</div><LineChart labels={D.gi.labels} series={D.gi.series} endLabels />{legend(D.gi.series)}</div>
+        </div>
+        </CfSection>
+        <CfSection t={lang === 'ar' ? 'الاقتصاد الأردني الكلي' : 'JORDAN MACRO'} n='5' open={false}>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))', gap: 12, marginTop: 14 }}>
           <div style={card}><div style={h2}>{t.jordan} — {t.j_growth}</div><LineChart labels={D.jg.labels} series={D.jg.series} endLabels zero />{legend(D.jg.series)}</div>
           <div style={card}><div style={h2}>{t.jordan} — {t.monthly_cpi}</div><LineChart labels={D.cpiLabels} series={[{ name: 'YoY', color: 'var(--cf-primary-strong)', w: 2.4, pts: D.cpiPts }]} endLabels zero /></div>
           <div style={card}><div style={h2}>{t.trade}</div><LineChart labels={D.mLabels} series={[{ name: t.exports, color: 'var(--cf-positive)', w: 2.2, pts: D.exPts }, { name: t.imports, color: 'var(--cf-negative)', w: 2.2, pts: D.imPts }]} endLabels />{legend([{ name: t.exports, color: 'var(--cf-positive)' }, { name: t.imports, color: 'var(--cf-negative)' }])}<div style={{ marginTop: 7, fontSize: 10.5, color: 'var(--cf-ink2)', fontWeight: 600 }} dir='ltr'>DoS H1-2025 (JOD m): X {fmt(D.h1.x, 0)} · M {fmt(D.h1.m, 0)} · Bal {fmt(D.h1.b, 0)}</div><div style={{ fontSize: 9.5, color: 'var(--cf-ink3)', marginTop: 3 }}>{t.dotNote}</div></div>
           <div style={card}><div style={h2}>{t.balance}</div><BarChart labels={D.tbLabels} pts={D.tbPts} /><div style={{ fontSize: 9.5, color: 'var(--cf-ink3)', marginTop: 3 }}>{t.dotNote}</div></div>
           <div style={card}><div style={h2}>{t.debt}</div><LineChart labels={D.debt.labels} series={D.debt.series} endLabels />{legend(D.debt.series)}</div>
+        </div>
+        </CfSection>
+        <CfSection t={lang === 'ar' ? 'الجهاز المصرفي' : 'BANKING SYSTEM'} n='7' open={true}>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))', gap: 12, marginTop: 14 }}>
           <div style={card}><div style={h2}>{t.sector} — {t.s_bs}</div><LineChart labels={D.bs.labels} series={D.bs.series} endLabels />{legend(D.bs.series)}</div>
           <div style={card}><div style={h2}>{t.sector} — {t.s_prof}</div><LineChart labels={D.prof.labels} series={D.prof.series} endLabels zero />{legend(D.prof.series)}</div>
           <div style={card}><div style={h2}>{t.sector} — {t.s_rates}</div><LineChart labels={D.rates.labels} series={D.rates.series} endLabels />{legend(D.rates.series)}</div>
@@ -489,7 +514,9 @@ export default function EconomyPage() {
           <div style={card}><div style={h2}>{t.m_credit}</div><LineChart labels={D.mCredit.labels} series={[{ name: t.credit, color: 'var(--cf-teal)', w: 2.4, pts: D.mCredit.pts }]} endLabels />{D.mCredit.labels.length ? <div style={{ fontSize: 9.5, color: 'var(--cf-ink3)', marginTop: 3 }}>{t.cbjLive}</div> : null}</div>
           <div style={card}><div style={h2}>{t.m_rates}</div><LineChart labels={D.mLend.labels} series={[{ name: t.lend, color: 'var(--cf-primary-strong)', w: 2.4, pts: D.mLend.pts }, { name: t.dep, color: 'var(--cf-teal)', w: 2, pts: D.mDep.pts }]} endLabels />{legend([{ name: t.lend, color: 'var(--cf-primary-strong)' }, { name: t.dep, color: 'var(--cf-teal)' }])}</div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 14, marginTop: 14 }}>
+        </CfSection>
+                <CfSection t={lang === 'ar' ? 'التوزيع الإقليمي وهيكل السوق' : 'REGIONAL & MARKET STRUCTURE'} n='4' open={true}>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 14, marginTop: 14 }}>
           <div style={card} data-cf='depmix'>
             <div style={h2}>{lang === 'ar' ? 'ودائع العملاء — التوزيع حسب المودع' : 'CUSTOMER DEPOSITS — MIX BY DEPOSITOR'}</div>
             <PieChart data={D.depMix} center={(Number(D.depTotVal || 0) / 1000).toFixed(1) + 'B'} centerSub={'JOD · ' + (D.depPer || '')} />
@@ -509,6 +536,7 @@ export default function EconomyPage() {
           <GeoMapCard D={D} lang={lang} h2={h2} />
           <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{'Map: Wikimedia Commons (CC BY-SA 2.5)'}</div>
         </div>
+        </CfSection>
         <div style={{ marginTop: 14, fontSize: 11, color: 'var(--cf-ink3)', lineHeight: 1.6 }}>
           <div>{t.forecast} · {t.y2564}</div>
           <div>{t.src}{syncs.length ? ' · ' + t.lastSync + ': ' + String(syncs[0].at).slice(0, 16).replace('T', ' ') + ' UTC' : ''}</div>
