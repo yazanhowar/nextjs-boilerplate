@@ -170,7 +170,7 @@ export async function GET(){ return NextResponse.json({ ok: true, service: 'zad'
 async function buildMacroBlock(): Promise<string> {
   try {
     var sbc: any = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
-    var r1 = await sbc.from('macro_indicators').select('category,indicator,period,value,unit,source').order('category', { ascending: true }).order('indicator', { ascending: true }).order('id', { ascending: true })
+    var r1 = await sbc.from('macro_indicators').select('category,indicator,period,value,unit,source').neq('category', '_cf_probe').order('category', { ascending: true }).order('indicator', { ascending: true }).order('id', { ascending: true })
     var rows = (r1 && r1.data) || []
     if (!rows.length) return ''
     var g: any = {}
