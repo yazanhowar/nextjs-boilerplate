@@ -16,6 +16,34 @@ const T: any = {
 function monthTime(p: string): number { var d = new Date(p.replace('-', ' 1, ')); return isNaN(d.getTime()) ? 0 : d.getTime() }
 function yearKey(p: string): number { var n = parseInt(p, 10); return isNaN(n) ? 0 : n + (p.indexOf('F') >= 0 ? 0.5 : 0) }
 
+function GeoMapCard(props: any) {
+  var D = props.D || {}
+  var lang = props.lang
+  var ar = lang === 'ar'
+  var ms = useState('dep')
+  var mode = ms[0], setMode = ms[1]
+  var isDep = mode === 'dep'
+  var data = isDep ? (D.govData || {}) : (D.credData || {})
+  var total = isDep ? D.govTotal : D.credTotal
+  var count = 0
+  Object.keys(data).forEach(function (k) { if (isFinite(Number(data[k]))) count++ })
+  var title = isDep ? (ar ? 'ودائع العملاء حسب المحافظات' : 'CUSTOMER DEPOSITS BY GOVERNORATE') : (ar ? 'التسهيلات الائتمانية حسب المحافظات' : 'CREDIT FACILITIES BY GOVERNORATE')
+  var pill = function (id: string, en: string, arr: string) {
+    var on = mode === id
+    return <button key={id} onClick={function () { setMode(id) }} style={{ border: '1px solid ' + (on ? 'var(--cf-primary-strong, #0f4c81)' : 'var(--cf-line, #e5eaf2)'), background: on ? 'var(--cf-primary-strong, #0f4c81)' : 'transparent', color: on ? '#ffffff' : 'var(--cf-ink2, #3d4f66)', borderRadius: 999, padding: '4px 12px', fontSize: 11, fontWeight: 800, cursor: 'pointer' }}>{ar ? arr : en}</button>
+  }
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+        <div style={props.h2}>{title + (total ? ' · ' + (total / 1000).toFixed(1) + (ar ? ' مليار دينار · الربع الأول 2026' : 'B JOD · Q1 2026') : '')}</div>
+        <div style={{ display: 'flex', gap: 6 }}>{[pill('dep', 'Deposits', 'الودائع'), pill('cred', 'Credit', 'الائتمان')]}</div>
+      </div>
+      <JordanMap data={data} lang={lang} />
+      {count ? <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{ar ? 'القيم بملايين الدنانير · البنك المركزي الأردني' : 'Values in JOD millions · CBJ statistical DB'}</div> : <div style={{ fontSize: 11, color: 'var(--cf-ink3)', marginTop: 8 }}>{ar ? 'التوزيع الإقليمي قيد المزامنة من البنك المركزي' : 'Regional split syncing from CBJ'}</div>}
+    </div>
+  )
+}
+
 function CfSignalBoard(props: any) {
   var D = props.D || {}
   var ar = props.lang === 'ar'
@@ -41,6 +69,8 @@ function CfSignalBoard(props: any) {
   var amm = D.govData ? Number(D.govData['Amman']) : null
   var share = (amm && D.govTotal) ? amm / D.govTotal * 100 : null
   if (share != null && isFinite(share)) add(0, 'Capital concentration', 'تركز الودائع', share.toFixed(0) + '% Amman', 0, share >= 80 ? 'Deposits heavily concentrated in the Capital — regional depth thin' : 'Regionally diversified funding', share >= 80 ? 'تركز مرتفع في العاصمة' : 'توزع إقليمي متوازن', 'CBJ · Q1 2026')
+  var ldr = (D.credTotal && D.govTotal) ? D.credTotal / D.govTotal * 100 : null
+  if (ldr != null && isFinite(ldr)) add(0, 'System LDR (regional)', 'نسبة الإقراض إلى الودائع', ldr.toFixed(0) + '%', 0, ldr >= 90 ? 'Loan book stretched against deposits' : 'Loans fully deposit-funded — ample lending headroom', ldr >= 90 ? 'توظيف مرتفع للودائع' : 'سيولة وافرة وقدرة إقراض متاحة', 'CBJ · Q1 2026 (LDR)')
   var w = D.gg && D.gg.series && D.gg.series[0] ? lastOf(D.gg.series[0]) : null
   if (w) add(1, 'Global growth', 'النمو العالمي', w.v.toFixed(1) + '% · ' + String(D.gg.labels[w.i]), w.v >= 3 ? 1 : w.v >= 2.5 ? 0 : -1, w.v >= 3.2 ? 'Global backdrop supportive' : w.v >= 2.5 ? 'Global growth steady but unspectacular' : 'Global headwinds building', w.v >= 3.2 ? 'بيئة عالمية داعمة' : w.v >= 2.5 ? 'نمو عالمي معتدل' : 'رياح عالمية معاكسة', 'IMF WEO')
   var em = D.gg && D.gg.series && D.gg.series[2] ? lastOf(D.gg.series[2]) : null
@@ -392,6 +422,11 @@ export default function EconomyPage() {
     govRows.forEach(function (r) { govData[String(r.indicator)] = Number(r.value) })
     var govTotal = 0
     govRows.forEach(function (r) { govTotal += Number(r.value) || 0 })
+    var credRows = rows.filter(function (r) { return r.category === 'credit_geo_governorate' })
+    var credData: any = {}
+    credRows.forEach(function (r) { credData[String(r.indicator)] = Number(r.value) })
+    var credTotal = 0
+    credRows.forEach(function (r) { credTotal += Number(r.value) || 0 })
     var toBn = function (o: any) { return { labels: o.labels, pts: o.pts.map(function (v: any) { return Math.round(v / 10) / 100 }) } }
     var ep = function (ind: string) { var r = last(yearly(pick('banking_epayments', ind))); return r ? { v: Number(r.value), u: r.unit || '' } : null }
     return {
@@ -407,7 +442,7 @@ export default function EconomyPage() {
       vint: (function () { for (var i2 = 0; i2 < rows.length; i2++) { var nt = rows[i2].note; if (nt && String(nt).indexOf('WEO') >= 0) { var mm = String(nt).match(/([0-9][0-9][0-9][0-9]-[0-9][0-9])/); if (mm) return mm[1] } } return null })(),
       mAssets: toBn(mAssets), mCredit: toBn(mCredit), mLend: mLend, mDep: mDep,
       mDepTot: toBn(mDepTot), depMix: depMix, depPer: depPerRaw, depTotVal: depTotVal, depYoY: depYoY,
-      govData: govData, govCount: govRows.length, govTotal: govTotal,
+      govData: govData, govCount: govRows.length, govTotal: govTotal, credData: credData, credTotal: credTotal,
       eShare: ep('Electronic channel share of payments'), eUsers: ep('Digital banking users'), eVal: ep('Digital payment value'), eAtm: ep('ATMs in Kingdom')
     }
   }, [rows, lang])
@@ -516,10 +551,7 @@ export default function EconomyPage() {
           <MarketShareInner lang={lang} />
         </div>
         <div style={card} data-cf='govmap'>
-          <div style={h2}>{(lang === 'ar' ? 'ودائع العملاء حسب المحافظات' : 'CUSTOMER DEPOSITS BY GOVERNORATE') + (D.govTotal ? ' · ' + (D.govTotal / 1000).toFixed(1) + (lang === 'ar' ? ' مليار دينار · الربع الأول 2026' : 'B JOD · Q1 2026') : '')}</div>
-          <JordanMap data={D.govData || {}} lang={lang} />
-          {D.govCount ? <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{lang === 'ar' ? 'القيم بملايين الدنانير · البنك المركزي الأردني' : 'Values in JOD millions · CBJ statistical DB'}</div> : null}
-          {D.govCount ? null : <div style={{ fontSize: 11, color: 'var(--cf-ink3)', marginTop: 8 }}>{lang === 'ar' ? 'التوزيع الإقليمي قيد المزامنة من البنك المركزي' : 'Regional split syncing from CBJ'}</div>}
+          <GeoMapCard D={D} lang={lang} h2={h2} />
           <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{'Map: Wikimedia Commons (CC BY-SA 2.5)'}</div>
         </div>
         <div style={{ marginTop: 14, fontSize: 11, color: 'var(--cf-ink3)', lineHeight: 1.6 }}>
