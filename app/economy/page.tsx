@@ -64,6 +64,16 @@ var JO_NAMES: any = {
 }
 
 function JordanMap(props: any) {
+  var ex = useState(false)
+  var big = ex[0], setBig = ex[1]
+  return (
+    <div>
+      <div onClick={function () { setBig(true) }} style={{ cursor: 'zoom-in' }} title='Click to expand'><JordanMapInner {...props} /></div>
+      {big ? <div onClick={function () { setBig(false) }} style={{ position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(11,31,59,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out', padding: 20 }}><div style={{ background: 'var(--cf-surface, #ffffff)', border: '1px solid var(--cf-line, #e5eaf2)', borderRadius: 16, padding: '20px 22px', width: 'min(960px, 94vw)', maxHeight: '92vh', overflow: 'auto', boxShadow: '0 24px 64px rgba(11,31,59,0.35)' }}><div style={{ zoom: 2.1 }}><JordanMapInner {...props} /></div></div></div> : null}
+    </div>
+  )
+}
+function JordanMapInner(props: any) {
   var data = props.data || {}
   var vals: number[] = []
   JO_GOVS.forEach(function (g: any) { var v = data[g.key]; if (v) vals.push(Number(v)) })
@@ -107,6 +117,16 @@ function JordanMap(props: any) {
 }
 
 function PieChart(props: any) {
+  var ex = useState(false)
+  var big = ex[0], setBig = ex[1]
+  return (
+    <div>
+      <div onClick={function () { setBig(true) }} style={{ cursor: 'zoom-in' }} title='Click to expand'><PieChartInner {...props} /></div>
+      {big ? <div onClick={function () { setBig(false) }} style={{ position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(11,31,59,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out', padding: 20 }}><div style={{ background: 'var(--cf-surface, #ffffff)', border: '1px solid var(--cf-line, #e5eaf2)', borderRadius: 16, padding: '20px 22px', width: 'min(960px, 94vw)', maxHeight: '92vh', overflow: 'auto', boxShadow: '0 24px 64px rgba(11,31,59,0.35)' }}><PieChartInner {...props} /></div></div> : null}
+    </div>
+  )
+}
+function PieChartInner(props: any) {
   var data = props.data || []
   var total = 0
   data.forEach(function (d: any) { total += Number(d.v) || 0 })
@@ -146,6 +166,16 @@ function PieChart(props: any) {
 }
 
 function LineChart(props: any) {
+  var ex = useState(false)
+  var big = ex[0], setBig = ex[1]
+  return (
+    <div>
+      <div onClick={function () { setBig(true) }} style={{ cursor: 'zoom-in' }} title='Click to expand'><LineChartInner {...props} /></div>
+      {big ? <div onClick={function () { setBig(false) }} style={{ position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(11,31,59,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out', padding: 20 }}><div style={{ background: 'var(--cf-surface, #ffffff)', border: '1px solid var(--cf-line, #e5eaf2)', borderRadius: 16, padding: '20px 22px', width: 'min(960px, 94vw)', maxHeight: '92vh', overflow: 'auto', boxShadow: '0 24px 64px rgba(11,31,59,0.35)' }}><LineChartInner {...props} /></div></div> : null}
+    </div>
+  )
+}
+function LineChartInner(props: any) {
   var series = props.series, labels = props.labels
   var H = props.h || 168, W = 620, P = { l: 40, r: 10, t: 10, b: 22 }
   var all: number[] = []
