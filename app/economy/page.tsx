@@ -295,7 +295,7 @@ export default function EconomyPage() {
     }).filter(function (d) { return d.v > 0 })
     var depTotVal = mDepTot.pts.length ? mDepTot.pts[mDepTot.pts.length - 1] : 0
     var depYoY = mDepTot.pts.length > 12 ? (mDepTot.pts[mDepTot.pts.length - 1] / mDepTot.pts[mDepTot.pts.length - 13] - 1) * 100 : null
-    var govRows = rows.filter(function (r) { return r.category === 'branch_network_governorate' })
+    var govRows = rows.filter(function (r) { return r.category === 'deposits_geo_governorate' })
     var govData: any = {}
     govRows.forEach(function (r) { govData[String(r.indicator)] = Number(r.value) })
     var govTotal = 0
@@ -420,8 +420,9 @@ export default function EconomyPage() {
           <MarketShareInner lang={lang} />
         </div>
         <div style={card} data-cf='govmap'>
-          <div style={h2}>{(lang === 'ar' ? 'فروع البنوك حسب المحافظة' : 'BANK BRANCHES BY GOVERNORATE') + (D.govTotal ? ' · ' + D.govTotal + (lang === 'ar' ? ' فرع' : ' branches') : '')}</div>
+          <div style={h2}>{(lang === 'ar' ? 'ودائع العملاء حسب المحافظات' : 'CUSTOMER DEPOSITS BY GOVERNORATE') + (D.govTotal ? ' · ' + (D.govTotal / 1000).toFixed(1) + (lang === 'ar' ? ' مليار دينار · الربع الأول 2026' : 'B JOD · Q1 2026') : '')}</div>
           <JordanMap data={D.govData || {}} lang={lang} />
+          {D.govCount ? <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{lang === 'ar' ? 'القيم بملايين الدنانير · البنك المركزي الأردني' : 'Values in JOD millions · CBJ statistical DB'}</div> : null}
           {D.govCount ? null : <div style={{ fontSize: 11, color: 'var(--cf-ink3)', marginTop: 8 }}>{lang === 'ar' ? 'التوزيع الإقليمي قيد المزامنة من البنك المركزي' : 'Regional split syncing from CBJ'}</div>}
           <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{'Map: Wikimedia Commons (CC BY-SA 2.5)'}</div>
         </div>
