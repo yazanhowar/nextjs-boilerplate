@@ -312,7 +312,7 @@ export default function BankPage() {
   if (!bank) return <div className="min-h-screen bg-[var(--cf-bg)] flex items-center justify-center text-[var(--cf-ink)]">Bank not found</div>
 
   // Latest + previous financials for delta
-  if (Number(bankId) === 1) { (financials || []).forEach(function (r) { if (r && !r.__cfJod) { ['total_assets','net_profit','customer_deposits','net_loans','total_equity'].forEach(function (k) { if (r[k] != null) r[k] = r[k] * 0.709; }); r.__cfJod = true; } }); }
+  // FX normalization happens once at fetch time (_fx mapper); render-time pass removed to prevent double USD->JOD conversion.
   const latest = financials[financials.length - 1]
   const prev = financials[financials.length - 2]
 
