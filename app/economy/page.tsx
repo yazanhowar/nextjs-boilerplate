@@ -69,7 +69,7 @@ function JordanMap(props: any) {
   JO_GOVS.forEach(function (g: any) { var v = data[g.key]; if (v) vals.push(Number(v)) })
   var max = vals.length ? Math.max.apply(null, vals) : 0
   var fill = function (v: any) {
-    if (!max || !v) return 'var(--cf-line, #e5eaf2)'
+    if (!max || !v) return '#dbe4ee'
     var q = Math.sqrt(Number(v) / max)
     if (q > 0.72) return 'var(--cf-primary-strong, #0f4c81)'
     if (q > 0.45) return '#3f7cac'
@@ -79,10 +79,10 @@ function JordanMap(props: any) {
   var ranked = JO_GOVS.slice().sort(function (a: any, b: any) { return (Number(data[b.key]) || 0) - (Number(data[a.key]) || 0) })
   return (
     <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-      <svg viewBox={JO_VIEWBOX} style={{ width: 250, maxWidth: '100%', height: 'auto', flex: '0 0 auto' }}>
+      <svg viewBox={JO_VIEWBOX} style={{ width: 250, maxWidth: '100%', height: 271, flex: '0 0 auto' }}>
         {JO_GOVS.map(function (g: any) {
           return (
-            <path key={g.key} d={g.d} fill={fill(data[g.key])} stroke='var(--cf-bg, #ffffff)' strokeWidth='2.5'>
+            <path key={g.key} d={g.d} fill={fill(data[g.key])} stroke='var(--cf-ink3, #7d8ea3)' strokeWidth='1.6'>
               <title>{(props.lang === 'ar' ? (JO_NAMES[g.key] || g.key) : g.key) + (data[g.key] ? ': ' + data[g.key] : '')}</title>
             </path>
           )
