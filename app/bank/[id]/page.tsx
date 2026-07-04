@@ -663,7 +663,7 @@ export default function BankPage() {
               <div className="grid grid-cols-2 gap-6">
                 {/* Lending rates */}
                 <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
-                  <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">Loan Interest Rates</div>
+                  <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">{bank.sector === 'islamic' ? 'Financing Rates (Murabaha)' : 'Loan Interest Rates'}</div>
                   <div className="space-y-3">
                     {[
                       { label: 'Home Loans', min: rates.home_loan_min, max: rates.home_loan_max },
@@ -685,7 +685,7 @@ export default function BankPage() {
 
                 {/* Savings rates */}
                 <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
-                  <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">Deposit Interest Rates</div>
+                  <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">{bank.sector === 'islamic' ? 'Expected Profit Rates (Mudaraba)' : 'Deposit Interest Rates'}</div>
                   <div className="space-y-3">
                     {[
                       { label: 'Savings Account', val: rates.saving_rate },
