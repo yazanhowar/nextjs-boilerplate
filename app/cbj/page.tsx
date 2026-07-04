@@ -33,13 +33,7 @@ export default function CbjPage(){
   ];
   return h('div',{className:'cbjx-wrap',dir:(isAr?'rtl':'ltr')},
     h('style',{dangerouslySetInnerHTML:{__html:CSS}}),
-    h('div',{className:'cbjx-top'},
-      h('div',{className:'cbjx-brand'}, h('img',{className:'cbjx-logo',src:logoSrc,alt:'ZAD'})),
-      h('div',{className:'cbjx-controls'},
-        h('button',{className:'cbjx-btn',onClick:toggleLang}, isAr?'EN':'العربية'),
-        h('button',{className:'cbjx-btn',onClick:toggleTheme,'aria-label':'theme'}, dark?'☀':'☾')
-      )
-    ),
+
     h('div',{className:'cbjx-hero'},
       h('div',{className:'cbjx-kicker'}, tr.kicker),
       h('h1',{className:'cbjx-h1'}, tr.h1),
