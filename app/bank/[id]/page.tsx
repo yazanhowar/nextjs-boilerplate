@@ -419,8 +419,8 @@ export default function BankPage() {
               {
                 label: 'Earnings Per Share',
                 value: latest.eps_fils ? `${latest.eps_fils} fils` : '—',
-                delta: prev?.eps_fils ? (latest.eps_fils - prev.eps_fils) : null,
-                sub: 'FY2024 basic EPS',
+                delta: prev?.eps_fils && latest.eps_fils != null ? ((latest.eps_fils - prev.eps_fils) / prev.eps_fils) * 100 : null,
+                sub: latest.fiscal_year ? ('FY' + latest.fiscal_year + ' basic EPS') : 'Basic EPS',
               },
             ].map(kpi => (
               <div key={kpi.label} className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-4">
