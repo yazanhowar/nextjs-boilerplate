@@ -108,7 +108,7 @@ function MarketShareInner(props: any) {
     var ok = true
     ;(async function () {
       try {
-        var bf: any = await supabase.from('bank_financials').select('bank_id,total_assets,currency').eq('fiscal_year', 2024)
+        var bf: any = await supabase.from('bank_financials').select('bank_id,total_assets,currency').eq('fiscal_year', 2025)
         var bn: any = await supabase.from('banks').select('id,name_en,name_ar,short_name')
         if (!ok || bf.error || bn.error || !bf.data || !bn.data) return
         var names: any = {}
@@ -135,7 +135,7 @@ function MarketShareInner(props: any) {
   if (othersV > 0) top.push({ name: lang === 'ar' ? 'بقية البنوك' : 'Other banks', v: Math.round(othersV / 1000), c: '#d3dbe6' })
   return (
     <div>
-      <PieChart data={top} center={(total / 1000000).toFixed(0) + 'B'} centerSub={lang === 'ar' ? 'دينار · 2024' : 'JOD · FY2024'} h={272} />
+      <PieChart data={top} center={(total / 1000000).toFixed(0) + 'B'} centerSub={lang === 'ar' ? 'دينار · 2025' : 'JOD · FY2025'} h={272} />
       <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{lang === 'ar' ? 'بيانات 2024 · على مستوى المجموعة · البنك العربي محوّل من الدولار (0.709)' : 'bank_financials FY2024 · group-level · Arab Bank converted USD→JOD @ 0.709'}</div>
     </div>
   )
