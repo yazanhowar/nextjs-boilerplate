@@ -125,7 +125,8 @@ export default function Dashboard() {
   const carVals = BANKS.map(b => financials[b.id]?.car).filter(Boolean) as number[]
   const avgCAR = carVals.length ? carVals.reduce((a,b)=>a+b,0)/carVals.length : null
 
-  const filtered = BANKS.filter(b => {
+  const AR_TAGS: Record<number,string> = {"1":"أكبر بنك أردني بشبكة عالمية في أكثر من 25 دولة.","2":"ثاني أكبر بنوك المملكة وأوسع شبكة فروع محلية.","3":"تابع لمجموعة KIPCO، الأسرع نمواً في الأرباح.","4":"مجموعة مصرفية إقليمية سريعة النمو (الأردن والعراق والسعودية).","5":"بنك متوسط الحجم رائد في الخدمات الرقمية وتمويل المنشآت الصغيرة.","6":"يدير 103 فروع في الأردن و22 في فلسطين.","7":"من أعرق البنوك الأردنية، تأسس عام 1955.","8":"متخصص في الخدمات المصرفية للشركات والاستثمار.","9":"أكبر بنك إسلامي في الأردن.","10":"مصرفية متوافقة مع الشريعة، المساهم الرئيسي الاتحاد للاستثمارات الإسلامية.","11":"ذراع الصيرفة الإسلامية المملوك بالكامل للبنك العربي، 47 فرعاً.","12":"بنك تجاري عريق تأسس عام 1960 بحضور قوي في فلسطين.","13":"بنك متخصص أصغر حجماً بملكية عائلية فلسطينية وخليجية.","14":"مملوك بنسبة 87% لمؤسسة المصرفية العربية البحرين.","15":"أصغر بنك أردني مدرج."};
+const filtered = BANKS.filter(b => {
     if (filter==='conventional' && b.sector!=='conventional') return false
     if (filter==='islamic' && b.sector!=='islamic') return false
     if (search) { const q=search.toLowerCase(); if (!b.name.toLowerCase().includes(q)&&!b.shortName.toLowerCase().includes(q)&&!b.ticker.toLowerCase().includes(q)) return false }
@@ -205,7 +206,7 @@ function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMou
         </div>
         <div>
           <div style={{ fontWeight:600, fontSize:15, color:t.text }}>{isAr ? bank.nameAr : bank.name}</div>
-          <div style={{ fontSize:12, color:t.textSub, marginTop:2 }}>{bank.sector==='islamic'?'Islamic':'Commercial'} &middot; {bank.ticker}</div>
+          <div style={{ fontSize:12, color:t.textSub, marginTop:2 }}>{bank.sector==='islamic'?(isAr?'إسلامي':'Islamic'):(isAr?'تجاري':'Commercial')} &middot; {bank.ticker}</div>
         </div>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:16 }}>
@@ -221,7 +222,7 @@ function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMou
         </div>
       </div>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-        <span style={{ fontSize:12, color:t.textSub }}>{bank.description.slice(0,52)}...</span>
+        <span style={{ fontSize:12, color:t.textSub }}>{String((isAr ? (AR_TAGS[bank.id] || bank.description) : bank.description) || '').slice(0,52)}...</span>
         <span onClick={(e: any) => { e.stopPropagation(); if (onAsk) onAsk() }} style={{ backgroundColor:hovered?t.accent:('var(--cf-surface2)'), color:hovered?'#fff':t.textSub, borderRadius:8, padding:'5px 12px', fontSize:12, fontWeight:500, transition:'all 0.15s', whiteSpace:'nowrap', marginLeft:8 }}>{L.bk_askAI}</span>
       </div>
     </div>
