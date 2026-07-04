@@ -187,7 +187,7 @@ function JordanMapInner(props: any) {
             return (
               <div key={g.key} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, padding: '3px 0', borderBottom: '1px solid var(--cf-line, #edf1f7)' }}>
                 <span style={{ color: 'var(--cf-ink2, #243b53)' }}>{props.lang === 'ar' ? (JO_NAMES[g.key] || g.key) : g.key}</span>
-                <span style={{ fontWeight: 600, color: 'var(--cf-ink, #0f2a4a)' }}>{v}</span>
+                <span style={{ fontWeight: 600, color: 'var(--cf-ink, #0f2a4a)' }}>{v.toLocaleString('en-US', { maximumFractionDigits: 1 })}</span>
               </div>
             )
           })}
