@@ -522,7 +522,7 @@ export default function EconomyPage() {
           <div style={card}><div style={h2}>{t.jordan} — {t.j_growth}</div><LineChart labels={D.jg.labels} series={D.jg.series} endLabels zero />{legend(D.jg.series)}</div>
           <div style={card}><div style={h2}>{t.jordan} — {t.monthly_cpi}</div><LineChart labels={D.cpiLabels} series={[{ name: 'YoY', color: 'var(--cf-primary-strong)', w: 2.4, pts: D.cpiPts }]} endLabels zero /></div>
           <div style={card}><div style={h2}>{t.trade}</div><LineChart labels={D.mLabels} series={[{ name: t.exports, color: 'var(--cf-positive)', w: 2.2, pts: D.exPts }, { name: t.imports, color: 'var(--cf-negative)', w: 2.2, pts: D.imPts }]} endLabels />{legend([{ name: t.exports, color: 'var(--cf-positive)' }, { name: t.imports, color: 'var(--cf-negative)' }])}<div style={{ marginTop: 7, fontSize: 10.5, color: 'var(--cf-ink2)', fontWeight: 600 }} dir='ltr'>DoS H1-2025 (JOD m): X {fmt(D.h1.x, 0)} · M {fmt(D.h1.m, 0)} · Bal {fmt(D.h1.b, 0)}</div><div style={{ fontSize: 9.5, color: 'var(--cf-ink3)', marginTop: 3 }}>{t.dotNote}</div></div>
-          <div style={card}><div style={h2}>{t.balance}</div><BarChart labels={D.tbLabels} pts={D.tbPts} /><div style={{ fontSize: 9.5, color: 'var(--cf-ink3)', marginTop: 3 }}>{t.dotNote}</div></div>
+          <div style={card}><div style={h2}>{t.balance}</div><CfZoom zoom={1.5}><BarChart labels={D.tbLabels} pts={D.tbPts} /></CfZoom><div style={{ fontSize: 9.5, color: 'var(--cf-ink3)', marginTop: 3 }}>{t.dotNote}</div></div>
           <div style={card}><div style={h2}>{t.debt}</div><LineChart labels={D.debt.labels} series={D.debt.series} endLabels />{legend(D.debt.series)}</div>
         </div>
         </CfSection>
