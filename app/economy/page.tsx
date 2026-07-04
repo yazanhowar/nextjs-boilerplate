@@ -510,13 +510,13 @@ export default function EconomyPage() {
           </div>
           <CfSignals lang={lang} />
         </div>
-                <CfSection t={lang === 'ar' ? 'الخلفية العالمية' : 'GLOBAL BACKDROP'} n='2' open={false} topic='global' lang={lang}>
+                <CfSection t={lang === 'ar' ? 'الخلفية العالمية' : 'GLOBAL BACKDROP'} n='2' open={true} topic='global' lang={lang}>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))', gap: 12, marginTop: 14 }}>
           <div style={card}><div style={h2}>{t.global} — {t.g_growth}</div><LineChart labels={D.gg.labels} series={D.gg.series} endLabels />{legend(D.gg.series)}</div>
           <div style={card}><div style={h2}>{t.global} — {t.g_infl}</div><LineChart labels={D.gi.labels} series={D.gi.series} endLabels />{legend(D.gi.series)}</div>
         </div>
         </CfSection>
-        <CfSection t={lang === 'ar' ? 'الاقتصاد الأردني الكلي' : 'JORDAN MACRO'} n='5' open={false} topic='jordan' lang={lang}>
+        <CfSection t={lang === 'ar' ? 'الاقتصاد الأردني الكلي' : 'JORDAN MACRO'} n='5' open={true} topic='jordan' lang={lang}>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))', gap: 12, marginTop: 14 }}>
           <div style={card}><div style={h2}>{t.jordan} — {t.j_growth}</div><LineChart labels={D.jg.labels} series={D.jg.series} endLabels zero />{legend(D.jg.series)}</div>
           <div style={card}><div style={h2}>{t.jordan} — {t.monthly_cpi}</div><LineChart labels={D.cpiLabels} series={[{ name: 'YoY', color: 'var(--cf-primary-strong)', w: 2.4, pts: D.cpiPts }]} endLabels zero /></div>
