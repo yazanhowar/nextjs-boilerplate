@@ -272,7 +272,7 @@ function LineChartInner(props: any) {
           <text x={P.l - 6} y={Y(g) + 3} textAnchor='end' fontSize={9} fill='var(--cf-ink3)'>{g.toFixed(1)}</text>
         </g>) })}
       {labels.map(function (lb: string, i: number) { return i % step === 0 ? (
-        <text key={'x' + i} x={X(i)} y={H - 6} textAnchor='middle' fontSize={8.5} fill='var(--cf-ink3)'>{lb}</text>) : null })}
+        <text key={'x' + i} x={X(i)} y={H - 6} textAnchor={X(i) > W - P.r - 12 ? 'end' : (X(i) < P.l + 12 ? 'start' : 'middle')} fontSize={8.5} fill='var(--cf-ink3)'>{lb}</text>) : null })}
       {series.map(function (s: any, si: number) {
         var segs: string[] = []; var cur = ''
         s.pts.forEach(function (v: any, i: number) {
