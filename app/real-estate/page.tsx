@@ -16,6 +16,7 @@ export default function RealEstatePage() {
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
   const [gov, setGov] = useState('all')
+  const [bankF, setBankF] = useState<any>('all')
 
   useEffect(() => {
     const stored = localStorage.getItem('hbtf-theme')
@@ -23,7 +24,7 @@ export default function RealEstatePage() {
   }, [])
 
   useEffect(() => {
-    getSupabase().from('bank_real_estate').select('*').order('price_jod').then(({ data }) => {
+    getSupabase().from('bank_real_estate').select('*').order('price_jod').limit(2000).then(({ data }) => {
       setListings(data || [])
       setLoading(false)
     })
@@ -66,11 +67,13 @@ export default function RealEstatePage() {
   ]
   function govOf(loc: any): string { const s = String(loc || ''); for (const g of GOVS) { if (g[1].test(s)) return g[0] } return 'Other' }
   const propertyTypes = ['all', ...new Set(listings.map(l => canonType(l.property_type)))]
+  const bankChips = [{ id: 'all', label: 'All banks' }, ...BANKS.filter(b => listings.some(l => l.bank_id === b.id)).map(b => ({ id: b.id, label: b.name }))]
   const governorates = ['all', ...GOVS.map(g => g[0]).filter(g => listings.some(l => govOf(l.location) === g)), ...(listings.some(l => govOf(l.location) === 'Other') ? ['Other'] : [])]
   
   const filtered = listings.filter(l => {
     if (filter !== 'all' && canonType(l.property_type) !== filter) return false
     if (gov !== 'all' && govOf(l.location) !== gov) return false
+    if (bankF !== 'all' && l.bank_id !== bankF) return false
     if (search) {
       const q = search.toLowerCase()
       const bank = BANKS.find(b => b.id === l.bank_id)
@@ -122,6 +125,11 @@ export default function RealEstatePage() {
               </button>
             ))}
           </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
+          {bankChips.map((b: any) => (
+            <button key={String(b.id)} onClick={() => setBankF(b.id)} style={{ padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 500, cursor: 'pointer', backgroundColor: bankF === b.id ? t.accent : t.surface, color: bankF === b.id ? '#fff' : t.textSub, border: '1px solid ' + (bankF === b.id ? t.accent : t.border) }}>{b.label}</button>
+          ))}
+        </div>
         </div>
 
         {loading ? (
