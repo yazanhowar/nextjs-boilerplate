@@ -224,7 +224,6 @@ function PieChartInner(props: any) {
     a0 = a1
     return { d: dp, c: d.c, name: d.name, pct: frac * 100, v: Number(d.v) }
   })
-  var _eY: any = series.map(function (s: any) { var li = -1; s.pts.forEach(function (v: any, i: number) { if (v !== null && v !== undefined) li = i }); return li >= 0 ? Y(Number(s.pts[li])) : null }); var _adj: any = _eY.slice(); var _io: any[] = []; for (var _q = 0; _q < _eY.length; _q++) { if (_eY[_q] != null) _io.push(_q) } _io.sort(function (a: any, b: any) { return _eY[a] - _eY[b] }); for (var _r = 1; _r < _io.length; _r++) { if (_adj[_io[_r]] - _adj[_io[_r - 1]] < 11) _adj[_io[_r]] = _adj[_io[_r - 1]] + 11 }
   return (
     <svg viewBox={'0 0 ' + W + ' ' + H} style={{ width: '100%', height: 'auto', display: 'block' }}>
       {segs.map(function (s: any, i: number) { return <path key={i} d={s.d} fill={s.c} stroke='var(--cf-bg, #fff)' strokeWidth='1.5' /> })}
@@ -287,7 +286,7 @@ function LineChartInner(props: any) {
           <g key={si}>
             {segs.map(function (d: string, di: number) { return <path key={di} d={d} fill='none' stroke={s.color} strokeWidth={s.w || 2} strokeDasharray={s.dash || undefined} /> })}
             {lastIdx >= 0 ? <circle cx={X(lastIdx)} cy={Y(Number(s.pts[lastIdx]))} r={3} fill={s.color} /> : null}
-            {lastIdx >= 0 && props.endLabels ? <text x={X(lastIdx) - 4} y={_adj[si] - 6} textAnchor='end' fontSize={9} fontWeight={700} fill={s.color}>{Number(s.pts[lastIdx]).toFixed(1)}</text> : null}
+            {lastIdx >= 0 && props.endLabels ? <text x={X(lastIdx) - 4} y={Y(Number(s.pts[lastIdx])) - 6} textAnchor='end' fontSize={9} fontWeight={700} fill={s.color}>{Number(s.pts[lastIdx]).toFixed(1)}</text> : null}
           </g>)
       })}
     </svg>)
