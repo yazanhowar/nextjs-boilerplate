@@ -14,7 +14,7 @@ export default function CbjPage(){
   const router=useRouter();
   useEffect(function(){
     try{
-      var l=localStorage.getItem('cf_lang'); if(l==='ar'||l==='en'){ setLang(l); }
+      var l=localStorage.getItem('lang'); if(l==='ar'||l==='en'){ setLang(l); }
       var t=localStorage.getItem('theme'); var d=(t==='dark'); setDark(d);
       var de=document.documentElement; if(d){ de.classList.add('dark'); } else { de.classList.remove('dark'); }
     }catch(e){}
@@ -23,7 +23,7 @@ export default function CbjPage(){
     try{ var de=document.documentElement; de.lang=lang; de.dir=(lang==='ar'?'rtl':'ltr'); }catch(e){}
   },[lang]);
   var tr=T[lang]; var isAr=(lang==='ar');
-  function toggleLang(){ var nl=(lang==='ar'?'en':'ar'); setLang(nl); try{ localStorage.setItem('cf_lang',nl); }catch(e){} }
+  function toggleLang(){ var nl=(lang==='ar'?'en':'ar'); setLang(nl); try{ localStorage.setItem('lang',nl); }catch(e){} }
   function toggleTheme(){ var nd=!dark; setDark(nd); try{ localStorage.setItem('theme', nd?'dark':'light'); }catch(e){} var de=document.documentElement; if(nd){ de.classList.add('dark'); } else { de.classList.remove('dark'); } }
   function go(u){ router.push(u); }
   var logoSrc=(isAr?'/convo-zad-ar.svg':'/convo-zad-en.svg');
