@@ -151,6 +151,7 @@ export default function SectorPage() {
       React.createElement('nav', { className: 'sk-nav' },
         React.createElement('a', { className: 'sk-navlink', href: '/banks' }, t.navFin),
         React.createElement('a', { className: 'sk-navlink on', href: '/sector' }, t.navSector),
+        React.createElement('a', { className: 'sk-navlink', href: '/economy' }, t.navSector === 'Sector' ? 'Economy' : 'الاقتصاد'),
         React.createElement('a', { className: 'sk-navlink', href: '/cbj' }, t.navCbj)
       ),
       React.createElement('div', { className: 'sk-tools' },
