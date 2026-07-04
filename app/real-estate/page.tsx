@@ -24,8 +24,9 @@ export default function RealEstatePage() {
   }, [])
 
   useEffect(() => {
-    getSupabase().from('bank_real_estate').select('*').order('price_jod').limit(2000).then(({ data }) => {
-      setListings(data || [])
+    getSupabase().from('bank_real_estate').select('*').order('price_jod').range(0, 999).then(async ({ data }) => {
+      const p2 = await getSupabase().from('bank_real_estate').select('*').order('price_jod').range(1000, 1999)
+      setListings((data || []).concat((p2 && p2.data) || []))
       setLoading(false)
     })
   }, [])
