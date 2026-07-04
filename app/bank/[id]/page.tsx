@@ -402,7 +402,7 @@ export default function BankPage() {
                 label: 'Total Assets',
                 value: fmtJOD(latest.total_assets),
                 delta: prev ? ((latest.total_assets - prev.total_assets) / Math.abs(prev.total_assets) * 100) : null,
-                sub: `FY${latest.fiscal_year}`,
+                sub: bank.id === 1 ? ('FY' + latest.fiscal_year + ' - group, USD converted @ 0.709') : ('FY' + latest.fiscal_year),
               },
               {
                 label: 'Return on Equity',
