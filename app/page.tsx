@@ -68,8 +68,8 @@ export default function Home(){
             <nav className='cf-nav-links' style={{ display:'flex', gap:'20px' }}>
               <a className='cf-link' href='/banks' style={{ fontSize:'13.5px' }}>{ t('navFin') }</a>
               <a className='cf-link' href='/sector' style={{ fontSize:'13.5px' }}>{ t('navSector') }</a>
-              <a className='cf-link' href='/cbj' style={{ fontSize:'13.5px' }}>{ t('navCbj') }</a>
               <a className='cf-link' href='/economy' style={{ fontSize:'13.5px' }}>{ t('navEco') }</a>
+              <a className='cf-link' href='/cbj' style={{ fontSize:'13.5px' }}>{ t('navCbj') }</a>
             </nav>
             <button onClick={function(){ setLang(ar ? 'en' : 'ar') }} className='cf-btn cf-btn-secondary' style={{ fontSize:'12.5px', padding:'7px 14px' }}>{ ar ? 'English' : dec(T.langWord.ar) }</button>
           </div>
