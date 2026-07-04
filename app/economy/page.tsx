@@ -95,7 +95,7 @@ function GeoMapCard(props: any) {
           <div style={{ zoom: 1.55, marginTop: 8 }}><JordanMapInner data={data} lang={lang} /></div>
         </div>
       </div> : null}
-      {count ? <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{ar ? 'القيم بملايين الدنانير · البنك المركزي الأردني' : 'Values in JOD millions · CBJ statistical DB'}</div> : <div style={{ fontSize: 11, color: 'var(--cf-ink3)', marginTop: 8 }}>{ar ? 'التوزيع الإقليمي قيد المزامنة من البنك المركزي' : 'Regional split syncing from CBJ'}</div>}
+      {count ? <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{ar ? 'القيم بمليارات الدنانير · البنك المركزي الأردني' : 'Values in JOD billions · CBJ statistical DB'}</div> : <div style={{ fontSize: 11, color: 'var(--cf-ink3)', marginTop: 8 }}>{ar ? 'التوزيع الإقليمي قيد المزامنة من البنك المركزي' : 'Regional split syncing from CBJ'}</div>}
     </div>
   )
 }
@@ -187,7 +187,7 @@ function JordanMapInner(props: any) {
             return (
               <div key={g.key} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, padding: '3px 0', borderBottom: '1px solid var(--cf-line, #edf1f7)' }}>
                 <span style={{ color: 'var(--cf-ink2, #243b53)' }}>{props.lang === 'ar' ? (JO_NAMES[g.key] || g.key) : g.key}</span>
-                <span style={{ fontWeight: 600, color: 'var(--cf-ink, #0f2a4a)' }}>{v.toLocaleString('en-US', { maximumFractionDigits: 1 })}</span>
+                <span style={{ fontWeight: 600, color: 'var(--cf-ink, #0f2a4a)' }}>{(v / 1000).toFixed(2)}</span>
               </div>
             )
           })}
