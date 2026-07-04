@@ -85,7 +85,7 @@ function GeoMapCard(props: any) {
         <div style={props.h2}>{title + (total ? ' · ' + (total / 1000).toFixed(1) + (ar ? ' مليار دينار · الربع الأول 2026' : 'B JOD · Q1 2026') : '')}</div>
         <div style={{ display: 'flex', gap: 6 }}>{[pill('dep', 'Deposits', 'الودائع'), pill('cred', 'Credit', 'الائتمان'), <button key='xp' onClick={function () { setBig(true) }} title='Expand' style={{ border: '1px solid var(--cf-line, #e5eaf2)', background: 'transparent', color: 'var(--cf-ink2, #3d4f66)', borderRadius: 8, padding: '3px 9px', fontSize: 12, cursor: 'pointer' }}>⤢</button>]}</div>
       </div>
-      <JordanMapInner data={data} lang={lang} />
+      <div onClick={function () { setBig(true) }} style={{ cursor: 'zoom-in' }} title='Click to expand'><JordanMapInner data={data} lang={lang} /></div>
       {big ? <div onClick={function () { setBig(false) }} style={{ position: 'fixed', inset: 0, zIndex: 92, background: 'rgba(11,31,59,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, cursor: 'zoom-out' }}>
         <div onClick={function (e: any) { e.stopPropagation() }} style={{ background: 'var(--cf-surface, #ffffff)', border: '1px solid var(--cf-line, #e5eaf2)', borderRadius: 16, padding: '18px 20px', width: 'min(860px, 94vw)', maxHeight: '92vh', overflow: 'auto', cursor: 'default' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
