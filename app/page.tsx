@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useLang } from '@/lib/LangContext'
 
 function dec(b){ try{ var bin=atob(b); var u=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++){ u[i]=bin.charCodeAt(i) } return new TextDecoder('utf-8').decode(u) }catch(e){ return '' } }
 
@@ -34,7 +35,7 @@ var T = {
 }
 
 export default function Home(){
-  const [lang, setLang] = useState('en')
+  const { lang, setLang } = useLang()
   var ar = lang === 'ar'
   function t(k){ var o=T[k]; if(!o) return ''; return ar ? dec(o.ar) : o.en }
   var cards = [
