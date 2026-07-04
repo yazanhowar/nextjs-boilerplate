@@ -264,7 +264,7 @@ function LineChartInner(props: any) {
   var Y = function (v: number) { return P.t + (H - P.t - P.b) * (1 - (v - lo) / (hi - lo)) }
   var grid = [lo + (hi - lo) * 0.08, (lo + hi) / 2, hi - (hi - lo) * 0.08]
   var step = Math.max(1, Math.ceil(labels.length / 8))
-  var _eY: any = series.map(function (s: any) { var _li = -1; s.pts.forEach(function (v: any, i: number) { if (v !== null && v !== undefined) _li = i }); return _li >= 0 ? Y(Number(s.pts[_li])) : null }); var _adj: any = _eY.slice(); var _io: any[] = []; for (var _q = 0; _q < _eY.length; _q++) { if (_eY[_q] != null) _io.push(_q) } _io.sort(function (a: any, b: any) { return _eY[a] - _eY[b] }); for (var _r = 1; _r < _io.length; _r++) { if (_adj[_io[_r]] - _adj[_io[_r - 1]] < 11) _adj[_io[_r]] = _adj[_io[_r - 1]] + 11 }
+  var _eY: any = series.map(function (s: any) { var _li = -1; s.pts.forEach(function (v: any, i: number) { if (v !== null && v !== undefined) _li = i }); return _li >= 0 ? Y(Number(s.pts[_li])) : null }); var _adj: any = _eY.slice(); var _io: any[] = []; for (var _q = 0; _q < _eY.length; _q++) { if (_eY[_q] != null) _io.push(_q) } _io.sort(function (a: any, b: any) { return _eY[a] - _eY[b] }); for (var _r = 1; _r < _io.length; _r++) { if (_adj[_io[_r]] - _adj[_io[_r - 1]] < 15) _adj[_io[_r]] = _adj[_io[_r - 1]] + 15 }
   return (
     <svg viewBox={'0 0 ' + W + ' ' + H} style={{ width: '100%', height: 'auto', display: 'block' }}>
       {grid.map(function (g: number, gi: number) { return (
