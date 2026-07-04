@@ -562,7 +562,7 @@ export default function EconomyPage() {
           </div>
         </div>
         <div style={card} data-cf='mktshare'>
-          <div style={h2}>{lang === 'ar' ? 'الحصص السوقية — إجمالي الموجودات 2024' : 'MARKET SHARE — FY2024 TOTAL ASSETS'}</div>
+          <div style={h2}>{lang === 'ar' ? 'الحصص السوقية — إجمالي الموجودات 2025' : 'MARKET SHARE — FY2025 TOTAL ASSETS'}</div>
           <MarketShareInner lang={lang} />
         </div>
         <div style={card} data-cf='govmap'>
