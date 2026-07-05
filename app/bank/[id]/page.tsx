@@ -4,6 +4,7 @@ import HbFootprintMap from '../../components/HbFootprintMap';
 
 import { zadMdToHtml, ZAD_MD_CSS } from '@/lib/zad-md'
 import { useState, useEffect, useRef } from 'react'
+import { useLang } from '@/lib/LangContext'
 import { useParams, useRouter } from 'next/navigation'
 import { BANKS, getBank } from '@/lib/banks-config'
 import { createClient } from '@supabase/supabase-js'
@@ -49,6 +50,7 @@ function deltaSign(n: number | null | undefined): string {
 const CHART_COLORS = ['var(--cf-primary)', 'var(--cf-gold)', 'var(--cf-positive)', 'var(--cf-negative)', 'var(--cf-ink2)', 'var(--cf-gold)']
 
 // ─── Section tabs ─────────────────────────────────────────────────────────────
+const TAB_AR: Record<string, string> = { overview: 'نظرة عامة', financials: 'المالية', rates: 'الأسعار والعمولات', products: 'المنتجات', ownership: 'الملكية', governance: 'القيادة', news: 'الأخبار' }
 const TABS = [
   { id: 'overview',     label: 'Overview' },
   { id: 'financials',   label: 'Financials' },
@@ -272,6 +274,8 @@ export default function BankPage() {
   const bank = getBank(bankId)
 
   const [activeTab, setActiveTab] = useState('overview')
+  const { lang } = useLang()
+  const isAr = lang === 'ar'
   const [imgError, setImgError] = useState(false)
   const [analystNote, setAnalystNote] = useState('')
   useEffect(() => { if (!bankId) return; supabase.from('banks').select('analyst_note').eq('id', bankId).single().then(({ data }: any) => { if (data && data.analyst_note) setAnalystNote(data.analyst_note) }) }, [bankId])
@@ -450,7 +454,7 @@ export default function BankPage() {
                   : 'text-[var(--cf-ink2)] border-transparent hover:text-[var(--cf-ink)]'
                 }`}
             >
-              {tab.label}
+              {isAr ? (TAB_AR[tab.id] || tab.label) : tab.label}
             </button>
           ))}
         </div>
