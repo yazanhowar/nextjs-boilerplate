@@ -1,7 +1,7 @@
 // app/layout.tsx
 import VersionGuard from '@/components/VersionGuard'
 import type { Metadata } from 'next'
-import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic, IBM_Plex_Mono } from 'next/font/google'
+import { IBM_Plex_Sans, Noto_Kufi_Arabic, IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
 import PasswordGate from '@/components/PasswordGate'
 import { LangProvider } from '@/lib/LangContext'
@@ -10,7 +10,7 @@ import CfAskZad from '@/components/CfAskZad'
 import CfDir from '@/components/CfDir'
 
 const ibmSans = IBM_Plex_Sans({ subsets: ['latin'], weight: ['400','500','600','700'], display: 'swap', variable: '--font-ibm-sans' })
-const ibmArabic = IBM_Plex_Sans_Arabic({ subsets: ['arabic'], weight: ['400','500','600','700'], display: 'swap', variable: '--font-ibm-ar' })
+const ibmArabic = Noto_Kufi_Arabic({ subsets: ['arabic'], weight: ['400','500','600','700'], display: 'swap', variable: '--font-ibm-ar' })
 const ibmMono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400','500','600'], display: 'swap', variable: '--font-ibm-mono' })
 
 export const metadata: Metadata = {
