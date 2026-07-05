@@ -58,11 +58,11 @@ export default function CfAskZad() {
           </div>
           <div style={{ padding: 10, borderTop: '1px solid var(--cf-line, #e5eaf2)', display: 'flex', gap: 8 }}>
             <input value={inp} onChange={function (e: any) { setInp(e.target.value) }} onKeyDown={function (e: any) { if (e.key === 'Enter') send(inp) }} placeholder={ar ? 'اسأل عن القطاع المصرفي…' : 'Ask about Jordanian banking…'} style={{ flex: 1, border: '1px solid var(--cf-line, #e5eaf2)', borderRadius: 10, padding: '9px 11px', fontSize: 12.5, outline: 'none', background: 'var(--cf-surface2, #f7f9fc)', color: 'var(--cf-ink, #14243a)' }} />
-            <button onClick={function () { send(inp) }} disabled={busy} style={{ border: 'none', background: 'var(--cf-gold, #c9a227)', color: '#ffffff', borderRadius: 10, padding: '0 14px', fontWeight: 900, fontSize: 12, cursor: 'pointer' }}>{ar ? 'إرسال' : 'Send'}</button>
+            <button onClick={function () { send(inp) }} disabled={busy} style={{ border: 'none', background: 'linear-gradient(105deg, #7a5aa4, #695ca1, #3e639b, #106b94)', color: '#ffffff', borderRadius: 10, padding: '0 14px', fontWeight: 900, fontSize: 12, cursor: 'pointer' }}>{ar ? 'إرسال' : 'Send'}</button>
           </div>
         </div>
       ) : null}
-      <button onClick={function () { setOpen(!open) }} style={{ position: 'fixed', insetInlineEnd: 22, bottom: 22, zIndex: 96, border: 'none', borderRadius: 999, padding: '11px 18px', background: 'var(--cf-gold, #c9a227)', color: '#ffffff', fontWeight: 900, fontSize: 12.5, letterSpacing: 0.4, cursor: 'pointer', boxShadow: '0 10px 28px rgba(11,31,59,0.30)' }}>{open ? '✕ ' + (ar ? 'إغلاق' : 'CLOSE') : (ar ? 'اسأل زاد' : 'ASK ZAD')}</button>
+      <button onClick={function () { setOpen(!open) }} style={{ position: 'fixed', insetInlineEnd: 22, bottom: 22, zIndex: 96, border: 'none', borderRadius: 999, padding: '11px 18px', background: 'linear-gradient(105deg, #7a5aa4, #695ca1, #3e639b, #106b94)', color: '#ffffff', fontWeight: 900, fontSize: 12.5, letterSpacing: 0.4, cursor: 'pointer', boxShadow: '0 10px 28px rgba(11,31,59,0.30)' }}>{open ? '✕ ' + (ar ? 'إغلاق' : 'CLOSE') : (ar ? 'اسأل زاد' : 'ASK ZAD')}</button>
     </div>
   )
 }
