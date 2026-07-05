@@ -75,6 +75,10 @@ function GeoMapCard(props: any) {
   var count = 0
   Object.keys(data).forEach(function (k) { if (isFinite(Number(data[k]))) count++ })
   var title = isDep ? (ar ? 'ودائع العملاء حسب المحافظات' : 'CUSTOMER DEPOSITS BY GOVERNORATE') : (ar ? 'التسهيلات الائتمانية حسب المحافظات' : 'CREDIT FACILITIES BY GOVERNORATE')
+  var _MC: any = { pos: { d: D.posData, t: D.posTotal, en: 'POS TERMINALS BY GOVERNORATE', ar: 'نقاط البيع حسب المحافظات', u: 'terminals', uar: 'نقطة بيع' }, atm: { d: D.atmData, t: D.atmTotal, en: 'ATMs BY GOVERNORATE', ar: 'أجهزة الصراف الآلي حسب المحافظات', u: 'ATMs', uar: 'صراف' }, branch: { d: D.branchData, t: D.branchTotal, en: 'BANK BRANCHES BY GOVERNORATE', ar: 'فروع البنوك حسب المحافظات', u: 'branches', uar: 'فرع' }, agent: { d: D.agentData, t: D.agentTotal, en: 'PAYMENT AGENTS BY GOVERNORATE', ar: 'وكلاء الدفع حسب المحافظات', u: 'agents', uar: 'وكيل' } }
+  var _mc: any = _MC[mode]
+  var isCur = !_mc
+  if (_mc) { data = _mc.d || {}; var _t = _mc.t; total = null; title = (ar ? _mc.ar : _mc.en) + (_t ? ' · ' + Number(_t).toLocaleString('en-US') + ' ' + (ar ? _mc.uar : _mc.u) : '') }
   var pill = function (id: string, en: string, arr: string) {
     var on = mode === id
     return <button key={id} onClick={function () { setMode(id) }} style={{ border: '1px solid ' + (on ? 'var(--cf-primary-strong, #0f4c81)' : 'var(--cf-line, #e5eaf2)'), background: on ? 'var(--cf-primary-strong, #0f4c81)' : 'transparent', color: on ? '#ffffff' : 'var(--cf-ink2, #3d4f66)', borderRadius: 999, padding: '4px 12px', fontSize: 11, fontWeight: 800, cursor: 'pointer' }}>{ar ? arr : en}</button>
@@ -83,16 +87,16 @@ function GeoMapCard(props: any) {
     <div>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
         <div style={props.h2}>{title + (total ? ' · ' + (total / 1000).toFixed(1) + (ar ? ' مليار دينار · الربع الأول 2026' : 'B JOD · Q1 2026') : '')}</div>
-        <div style={{ display: 'flex', gap: 6 }}>{[pill('dep', 'Deposits', 'الودائع'), pill('cred', 'Credit', 'الائتمان'), <button key='xp' onClick={function () { setBig(true) }} title='Expand' style={{ border: '1px solid var(--cf-line, #e5eaf2)', background: 'transparent', color: 'var(--cf-ink2, #3d4f66)', borderRadius: 8, padding: '3px 9px', fontSize: 12, cursor: 'pointer' }}>⤢</button>]}</div>
+        <div style={{ display: 'flex', gap: 6 }}>{[pill('dep', 'Deposits', 'الودائع'), pill('cred', 'Credit', 'الائتمان'), pill('pos', 'POS', 'نقاط البيع'), pill('atm', 'ATMs', 'صرافات'), pill('branch', 'Branches', 'فروع'), pill('agent', 'Agents', 'وكلاء'), <button key='xp' onClick={function () { setBig(true) }} title='Expand' style={{ border: '1px solid var(--cf-line, #e5eaf2)', background: 'transparent', color: 'var(--cf-ink2, #3d4f66)', borderRadius: 8, padding: '3px 9px', fontSize: 12, cursor: 'pointer' }}>⤢</button>]}</div>
       </div>
-      <div onClick={function () { setBig(true) }} style={{ cursor: 'zoom-in' }} title='Click to expand'><JordanMapInner data={data} lang={lang} /></div>
+      <div onClick={function () { setBig(true) }} style={{ cursor: 'zoom-in' }} title='Click to expand'><JordanMapInner data={data} lang={lang} cur={isCur} /></div>
       {big ? <div onClick={function () { setBig(false) }} style={{ position: 'fixed', inset: 0, zIndex: 92, background: 'rgba(11,31,59,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, cursor: 'zoom-out' }}>
         <div onClick={function (e: any) { e.stopPropagation() }} style={{ background: 'var(--cf-surface, #ffffff)', border: '1px solid var(--cf-line, #e5eaf2)', borderRadius: 16, padding: '18px 20px', width: 'min(860px, 94vw)', maxHeight: '92vh', overflow: 'auto', cursor: 'default' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
             <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--cf-ink, #14243a)' }}>{title}</div>
             <div style={{ display: 'flex', gap: 6 }}>{[pill('dep', 'Deposits', 'الودائع'), pill('cred', 'Credit', 'الائتمان'), <button key='cl' onClick={function () { setBig(false) }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 15, color: 'var(--cf-ink3, #7d8ea3)' }}>✕</button>]}</div>
           </div>
-          <div style={{ zoom: 1.55, marginTop: 8 }}><JordanMapInner data={data} lang={lang} /></div>
+          <div style={{ zoom: 1.55, marginTop: 8 }}><JordanMapInner data={data} lang={lang} cur={isCur} /></div>
         </div>
       </div> : null}
       {count ? <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{ar ? 'القيم بمليارات الدنانير · البنك المركزي الأردني' : 'Values in JOD billions · CBJ statistical DB'}</div> : <div style={{ fontSize: 11, color: 'var(--cf-ink3)', marginTop: 8 }}>{ar ? 'التوزيع الإقليمي قيد المزامنة من البنك المركزي' : 'Regional split syncing from CBJ'}</div>}
@@ -187,7 +191,7 @@ function JordanMapInner(props: any) {
             return (
               <div key={g.key} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, padding: '3px 0', borderBottom: '1px solid var(--cf-line, #edf1f7)' }}>
                 <span style={{ color: 'var(--cf-ink2, #243b53)' }}>{props.lang === 'ar' ? (JO_NAMES[g.key] || g.key) : g.key}</span>
-                <span style={{ fontWeight: 600, color: 'var(--cf-ink, #0f2a4a)' }}>{(v / 1000).toFixed(2)}</span>
+                <span style={{ fontWeight: 600, color: 'var(--cf-ink, #0f2a4a)' }}>{props.cur === false ? Number(v).toLocaleString('en-US') : (v / 1000).toFixed(2)}</span>
               </div>
             )
           })}
