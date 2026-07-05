@@ -512,7 +512,7 @@ export default function EconomyPage() {
         <div style={card} data-cf='signals'>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
             <div style={h2}>{lang === 'ar' ? 'لوحة إشارات زاد' : 'ZAD SIGNAL BOARD'}</div>
-            <button onClick={function () { setAskOpen(true) }} style={{ border: 'none', background: 'var(--cf-gold, #c9a227)', color: '#1a2436', borderRadius: 999, padding: '5px 14px', fontSize: 11, fontWeight: 900, cursor: 'pointer', letterSpacing: 0.4 }}>{lang === 'ar' ? 'اسأل زاد' : 'ASK ZAD'}</button>
+            
           </div>
           <CfSignals lang={lang} />
         </div>
