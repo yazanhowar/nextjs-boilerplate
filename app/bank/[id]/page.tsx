@@ -398,19 +398,19 @@ export default function BankPage() {
           <div className="grid grid-cols-5 gap-4 mb-6">
             {[
               {
-                label: 'Net Profit',
+                label: (isAr ? 'صافي الربح' : 'Net Profit'),
                 value: fmtJOD(latest.net_profit),
                 delta: prev ? ((latest.net_profit - prev.net_profit) / Math.abs(prev.net_profit) * 100) : null,
                 sub: `FY${latest.fiscal_year}`,
               },
               {
-                label: 'Total Assets',
+                label: (isAr ? 'إجمالي الأصول' : 'Total Assets'),
                 value: fmtJOD(latest.total_assets),
                 delta: prev ? ((latest.total_assets - prev.total_assets) / Math.abs(prev.total_assets) * 100) : null,
                 sub: bank.id === 1 ? ('FY' + latest.fiscal_year + ' - group, USD converted @ 0.709') : ('FY' + latest.fiscal_year),
               },
               {
-                label: 'Return on Equity',
+                label: (isAr ? 'العائد على حقوق الملكية' : 'Return on Equity'),
                 value: pct(latest.roe),
                 delta: prev ? (latest.roe - prev.roe) : null,
                 sub: (isAr ? 'الربح مقابل حقوق المساهمين' : 'Profit vs shareholder equity'),
@@ -425,7 +425,7 @@ export default function BankPage() {
                 label: (isAr ? 'ربحية السهم' : 'Earnings Per Share'),
                 value: latest.eps_fils ? `${latest.eps_fils} fils` : '—',
                 delta: prev?.eps_fils && latest.eps_fils != null ? ((latest.eps_fils - prev.eps_fils) / prev.eps_fils) * 100 : null,
-                sub: latest.fiscal_year ? ('FY' + latest.fiscal_year + ' basic EPS') : 'Basic EPS',
+                sub: latest.fiscal_year ? (isAr ? ('ربحية أساسية · ' + latest.fiscal_year) : ('FY' + latest.fiscal_year + ' basic EPS')) : (isAr ? 'ربحية أساسية' : 'Basic EPS'),
               },
             ].map(kpi => (
               <div key={kpi.label} className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-4">
@@ -469,10 +469,10 @@ export default function BankPage() {
                 const latest: any = financials[financials.length - 1] || {}
                 const prev: any = financials[financials.length - 2] || {}
                 const items: any[] = [
-                  { label: 'Total Assets', v: latest.total_assets, p: prev.total_assets, kind: 'money' },
+                  { label: (isAr ? 'إجمالي الأصول' : 'Total Assets'), v: latest.total_assets, p: prev.total_assets, kind: 'money' },
                   { label: (isAr ? 'ودائع العملاء' : 'Cust. Deposits'), v: latest.customer_deposits, p: prev.customer_deposits, kind: 'money' },
                   { label: (isAr ? 'صافي القروض' : 'Net Loans'), v: latest.net_loans, p: prev.net_loans, kind: 'money' },
-                  { label: 'Net Profit', v: latest.net_profit, p: prev.net_profit, kind: 'money' },
+                  { label: (isAr ? 'صافي الربح' : 'Net Profit'), v: latest.net_profit, p: prev.net_profit, kind: 'money' },
                   { label: 'ROE', v: latest.roe, p: prev.roe, kind: 'pct' },
                   { label: 'CAR', v: latest.car, p: prev.car, kind: 'pct' },
                 ]
@@ -495,7 +495,7 @@ export default function BankPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
                 <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>{isAr ? 'اتجاه الميزانية العمومية' : 'Balance Sheet Trend'}</div>
-                <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>{'JOD billions, by fiscal year' + ((financials || []).some(function (f: any) { return f._fx }) ? ' · converted from USD @ 0.709' : '')}</div>
+                <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>{(isAr ? 'مليار دينار، حسب السنة المالية' : 'JOD billions, by fiscal year') + ((financials || []).some(function (f: any) { return f._fx }) ? ' · converted from USD @ 0.709' : '')}</div>
                 <ResponsiveContainer width="100%" height={240}>
                   <BarChart data={financials.map((f: any) => ({ name: 'FY' + f.fiscal_year, Assets: Number(((f.total_assets || 0) / 1000000).toFixed(2)), Deposits: Number(((f.customer_deposits || 0) / 1000000).toFixed(2)), Loans: (f.net_loans == null ? null : Number((f.net_loans / 1000000).toFixed(2))) }))} margin={{ top: 4, right: 8, left: -12, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" vertical={false} />
@@ -557,7 +557,7 @@ export default function BankPage() {
                   )}
                   <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid var(--cf-line)', display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
                     <span style={{ color: 'var(--cf-ink3)' }}>{isAr ? 'النوع' : 'Type'}</span>
-                    <span style={{ color: 'var(--cf-ink)', fontWeight: 600 }}>{bank.sector === 'islamic' ? 'Islamic Banking' : 'Commercial Banking'}</span>
+                    <span style={{ color: 'var(--cf-ink)', fontWeight: 600 }}>{bank.sector === 'islamic' ? (isAr ? 'مصرفية إسلامية' : 'Islamic Banking') : (isAr ? 'مصرفية تجارية' : 'Commercial Banking')}</span>
                   </div>
                 </div>
               )}
@@ -605,12 +605,12 @@ export default function BankPage() {
                   </thead>
                   <tbody>
                     {[
-                      { label: 'Net Profit', key: 'net_profit', format: fmtJOD },
-                      { label: 'Total Assets', key: 'total_assets', format: fmtJOD },
+                      { label: (isAr ? 'صافي الربح' : 'Net Profit'), key: 'net_profit', format: fmtJOD },
+                      { label: (isAr ? 'إجمالي الأصول' : 'Total Assets'), key: 'total_assets', format: fmtJOD },
                       { label: (isAr ? 'ودائع العملاء' : 'Customer Deposits'), key: 'customer_deposits', format: fmtJOD },
                       { label: (isAr ? 'القروض للعملاء' : 'Loans to Customers'), key: 'net_loans', format: fmtJOD },
-                      { label: 'Shareholders\' Equity', key: 'total_equity', format: fmtJOD },
-                      { label: 'Return on Equity', key: 'roe', format: pct },
+                      { label: (isAr ? 'حقوق المساهمين' : 'Shareholders\' Equity'), key: 'total_equity', format: fmtJOD },
+                      { label: (isAr ? 'العائد على حقوق الملكية' : 'Return on Equity'), key: 'roe', format: pct },
                       { label: (isAr ? 'العائد على الأصول' : 'Return on Assets'), key: 'roa', format: pct },
                       { label: (isAr ? 'نسبة كفاية رأس المال' : 'Capital Adequacy Ratio'), key: 'car', format: pct },
                       { label: (isAr ? 'نسبة القروض المتعثرة' : 'Bad Loan Ratio'), key: 'npl_ratio', format: pct },
@@ -668,7 +668,7 @@ export default function BankPage() {
               <div className="grid grid-cols-2 gap-6">
                 {/* Lending rates */}
                 <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
-                  <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">{bank.sector === 'islamic' ? 'Financing Rates (Murabaha)' : 'Loan Interest Rates'}</div>
+                  <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">{bank.sector === 'islamic' ? (isAr ? 'أسعار التمويل (مرابحة)' : 'Financing Rates (Murabaha)') : (isAr ? 'أسعار الفائدة على القروض' : 'Loan Interest Rates')}</div>
                   <div className="space-y-3">
                     {[
                       { label: (isAr ? 'قروض السكن' : 'Home Loans'), min: rates.home_loan_min, max: rates.home_loan_max },
@@ -690,7 +690,7 @@ export default function BankPage() {
 
                 {/* Savings rates */}
                 <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
-                  <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">{bank.sector === 'islamic' ? 'Expected Profit Rates (Mudaraba)' : 'Deposit Interest Rates'}</div>
+                  <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">{bank.sector === 'islamic' ? (isAr ? 'أسعار الأرباح المتوقعة (مضاربة)' : 'Expected Profit Rates (Mudaraba)') : (isAr ? 'أسعار الفائدة على الودائع' : 'Deposit Interest Rates')}</div>
                   <div className="space-y-3">
                     {[
                       { label: (isAr ? 'حساب التوفير' : 'Savings Account'), val: rates.saving_rate },
@@ -766,7 +766,7 @@ export default function BankPage() {
                         <div className="flex items-center gap-3">
                           <span className="text-[11px] text-[var(--cf-ink2)]">{o.country || ''}</span>
                           <span className="text-[14px] font-bold text-[var(--cf-gold)]">
-                            {o.ownership_pct != null ? `${o.ownership_pct.toFixed(2)}%` : 'Controlling'}
+                            {o.ownership_pct != null ? `${o.ownership_pct.toFixed(2)}%` : (isAr ? 'مسيطر' : 'Controlling')}
                           </span>
                         </div>
                       </div>
