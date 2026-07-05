@@ -63,6 +63,8 @@ const TABS = [
 
 // ─── Chart prompt component ───────────────────────────────────────────────────
 function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string }) {
+  const { lang } = useLang()
+  const isAr = lang === 'ar'
   const [prompt, setPrompt] = useState('')
   const [loading, setLoading] = useState(false)
   const [chartData, setChartData] = useState<any>(null)
@@ -93,7 +95,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
       if (data.error) setError(data.error)
       else setChartData(data)
     } catch {
-      setError('Could not generate chart. Please try again.')
+      setError((isAr ? 'تعذّر إنشاء الرسم البياني. حاول مرة أخرى.' : 'Could not generate chart. Please try again.'))
     } finally {
       setLoading(false)
     }
@@ -136,7 +138,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
         <input
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
-          placeholder={`e.g. "Compare ${bankName} loan rates vs market average"`}
+          placeholder={isAr ? ('مثال: "قارن أسعار قروض ' + bankName + ' مع متوسط السوق"') : ('e.g. "Compare ' + bankName + ' loan rates vs market average"')}
           className="flex-1 bg-[var(--cf-bg)] border border-[var(--cf-line)] rounded-lg px-4 py-3
                      text-[13px] text-[var(--cf-ink)] placeholder-[var(--cf-ink3)]
                      focus:outline-none focus:border-[var(--cf-gold)] transition-colors"
@@ -148,7 +150,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
                      px-5 py-3 rounded-lg hover:bg-[var(--cf-gold)] disabled:opacity-50
                      transition-colors whitespace-nowrap"
         >
-          {loading ? 'Thinking...' : 'Ask ZAD'}
+          {loading ? (isAr ? 'جارٍ التفكير...' : 'Thinking...') : (isAr ? 'اسأل زاد' : 'Ask ZAD')}
         </button>
       </form>
 
