@@ -71,6 +71,7 @@ button[aria-label*="English"]:hover {
 
 /* ── RTL ────────────────────────────────────────────────────────────────── */
 [dir="rtl"] { font-family: var(--cf-font-ar); --cf-font-sans: var(--cf-font-ar); }
+[dir="rtl"] body { --font-ibm-sans: var(--font-ibm-ar) !important; font-family: var(--cf-font-ar) !important; }
 [dir="rtl"] .text-start { text-align: right; }
 [dir="rtl"] .text-end   { text-align: left;  }
 
