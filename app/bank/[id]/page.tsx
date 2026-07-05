@@ -241,24 +241,24 @@ function LoanCalculator() {
   const outCard: any = { background: 'var(--cf-surface2)', borderRadius: '10px', padding: '12px 13px' }
   return (
     <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
-      <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>Loan Repayment Calculator</div>
+      <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>{isAr ? 'حاسبة سداد القرض' : 'Loan Repayment Calculator'}</div>
       <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>Estimate monthly instalments — enter the rate quoted to you</div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '18px' }}>
-        <label><div style={lblStyle}>Amount (JOD)</div><input type="number" value={amount} onChange={(e: any) => setAmount(Math.max(0, Number(e.target.value)))} style={fieldStyle} /></label>
-        <label><div style={lblStyle}>Rate (% APR)</div><input type="number" step="0.1" value={rate} onChange={(e: any) => setRate(Math.max(0, Number(e.target.value)))} style={fieldStyle} /></label>
-        <label><div style={lblStyle}>Term (years)</div><input type="number" value={years} onChange={(e: any) => setYears(Math.max(1, Number(e.target.value)))} style={fieldStyle} /></label>
+        <label><div style={lblStyle}>{isAr ? 'المبلغ (دينار)' : 'Amount (JOD)'}</div><input type="number" value={amount} onChange={(e: any) => setAmount(Math.max(0, Number(e.target.value)))} style={fieldStyle} /></label>
+        <label><div style={lblStyle}>{isAr ? 'الفائدة (% سنوياً)' : 'Rate (% APR)'}</div><input type="number" step="0.1" value={rate} onChange={(e: any) => setRate(Math.max(0, Number(e.target.value)))} style={fieldStyle} /></label>
+        <label><div style={lblStyle}>{isAr ? 'المدة (بالسنوات)' : 'Term (years)'}</div><input type="number" value={years} onChange={(e: any) => setYears(Math.max(1, Number(e.target.value)))} style={fieldStyle} /></label>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
         <div style={{ background: 'var(--cf-primary-soft)', borderRadius: '10px', padding: '12px 13px' }}>
-          <div style={lblStyle}>Monthly</div>
+          <div style={lblStyle}>{isAr ? 'القسط الشهري' : 'Monthly'}</div>
           <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--cf-primary-strong)', marginTop: '5px' }}>{money(monthly)}</div>
         </div>
         <div style={outCard}>
-          <div style={lblStyle}>Total Interest</div>
+          <div style={lblStyle}>{isAr ? 'إجمالي الفوائد' : 'Total Interest'}</div>
           <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--cf-ink)', marginTop: '5px' }}>{money(interest)}</div>
         </div>
         <div style={outCard}>
-          <div style={lblStyle}>Total Repayment</div>
+          <div style={lblStyle}>{isAr ? 'إجمالي السداد' : 'Total Repayment'}</div>
           <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--cf-ink)', marginTop: '5px' }}>{money(total)}</div>
         </div>
       </div>
@@ -314,7 +314,7 @@ export default function BankPage() {
     load()
   }, [bankId])
 
-  if (!bank) return <div className="min-h-screen bg-[var(--cf-bg)] flex items-center justify-center text-[var(--cf-ink)]">Bank not found</div>
+  if (!bank) return <div className="min-h-screen bg-[var(--cf-bg)] flex items-center justify-center text-[var(--cf-ink)]">{isAr ? 'البنك غير موجود' : 'Bank not found'}</div>
 
   // Latest + previous financials for delta
   // FX normalization happens once at fetch time (_fx mapper); render-time pass removed to prevent double USD->JOD conversion.
@@ -333,16 +333,16 @@ export default function BankPage() {
 
   // Category labels (plain English)
   const catLabel: Record<string, string> = {
-    agm: 'Shareholder Meetings',
-    financial_results: 'Financial Results',
-    dividend: 'Dividends',
-    rating: 'Credit Ratings',
-    leadership_change: 'Leadership Changes',
-    strategic: 'Strategy & Partnerships',
-    product_launch: 'Product Launches',
-    regulation: 'Regulatory Updates',
-    merger_acquisition: 'Mergers & Acquisitions',
-    other: 'Other',
+    agm: (isAr ? 'اجتماعات المساهمين' : 'Shareholder Meetings'),
+    financial_results: (isAr ? 'النتائج المالية' : 'Financial Results'),
+    dividend: (isAr ? 'توزيعات الأرباح' : 'Dividends'),
+    rating: (isAr ? 'التصنيفات الائتمانية' : 'Credit Ratings'),
+    leadership_change: (isAr ? 'تغييرات في القيادة' : 'Leadership Changes'),
+    strategic: (isAr ? 'الاستراتيجية والشراكات' : 'Strategy & Partnerships'),
+    product_launch: (isAr ? 'إطلاق المنتجات' : 'Product Launches'),
+    regulation: (isAr ? 'تحديثات تنظيمية' : 'Regulatory Updates'),
+    merger_acquisition: (isAr ? 'عمليات الاندماج والاستحواذ' : 'Mergers & Acquisitions'),
+    other: (isAr ? 'أخرى' : 'Other'),
   }
 
   return (
@@ -355,7 +355,7 @@ export default function BankPage() {
               onClick={() => router.push('/banks')}
               className="text-[var(--cf-ink2)] hover:text-[var(--cf-ink)] transition-colors text-[13px]"
             >
-              ← All banks
+              {isAr ? '→ كل البنوك' : '← All banks'}
             </button>
             <div className="w-px h-5 bg-[var(--cf-line)]" />
             <div className="flex items-center gap-3">
@@ -376,7 +376,7 @@ export default function BankPage() {
               {bank.isHBTF && (
                 <span className="text-[10px] font-semibold text-[var(--cf-gold)] bg-[var(--cf-gold)]/10
                                  border border-[var(--cf-gold)]/20 px-2 py-0.5 rounded-full">
-                  OUR BANK
+                  {isAr ? 'بنكنا' : 'OUR BANK'}
                 </span>
               )}
             </div>
@@ -386,7 +386,7 @@ export default function BankPage() {
             className="text-[12px] px-4 py-2 rounded-lg border border-[var(--cf-line)]
                        text-[var(--cf-ink2)] hover:border-[var(--cf-gold)] hover:text-[var(--cf-gold)] transition-colors"
           >
-            Compare with another bank
+            {isAr ? 'قارن مع بنك آخر' : 'Compare with another bank'}
           </button>
         </div>
       </header>
@@ -494,7 +494,7 @@ export default function BankPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
-                <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>Balance Sheet Trend</div>
+                <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>{isAr ? 'اتجاه الميزانية العمومية' : 'Balance Sheet Trend'}</div>
                 <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>{'JOD billions, by fiscal year' + ((financials || []).some(function (f: any) { return f._fx }) ? ' · converted from USD @ 0.709' : '')}</div>
                 <ResponsiveContainer width="100%" height={240}>
                   <BarChart data={financials.map((f: any) => ({ name: 'FY' + f.fiscal_year, Assets: Number(((f.total_assets || 0) / 1000000).toFixed(2)), Deposits: Number(((f.customer_deposits || 0) / 1000000).toFixed(2)), Loans: (f.net_loans == null ? null : Number((f.net_loans / 1000000).toFixed(2))) }))} margin={{ top: 4, right: 8, left: -12, bottom: 0 }}>
@@ -510,7 +510,7 @@ export default function BankPage() {
                 </ResponsiveContainer>
               </div>
               <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
-                <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>Profitability Trend</div>
+                <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>{isAr ? 'اتجاه الربحية' : 'Profitability Trend'}</div>
                 <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>ROE, ROA + net interest margin (%), by fiscal year</div>
                 <ResponsiveContainer width="100%" height={240}>
                   <LineChart data={financials.map((f: any) => ({ name: 'FY' + f.fiscal_year, ROE: f.roe, ROA: f.roa, NIM: f.net_interest_margin }))} margin={{ top: 4, right: 8, left: -12, bottom: 0 }}>
@@ -529,8 +529,8 @@ export default function BankPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
-                <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>Key Ratios — Latest FY</div>
-                <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>Capital, returns and asset quality (%)</div>
+                <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>{isAr ? 'أبرز النسب — آخر سنة مالية' : 'Key Ratios — Latest FY'}</div>
+                <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>{isAr ? 'رأس المال والعوائد وجودة الأصول (%)' : 'Capital, returns and asset quality (%)'}</div>
                 <ResponsiveContainer width="100%" height={240}>
                   <BarChart layout="vertical" data={(() => { const f: any = financials[financials.length - 1] || {}; return [{ name: 'CAR', value: f.car }, { name: 'Loan/Deposit', value: f.loan_to_deposit }, { name: 'ROE', value: f.roe }, { name: 'ROA', value: f.roa }, { name: 'NPL', value: f.npl_ratio }].filter((x: any) => x.value != null) })()} margin={{ top: 4, right: 16, left: 20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" horizontal={false} />
@@ -551,19 +551,19 @@ export default function BankPage() {
                   <p style={{ fontSize: '13px', color: 'var(--cf-ink2)', lineHeight: '1.6', margin: 0 }}>{bank.description}</p>
                   {analystNote && (
                     <div style={{ marginTop: '14px', padding: '12px 14px', background: 'var(--cf-surface2)', borderRadius: '10px', borderInlineStart: '3px solid var(--cf-primary)' }}>
-                      <div style={{ fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--cf-ink3)', marginBottom: '6px' }}>ZAD Insight</div>
+                      <div style={{ fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--cf-ink3)', marginBottom: '6px' }}>{isAr ? 'رؤية زاد' : 'ZAD Insight'}</div>
                       <p style={{ fontSize: '12.5px', color: 'var(--cf-ink2)', lineHeight: '1.65', margin: 0 }}>{analystNote}</p>
                     </div>
                   )}
                   <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid var(--cf-line)', display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-                    <span style={{ color: 'var(--cf-ink3)' }}>Type</span>
+                    <span style={{ color: 'var(--cf-ink3)' }}>{isAr ? 'النوع' : 'Type'}</span>
                     <span style={{ color: 'var(--cf-ink)', fontWeight: 600 }}>{bank.sector === 'islamic' ? 'Islamic Banking' : 'Commercial Banking'}</span>
                   </div>
                 </div>
               )}
               {products && products.length > 0 && (
                 <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
-                  <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>Product Portfolio</div>
+                  <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>{isAr ? 'محفظة المنتجات' : 'Product Portfolio'}</div>
                   <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>{products.length + ' products across categories'}</div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                     {(() => {
@@ -589,13 +589,13 @@ export default function BankPage() {
             {/* Year-over-year table */}
             <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl overflow-hidden">
               <div className="px-5 py-4 border-b border-[var(--cf-line)]">
-                <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)]">Year-over-year comparison</div>
+                <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)]">{isAr ? 'مقارنة سنوية' : 'Year-over-year comparison'}</div>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-[13px]">
                   <thead>
                     <tr className="border-b border-[var(--cf-line)]">
-                      <th className="text-start px-5 py-3 text-[var(--cf-ink2)] font-medium">Metric</th>
+                      <th className="text-start px-5 py-3 text-[var(--cf-ink2)] font-medium">{isAr ? 'المؤشر' : 'Metric'}</th>
                       {financials.map(f => (
                         <th key={f.fiscal_year} className="text-end px-5 py-3 text-[var(--cf-ink2)] font-medium">
                           FY{f.fiscal_year}
@@ -632,7 +632,7 @@ export default function BankPage() {
             {/* Assets vs Deposits chart */}
             <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
               <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">
-                Assets & Deposits Growth (JOD billions)
+                {isAr ? 'نمو الأصول والودائع (مليار دينار)' : 'Assets & Deposits Growth (JOD billions)'}
               </div>
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={financials.map(f => ({
@@ -714,7 +714,7 @@ export default function BankPage() {
                 {/* tariffs would go here */}
               </div>
             ) : (
-              <div className="text-[var(--cf-ink2)] text-center py-12">No rate data available</div>
+              <div className="text-[var(--cf-ink2)] text-center py-12">{isAr ? 'لا تتوفر بيانات أسعار' : 'No rate data available'}</div>
             )}
             
           </div>
@@ -736,7 +736,7 @@ export default function BankPage() {
                       {p.is_islamic && (
                         <span className="mt-2 inline-block text-[10px] text-[var(--cf-positive)] bg-[var(--cf-positive)]/10
                                          border border-[var(--cf-positive)]/20 px-2 py-0.5 rounded-full">
-                          Sharia-compliant
+                          {isAr ? 'متوافق مع الشريعة' : 'Sharia-compliant'}
                         </span>
                       )}
                     </div>
@@ -745,7 +745,7 @@ export default function BankPage() {
               </div>
             ))}
             {products.length === 0 && (
-              <div className="text-center py-12 text-[var(--cf-ink2)]">No product data available</div>
+              <div className="text-center py-12 text-[var(--cf-ink2)]">{isAr ? 'لا تتوفر بيانات منتجات' : 'No product data available'}</div>
             )}
           </div>
         )}
@@ -785,7 +785,7 @@ export default function BankPage() {
                   ))}
                 </div>
               ) : (
-                <div className="text-[var(--cf-ink2)] text-center py-8">No ownership data available</div>
+                <div className="text-[var(--cf-ink2)] text-center py-8">{isAr ? 'لا تتوفر بيانات ملكية' : 'No ownership data available'}</div>
               )}
             </div>
           </div>
@@ -796,7 +796,7 @@ export default function BankPage() {
           <div className="grid grid-cols-2 gap-6">
             {/* Executives */}
             <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
-              <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">Executive Management</div>
+              <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">{isAr ? 'الإدارة التنفيذية' : 'Executive Management'}</div>
               <div className="space-y-3">
                 {executives.map((e, i) => (
                   <div key={i} className="flex items-start gap-3 py-2 border-b border-[var(--cf-line)] last:border-0">
@@ -820,7 +820,7 @@ export default function BankPage() {
 
             {/* Board */}
             <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
-              <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">Board of Directors</div>
+              <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">{isAr ? 'مجلس الإدارة' : 'Board of Directors'}</div>
               <div className="space-y-3">
                 {boardMembers.slice(0, 12).map((b, i) => (
                   <div key={i} className="flex items-start gap-3 py-2 border-b border-[var(--cf-line)] last:border-0">
@@ -840,7 +840,7 @@ export default function BankPage() {
                         {b.is_independent && (
                           <span className="ml-2 text-[10px] text-[var(--cf-positive)] bg-[var(--cf-positive)]/10
                                            border border-[var(--cf-positive)]/20 px-1.5 py-0 rounded-full">
-                            Independent
+                            {isAr ? 'مستقل' : 'Independent'}
                           </span>
                         )}
                       </div>
@@ -895,13 +895,13 @@ export default function BankPage() {
                   <a href={a.source_url} target="_blank" rel="noopener"
                      className="text-[11px] text-[var(--cf-ink2)] hover:text-[var(--cf-gold)] transition-colors
                                 flex-shrink-0 mt-0.5">
-                    Source →
+                    {isAr ? 'المصدر ←' : 'Source →'}
                   </a>
                 )}
               </div>
             ))}
             {announcements.length === 0 && (
-              <div className="text-center py-12 text-[var(--cf-ink2)]">No announcements available</div>
+              <div className="text-center py-12 text-[var(--cf-ink2)]">{isAr ? 'لا تتوفر إعلانات' : 'No announcements available'}</div>
             )}
           </div>
         )}
