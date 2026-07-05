@@ -411,10 +411,10 @@ export default function EconomyPage() {
     credRows.forEach(function (r) { credData[String(r.indicator)] = Number(r.value) })
     var credTotal = 0
     credRows.forEach(function (r) { credTotal += Number(r.value) || 0 })
-    var toBn = function (o: any) { return { labels: o.labels, pts: o.pts.map(function (v: any) { return Math.round(v / 10) / 100 }) } }
+    var mkGeo = function (cat: string) { var rr = rows.filter(function (r: any) { return r.category === cat }); var d: any = {}; var t = 0; rr.forEach(function (r: any) { d[String(r.indicator)] = Number(r.value); t += Number(r.value) || 0 }); return { d: d, t: t } }; var _pos = mkGeo('pos_geo_governorate'); var _atm = mkGeo('atm_geo_governorate'); var _br = mkGeo('branches_geo_governorate'); var _ag = mkGeo('agents_geo_governorate'); var toBn = function (o: any) { return { labels: o.labels, pts: o.pts.map(function (v: any) { return Math.round(v / 10) / 100 }) } }
     var ep = function (ind: string) { var r = last(yearly(pick('banking_epayments', ind))); return r ? { v: Number(r.value), u: r.unit || '' } : null }
     return {
-      gg: gg, gi: gi, jg: jg, debt: debt, bs: bs, prof: prof, rates: rates,
+      posData: _pos.d, posTotal: _pos.t, atmData: _atm.d, atmTotal: _atm.t, branchData: _br.d, branchTotal: _br.t, agentData: _ag.d, agentTotal: _ag.t, gg: gg, gi: gi, jg: jg, debt: debt, bs: bs, prof: prof, rates: rates,
       cpiLabels: cpiM.map(function (r) { return r.period.replace('-20', ' ') }), cpiPts: cpiM.map(function (r) { return Number(r.value) }),
       mLabels: mLabels, exPts: exM.map(function (r) { return Number(r.value) }), imPts: imM.map(function (r) { return Number(r.value) }), tbLabels: tbM.map(function (r) { return r.period.replace('-20', ' ') }), tbPts: tbM.map(function (r) { return Number(r.value) }),
       kGdp: last(yearly(pick('jo_gdp', 'Real GDP growth'))), kGdpF: (pick('jo_gdp', 'Real GDP growth forecast').filter(function (r) { return r.period === '2026F' })[0] || null),
