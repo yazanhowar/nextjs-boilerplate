@@ -136,7 +136,7 @@ const filtered = BANKS.filter(b => {
   })
 
   return (
-    <div dir={isAr ? 'rtl' : 'ltr'} style={{ minHeight:'100vh', backgroundColor:t.bg, fontFamily:'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif', color:t.text }}>
+    <div dir={isAr ? 'rtl' : 'ltr'} style={{ minHeight:'100vh', backgroundColor:t.bg, color:t.text }}>
       <main style={{ maxWidth:1200, margin:'0 auto', padding:'32px 24px' }}>
         <div style={{ marginBottom:28 }}>
           <h1 style={{ fontSize:28, fontWeight:700, margin:'0 0 8px', color:t.text }}>{L.bk_title}</h1>
