@@ -239,7 +239,7 @@ function PieChartInner(props: any) {
           <g key={'l' + i}>
             <rect x={236} y={ly - 9} width={11} height={11} rx={2} fill={s.c} />
             <text x={254} y={ly} style={{ fontSize: 11, fill: 'var(--cf-ink2, #243b53)' }}>{s.name}</text>
-            <text x={W - 12} y={ly} textAnchor='end' style={{ fontSize: 11, fontWeight: 600, fill: 'var(--cf-ink)' }}>{s.v.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' · ' + s.pct.toFixed(1) + '%'}</text>
+            <text x={W - 12} y={ly} textAnchor='end' style={{ fontSize: 11, fontWeight: 600, fill: 'var(--cf-ink)' }}>{(s.v / 1000).toFixed(2) + ' · ' + s.pct.toFixed(1) + '%'}</text>
           </g>
         )
       })}
