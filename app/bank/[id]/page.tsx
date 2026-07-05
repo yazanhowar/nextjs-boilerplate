@@ -121,7 +121,7 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
     <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-6">
       <div className="flex items-center gap-2 mb-4">
         <span className="text-[var(--cf-gold)] text-[18px]">⚡</span>
-        <span className="font-semibold text-[var(--cf-ink)]">Ask about {bankName}</span>
+        <span className="font-semibold text-[var(--cf-ink)]">{isAr ? 'اسأل عن' : 'Ask about'} {bankName}</span>
       </div>
 
       {/* Example prompts */}
@@ -734,7 +734,7 @@ export default function BankPage() {
           <div className="space-y-4">
             {productCategories.map(cat => (
               <div key={cat} id={'cat-' + cat} className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
-                <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">{cat.split('_').join(' ')}</div>
+                <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">{isAr ? (({'retail':'التجزئة','deposit':'الودائع','deposits':'الودائع','lending':'الإقراض','loans':'القروض','cards':'البطاقات','card':'البطاقات','corporate':'الشركات','sme':'الشركات الصغيرة والمتوسطة','wealth':'إدارة الثروات','digital':'الخدمات الرقمية','business':'الأعمال','personal':'الأفراد','savings':'التوفير','current':'الحسابات الجارية','financing':'التمويل','investment':'الاستثمار','insurance':'التأمين','islamic':'الإسلامية','treasury':'الخزينة','trade':'التجارة'} as Record<string, string>)[cat.toLowerCase()] || cat.split('_').join(' ')) : cat.split('_').join(' ')}</div>
                 <div className="grid grid-cols-2 gap-3">
                   {products.filter(p => p.category === cat).map((p, i) => (
                     <div key={i} className="p-3 rounded-lg bg-[var(--cf-bg)] border border-[var(--cf-line)]">
@@ -764,7 +764,7 @@ export default function BankPage() {
           <div className="space-y-6">
             <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
               <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">
-                Who owns {bank.shortName}
+                {isAr ? 'من يملك' : 'Who owns'} {bank.shortName}
               </div>
               {ownership.length > 0 ? (
                 <div className="space-y-3">
