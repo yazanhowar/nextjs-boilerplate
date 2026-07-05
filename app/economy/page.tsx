@@ -163,6 +163,7 @@ function JordanMapInner(props: any) {
   var vals: number[] = []
   JO_GOVS.forEach(function (g: any) { var v = data[g.key]; if (v) vals.push(Number(v)) })
   var max = vals.length ? Math.max.apply(null, vals) : 0
+  var _tot = vals.reduce(function (a: any, b: any) { return a + b }, 0)
   var fill = function (v: any) {
     if (!max || !v) return '#dbe4ee'
     var q = Math.sqrt(Number(v) / max)
@@ -191,7 +192,7 @@ function JordanMapInner(props: any) {
             return (
               <div key={g.key} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, padding: '3px 0', borderBottom: '1px solid var(--cf-line, #edf1f7)' }}>
                 <span style={{ color: 'var(--cf-ink2, #243b53)' }}>{props.lang === 'ar' ? (JO_NAMES[g.key] || g.key) : g.key}</span>
-                <span style={{ fontWeight: 600, color: 'var(--cf-ink, #0f2a4a)' }}>{props.cur === false ? Number(v).toLocaleString('en-US') : (v / 1000).toFixed(2)}</span>
+                <span style={{ fontWeight: 600, color: 'var(--cf-ink, #0f2a4a)' }}>{(props.cur === false ? Number(v).toLocaleString('en-US') : (v / 1000).toFixed(2)) + (_tot ? ' · ' + (Number(v) / _tot * 100).toFixed(1) + '%' : '')}</span>
               </div>
             )
           })}
