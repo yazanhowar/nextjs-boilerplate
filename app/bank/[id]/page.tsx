@@ -71,7 +71,12 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
   const [error, setError] = useState('')
   const chartRef = useRef<HTMLDivElement>(null)
 
-  const examples = [
+  const examples = isAr ? [
+    `اعرض اتجاه أرباح ${bankName} على مدى 3 سنوات`,
+    `قارن رسوم بطاقات ائتمان ${bankName} مع ${bankName === 'HBTF' ? 'البنك العربي' : 'بنك الإسكان'}`,
+    `ما هي أسعار الودائع التي يقدمها ${bankName}؟`,
+    `تفصيل إيرادات ${bankName} حسب السنة`,
+  ] : [
     `Show ${bankName} profit trend over 3 years`,
     `Compare ${bankName} credit card fees vs ${bankName === 'HBTF' ? 'Arab Bank' : 'Housing Bank'}`,
     `What deposit rates does ${bankName} offer?`,
@@ -374,7 +379,7 @@ export default function BankPage() {
               <div>
                 <div className="font-bold text-[var(--cf-ink)] text-[16px]">{bank.name}</div>
                 <div className="text-[11px] text-[var(--cf-ink2)]">
-                  {bank.sector === 'islamic' ? (isAr ? 'بنك إسلامي' : 'Islamic Bank') : (isAr ? 'بنك تجاري' : 'Commercial Bank')} · {bank.ticker} · ASE listed
+                  {bank.sector === 'islamic' ? (isAr ? 'بنك إسلامي' : 'Islamic Bank') : (isAr ? 'بنك تجاري' : 'Commercial Bank')} · {bank.ticker} · {isAr ? 'مدرج في بورصة عمّان' : 'ASE listed'}
                 </div>
               </div>
               {bank.isHBTF && (
@@ -427,7 +432,7 @@ export default function BankPage() {
               },
               {
                 label: (isAr ? 'ربحية السهم' : 'Earnings Per Share'),
-                value: latest.eps_fils ? `${latest.eps_fils} fils` : '—',
+                value: latest.eps_fils ? (isAr ? `${latest.eps_fils} فلس` : `${latest.eps_fils} fils`) : '—',
                 delta: prev?.eps_fils && latest.eps_fils != null ? ((latest.eps_fils - prev.eps_fils) / prev.eps_fils) * 100 : null,
                 sub: latest.fiscal_year ? (isAr ? ('ربحية أساسية · ' + latest.fiscal_year) : ('FY' + latest.fiscal_year + ' basic EPS')) : (isAr ? 'ربحية أساسية' : 'Basic EPS'),
               },
@@ -437,7 +442,7 @@ export default function BankPage() {
                 <div className="text-[20px] font-bold text-[var(--cf-ink)]">{loading ? '...' : kpi.value}</div>
                 {kpi.delta != null && (
                   <div className={`text-[11px] font-medium mt-1 ${deltaColor(kpi.delta)}`}>
-                    {deltaSign(kpi.delta)} {Math.abs(kpi.delta).toFixed(1)}% vs prior year
+                    {deltaSign(kpi.delta)} {Math.abs(kpi.delta).toFixed(1)}%{isAr ? ' مقابل العام السابق' : ' vs prior year'}
                   </div>
                 )}
                 <div className="text-[10px] text-[var(--cf-ink2)] mt-1">{kpi.sub}</div>
