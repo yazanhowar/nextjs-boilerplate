@@ -192,7 +192,7 @@ function JordanMapInner(props: any) {
             return (
               <div key={g.key} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, padding: '3px 0', borderBottom: '1px solid var(--cf-line, #edf1f7)' }}>
                 <span style={{ color: 'var(--cf-ink2, #243b53)' }}>{props.lang === 'ar' ? (JO_NAMES[g.key] || g.key) : g.key}</span>
-                <span style={{ fontWeight: 600, color: 'var(--cf-ink, #0f2a4a)' }}>{props.cur === false ? Number(v).toLocaleString('en-US') : (v / 1000).toFixed(2)}{_tot ? <span style={{ color: 'var(--cf-ink3, #7d8ea3)', fontWeight: 400, marginInlineStart: 6 }}>{(Number(v) / _tot * 100).toFixed(1) + '%'}</span> : null}</span>
+                <span style={{ fontWeight: 600, color: 'var(--cf-ink, #0f2a4a)' }}>{props.cur === false ? Number(v).toLocaleString('en-US') : (v / 1000).toFixed(2)}{_tot ? <span style={{ color: 'var(--cf-ink3, #7d8ea3)', fontWeight: 400, marginInlineStart: 10 }}>{'\u00b7 ' + (Number(v) / _tot * 100).toFixed(1) + '%'}</span> : null}</span>
               </div>
             )
           })}
