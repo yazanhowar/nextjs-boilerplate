@@ -125,7 +125,7 @@ function MarketShareInner(props: any) {
     })()
     return function () { ok = false }
   }, [])
-  if (!msRows || !msRows.length) return <div style={{ fontSize: 11, color: 'var(--cf-ink3)' }}>{lang === 'ar' ? 'جارٍ تحميل بيانات 2024…' : 'Loading FY2024 balance sheets…'}</div>
+  if (!msRows || !msRows.length) return <div style={{ fontSize: 11, color: 'var(--cf-ink3)' }}>{lang === 'ar' ? 'جارٍ تحميل بيانات 2025…' : 'Loading FY2025 balance sheets…'}</div>
   var total = 0
   msRows.forEach(function (r: any) { total += r.v })
   var COLORS = ['var(--cf-primary-strong, #0f4c81)', '#3f7cac', 'var(--cf-gold, #c9a227)', 'var(--cf-teal, #2a9d8f)', '#7ea8c9', '#8b9bb0']
@@ -136,7 +136,7 @@ function MarketShareInner(props: any) {
   return (
     <div>
       <PieChart data={top} center={(total / 1000000).toFixed(0) + 'B'} centerSub={lang === 'ar' ? 'دينار · 2025' : 'JOD · FY2025'} h={272} />
-      <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{lang === 'ar' ? 'بيانات 2024 · على مستوى المجموعة · البنك العربي محوّل من الدولار (0.709)' : 'bank_financials FY2024 · group-level · Arab Bank converted USD→JOD @ 0.709'}</div>
+      <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{lang === 'ar' ? 'بيانات 2025 · على مستوى المجموعة · البنك العربي محوّل من الدولار (0.709)' : 'bank_financials FY2025 · group-level · Arab Bank converted USD→JOD @ 0.709'}</div>
     </div>
   )
 }
