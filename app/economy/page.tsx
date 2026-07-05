@@ -94,12 +94,12 @@ function GeoMapCard(props: any) {
         <div onClick={function (e: any) { e.stopPropagation() }} style={{ background: 'var(--cf-surface, #ffffff)', border: '1px solid var(--cf-line, #e5eaf2)', borderRadius: 16, padding: '18px 20px', width: 'min(860px, 94vw)', maxHeight: '92vh', overflow: 'auto', cursor: 'default' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
             <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--cf-ink, #14243a)' }}>{title}</div>
-            <div style={{ display: 'flex', gap: 6 }}>{[pill('dep', 'Deposits', 'الودائع'), pill('cred', 'Credit', 'الائتمان'), <button key='cl' onClick={function () { setBig(false) }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 15, color: 'var(--cf-ink3, #7d8ea3)' }}>✕</button>]}</div>
+            <div style={{ display: 'flex', gap: 6 }}>{[pill('dep', 'Deposits', 'الودائع'), pill('cred', 'Credit', 'الائتمان'), pill('pos', 'POS', 'نقاط البيع'), pill('atm', 'ATMs', 'صرافات'), pill('branch', 'Branches', 'فروع'), pill('agent', 'Agents', 'وكلاء'), <button key='cl' onClick={function () { setBig(false) }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 15, color: 'var(--cf-ink3, #7d8ea3)' }}>✕</button>]}</div>
           </div>
           <div style={{ zoom: 1.55, marginTop: 8 }}><JordanMapInner data={data} lang={lang} cur={isCur} /></div>
         </div>
       </div> : null}
-      {count ? <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{ar ? 'القيم بمليارات الدنانير · البنك المركزي الأردني' : 'Values in JOD billions · CBJ statistical DB'}</div> : <div style={{ fontSize: 11, color: 'var(--cf-ink3)', marginTop: 8 }}>{ar ? 'التوزيع الإقليمي قيد المزامنة من البنك المركزي' : 'Regional split syncing from CBJ'}</div>}
+      {count ? <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{ar ? 'القيم بمليارات الدنانير · البنك المركزي الأردني' : (isCur ? 'Values in JOD billions · CBJ statistical DB' : 'Facility counts · CBJ Payment System Report 2024')}</div> : <div style={{ fontSize: 11, color: 'var(--cf-ink3)', marginTop: 8 }}>{ar ? 'التوزيع الإقليمي قيد المزامنة من البنك المركزي' : 'Regional split syncing from CBJ'}</div>}
     </div>
   )
 }
