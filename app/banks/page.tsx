@@ -141,7 +141,7 @@ const filtered = BANKS.filter(b => {
         <div style={{ marginBottom:28 }}>
           <h1 style={{ fontSize:28, fontWeight:700, margin:'0 0 8px', color:t.text }}>{L.bk_title}</h1>
           <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
-            <span style={{ fontSize:14, color:t.textSub }}>FY{dataYear} data &middot; All figures in JOD unless noted</span>
+            <span style={{ fontSize:14, color:t.textSub }}>{isAr ? `السنة المالية ${dataYear} · جميع الأرقام بالدينار الأردني ما لم يُذكر غير ذلك` : `FY${dataYear} data · All figures in JOD unless noted`}</span>
             <div style={{ display:'flex', gap:4 }}>
               {[2025,2024,2023].map(yr => (
                 <button key={yr} onClick={() => setSelectedYear(yr)} style={{ padding:'3px 10px', borderRadius:20, fontSize:12, fontWeight:500, cursor:'pointer', backgroundColor:selectedYear===yr?t.accent:'transparent', color:selectedYear===yr?'#fff':t.textSub, border:`1px solid ${selectedYear===yr?t.accent:t.border}`, transition:'all 0.15s' }}>{yr}</button>
@@ -152,8 +152,8 @@ const filtered = BANKS.filter(b => {
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12, marginBottom:32 }}>
           {[
-            { label:L.bk_combinedAssets, value:fmtK(grandAssets), sub:'All 15 banks, group basis' },
-            { label:L.bk_combinedProfit, value:fmtK(grandProfit), sub:`FY${dataYear}` },
+            { label:L.bk_combinedAssets, value:fmtK(grandAssets), sub:isAr?'جميع البنوك الـ15 · على أساس المجموعة':'All 15 banks, group basis' },
+            { label:L.bk_combinedProfit, value:fmtK(grandProfit), sub:isAr?`السنة المالية ${dataYear}`:`FY${dataYear}` },
             { label:L.bk_avgROE, value:avgROE!=null?`${avgROE.toFixed(1)}%`:'-', sub:L.bk_roeSub },
             { label:L.bk_avgCAR, value:avgCAR!=null?`${avgCAR.toFixed(1)}%`:'-', sub:L.bk_carSub },
           ].map((kpi,i) => (
@@ -215,12 +215,12 @@ function BankCard({ bank, fin, delta, loading, dark, t, dataYear, hovered, onMou
         <div style={{ backgroundColor:'var(--cf-surface2)', borderRadius:10, padding:'12px 14px' }}>
           <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>{L.bk_netProfit}</div>
           <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.net_profit,bank.id):'-')}</div>
-          {delta!=null&&!loading&&<div style={{ fontSize:11, color:delta>=0?t.green:t.red, marginTop:3, fontWeight:500 }}>{delta>=0?String.fromCharCode(8593):String.fromCharCode(8595)} {Math.abs(delta).toFixed(1)}% vs {dataYear-1}</div>}
+          {delta!=null&&!loading&&<div style={{ fontSize:11, color:delta>=0?t.green:t.red, marginTop:3, fontWeight:500 }}>{delta>=0?String.fromCharCode(8593):String.fromCharCode(8595)} {Math.abs(delta).toFixed(1)}% {isAr ? 'مقابل' : 'vs'} {dataYear-1}</div>}
         </div>
         <div style={{ backgroundColor:'var(--cf-surface2)', borderRadius:10, padding:'12px 14px' }}>
           <div style={{ fontSize:11, color:t.textSub, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.04em' }}>{L.bk_totalAssets}</div>
           <div style={{ fontSize:16, fontWeight:700, color:t.text }}>{loading?'...':(fin?fmtK(fin.total_assets,bank.id):'-')}</div>
-          {fin?.roe!=null&&!loading&&<div style={{ fontSize:11, color:t.textSub, marginTop:3 }}>ROE {fin.roe.toFixed(1)}%</div>}
+          {fin?.roe!=null&&!loading&&<div style={{ fontSize:11, color:t.textSub, marginTop:3 }}>{isAr ? 'العائد' : 'ROE'} {fin.roe.toFixed(1)}%</div>}
         </div>
       </div>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
