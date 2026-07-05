@@ -72,6 +72,7 @@ button[aria-label*="English"]:hover {
 /* ── RTL ────────────────────────────────────────────────────────────────── */
 [dir="rtl"] { font-family: var(--font-ibm-ar), 'Noto Sans Arabic', sans-serif; }
 [dir="rtl"] body { font-family: var(--font-ibm-ar), 'Noto Sans Arabic', sans-serif !important; }
+[dir="rtl"] svg text { font-family: var(--font-ibm-sans), 'IBM Plex Sans', sans-serif !important; }
 [dir="rtl"] .text-start { text-align: right; }
 [dir="rtl"] .text-end   { text-align: left;  }
 
