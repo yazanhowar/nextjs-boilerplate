@@ -531,7 +531,7 @@ export default function EconomyPage() {
           <div style={card}><div style={h2}>{t.sector} — {t.s_bs}</div><LineChart labels={D.bs.labels} series={D.bs.series} endLabels />{legend(D.bs.series)}
           <div style={{ fontSize: 10, color: 'var(--cf-ink3, #7d8ea3)', marginTop: 2 }}>{lang === 'ar' ? 'الأحدث: كانون الأول ٫٢٠٢٥ · البنك المركزي' : 'Latest: Dec-2025 · CBJ'}</div></div>
           <div style={card}><div style={h2}>{t.sector} — {t.s_prof}</div><LineChart labels={D.prof.labels} series={D.prof.series} endLabels zero />{legend(D.prof.series)}
-          <div style={{ fontSize: 10, color: 'var(--cf-ink3, #7d8ea3)', marginTop: 2 }}>{lang === 'ar' ? 'السنة المالية ٢٠٢٤ — أحدث تقرير سنوي منشور' : 'FY2024 · latest published annual data'}</div></div>
+          <div style={{ fontSize: 10, color: 'var(--cf-ink3, #7d8ea3)', marginTop: 2 }}>{lang === 'ar' ? '٢٠٢٠–٢٤ البنك المركزي · ٢٠٢٥ تجميع ١٥ بنك' : '2020–24 CBJ domestic · 2025 group agg. (15 banks)'}</div></div>
           <div style={card}><div style={h2}>{t.sector} — {t.s_rates}</div><LineChart labels={D.rates.labels} series={D.rates.series} endLabels />{legend(D.rates.series)}</div>
           <div style={card}>
             <div style={h2}>{t.epay}</div>
