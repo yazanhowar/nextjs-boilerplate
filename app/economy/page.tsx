@@ -477,7 +477,7 @@ export default function EconomyPage() {
     { l: t.kpi_cpi, v: D.kCpi ? fmt(D.kCpi.value, 2) + '%' : '—', s: D.kCpi ? D.kCpi.period : '' },
     { l: t.kpi_trade, v: D.kH1b ? fmt(D.kH1b.value, 0) : '—', s: D.kH1b ? D.kH1b.period + ' · JOD m · DoS' : '' },
     { l: t.kpi_debt, v: D.kDebt ? fmt(D.kDebt.value, 1) + '%' : '—', s: D.kDebt ? D.kDebt.period + ' · excl SSIF' : '' },
-    { l: t.kpi_unemp, v: D.kUn ? fmt(D.kUn.value, 1) + '%' : '—', s: D.kUn ? D.kUn.period + ' · IMF' : '' }
+    { l: t.kpi_unemp, v: D.kUn ? fmt(D.kUn.value, 1) + '%' : '—', s: D.kUn ? D.kUn.period + ' · ' + (D.kUn.source && /DoS/i.test(D.kUn.source) ? 'DoS' : (D.kUn.source && /CBJ/i.test(D.kUn.source) ? 'CBJ' : 'IMF')) : '' }
   ]
 
   return (
