@@ -227,6 +227,8 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
 
 // ─── Main bank page ───────────────────────────────────────────────────────────
 function LoanCalculator() {
+  const { lang } = useLang()
+  const isAr = lang === 'ar'
   const [amount, setAmount] = useState<number>(50000)
   const [rate, setRate] = useState<number>(7.5)
   const [years, setYears] = useState<number>(10)
@@ -370,7 +372,7 @@ export default function BankPage() {
               <div>
                 <div className="font-bold text-[var(--cf-ink)] text-[16px]">{bank.name}</div>
                 <div className="text-[11px] text-[var(--cf-ink2)]">
-                  {bank.sector === 'islamic' ? 'Islamic Bank' : 'Commercial Bank'} · {bank.ticker} · ASE listed
+                  {bank.sector === 'islamic' ? (isAr ? 'بنك إسلامي' : 'Islamic Bank') : (isAr ? 'بنك تجاري' : 'Commercial Bank')} · {bank.ticker} · ASE listed
                 </div>
               </div>
               {bank.isHBTF && (
