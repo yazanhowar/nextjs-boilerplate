@@ -413,16 +413,16 @@ export default function BankPage() {
                 label: 'Return on Equity',
                 value: pct(latest.roe),
                 delta: prev ? (latest.roe - prev.roe) : null,
-                sub: 'Profit vs shareholder equity',
+                sub: (isAr ? 'الربح مقابل حقوق المساهمين' : 'Profit vs shareholder equity'),
               },
               {
-                label: 'Capital Ratio',
+                label: (isAr ? 'نسبة رأس المال' : 'Capital Ratio'),
                 value: pct(latest.car),
                 delta: null,
-                sub: 'Min. required: 14%',
+                sub: (isAr ? 'الحد الأدنى المطلوب: 14%' : 'Min. required: 14%'),
               },
               {
-                label: 'Earnings Per Share',
+                label: (isAr ? 'ربحية السهم' : 'Earnings Per Share'),
                 value: latest.eps_fils ? `${latest.eps_fils} fils` : '—',
                 delta: prev?.eps_fils && latest.eps_fils != null ? ((latest.eps_fils - prev.eps_fils) / prev.eps_fils) * 100 : null,
                 sub: latest.fiscal_year ? ('FY' + latest.fiscal_year + ' basic EPS') : 'Basic EPS',
@@ -470,8 +470,8 @@ export default function BankPage() {
                 const prev: any = financials[financials.length - 2] || {}
                 const items: any[] = [
                   { label: 'Total Assets', v: latest.total_assets, p: prev.total_assets, kind: 'money' },
-                  { label: 'Cust. Deposits', v: latest.customer_deposits, p: prev.customer_deposits, kind: 'money' },
-                  { label: 'Net Loans', v: latest.net_loans, p: prev.net_loans, kind: 'money' },
+                  { label: (isAr ? 'ودائع العملاء' : 'Cust. Deposits'), v: latest.customer_deposits, p: prev.customer_deposits, kind: 'money' },
+                  { label: (isAr ? 'صافي القروض' : 'Net Loans'), v: latest.net_loans, p: prev.net_loans, kind: 'money' },
                   { label: 'Net Profit', v: latest.net_profit, p: prev.net_profit, kind: 'money' },
                   { label: 'ROE', v: latest.roe, p: prev.roe, kind: 'pct' },
                   { label: 'CAR', v: latest.car, p: prev.car, kind: 'pct' },
@@ -607,13 +607,13 @@ export default function BankPage() {
                     {[
                       { label: 'Net Profit', key: 'net_profit', format: fmtJOD },
                       { label: 'Total Assets', key: 'total_assets', format: fmtJOD },
-                      { label: 'Customer Deposits', key: 'customer_deposits', format: fmtJOD },
-                      { label: 'Loans to Customers', key: 'net_loans', format: fmtJOD },
+                      { label: (isAr ? 'ودائع العملاء' : 'Customer Deposits'), key: 'customer_deposits', format: fmtJOD },
+                      { label: (isAr ? 'القروض للعملاء' : 'Loans to Customers'), key: 'net_loans', format: fmtJOD },
                       { label: 'Shareholders\' Equity', key: 'total_equity', format: fmtJOD },
                       { label: 'Return on Equity', key: 'roe', format: pct },
-                      { label: 'Return on Assets', key: 'roa', format: pct },
-                      { label: 'Capital Adequacy Ratio', key: 'car', format: pct },
-                      { label: 'Bad Loan Ratio', key: 'npl_ratio', format: pct },
+                      { label: (isAr ? 'العائد على الأصول' : 'Return on Assets'), key: 'roa', format: pct },
+                      { label: (isAr ? 'نسبة كفاية رأس المال' : 'Capital Adequacy Ratio'), key: 'car', format: pct },
+                      { label: (isAr ? 'نسبة القروض المتعثرة' : 'Bad Loan Ratio'), key: 'npl_ratio', format: pct },
                     ].map(row => (
                       <tr key={row.key} className="border-b border-[var(--cf-line)] hover:bg-[var(--cf-surface2)] transition-colors">
                         <td className="px-5 py-3 text-[var(--cf-ink2)]">{row.label}</td>
@@ -671,10 +671,10 @@ export default function BankPage() {
                   <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">{bank.sector === 'islamic' ? 'Financing Rates (Murabaha)' : 'Loan Interest Rates'}</div>
                   <div className="space-y-3">
                     {[
-                      { label: 'Home Loans', min: rates.home_loan_min, max: rates.home_loan_max },
-                      { label: 'Personal Loans', min: rates.personal_loan_min, max: rates.personal_loan_max },
-                      { label: 'Car Loans', min: rates.car_loan_min, max: rates.car_loan_max },
-                      { label: 'Business Loans', min: rates.corporate_loan_min, max: rates.corporate_loan_max },
+                      { label: (isAr ? 'قروض السكن' : 'Home Loans'), min: rates.home_loan_min, max: rates.home_loan_max },
+                      { label: (isAr ? 'القروض الشخصية' : 'Personal Loans'), min: rates.personal_loan_min, max: rates.personal_loan_max },
+                      { label: (isAr ? 'قروض السيارات' : 'Car Loans'), min: rates.car_loan_min, max: rates.car_loan_max },
+                      { label: (isAr ? 'قروض الأعمال' : 'Business Loans'), min: rates.corporate_loan_min, max: rates.corporate_loan_max },
                     ].map(r => (
                       <div key={r.label} className="flex justify-between items-center py-2
                                                       border-b border-[var(--cf-line)] last:border-0">
@@ -693,11 +693,11 @@ export default function BankPage() {
                   <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">{bank.sector === 'islamic' ? 'Expected Profit Rates (Mudaraba)' : 'Deposit Interest Rates'}</div>
                   <div className="space-y-3">
                     {[
-                      { label: 'Savings Account', val: rates.saving_rate },
-                      { label: '1-Month Term Deposit', val: rates.td_1m },
-                      { label: '3-Month Term Deposit', val: rates.td_3m },
-                      { label: '6-Month Term Deposit', val: rates.td_6m },
-                      { label: '12-Month Term Deposit', val: rates.td_12m },
+                      { label: (isAr ? 'حساب التوفير' : 'Savings Account'), val: rates.saving_rate },
+                      { label: (isAr ? 'وديعة لأجل شهر' : '1-Month Term Deposit'), val: rates.td_1m },
+                      { label: (isAr ? 'وديعة لأجل 3 أشهر' : '3-Month Term Deposit'), val: rates.td_3m },
+                      { label: (isAr ? 'وديعة لأجل 6 أشهر' : '6-Month Term Deposit'), val: rates.td_6m },
+                      { label: (isAr ? 'وديعة لأجل 12 شهراً' : '12-Month Term Deposit'), val: rates.td_12m },
                     ].map(r => (
                       <div key={r.label} className="flex justify-between items-center py-2
                                                       border-b border-[var(--cf-line)] last:border-0">
@@ -813,7 +813,7 @@ export default function BankPage() {
                   </div>
                 ))}
                 {executives.length === 0 && (
-                  <div className="text-[var(--cf-ink2)] text-center py-6">No data available</div>
+                  <div className="text-[var(--cf-ink2)] text-center py-6">{isAr ? 'لا تتوفر بيانات' : 'No data available'}</div>
                 )}
               </div>
             </div>
@@ -848,7 +848,7 @@ export default function BankPage() {
                   </div>
                 ))}
                 {boardMembers.length === 0 && (
-                  <div className="text-[var(--cf-ink2)] text-center py-6">No data available</div>
+                  <div className="text-[var(--cf-ink2)] text-center py-6">{isAr ? 'لا تتوفر بيانات' : 'No data available'}</div>
                 )}
               </div>
             </div>
