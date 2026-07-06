@@ -58,6 +58,24 @@ function fmt(v: any, dec?: number) { if (v == null || isNaN(v)) return '\u2014';
 function shortPeriod(p: any) { if (!p) return ''; var s = String(p); var mo = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; if (s.length >= 7 && s.charAt(4) === '-') { var m = parseInt(s.slice(5, 7), 10); return mo[m] + " '" + s.slice(2, 4); } return s; }
 function yoyCalc(series: any[]) { if (!series || series.length < 13) return null; var latest = series[series.length - 1].value; var prior = series[series.length - 13].value; if (prior == null || latest == null) return null; return { latest: latest, prior: prior, pct: ((latest - prior) / prior) * 100 }; }
 
+function __cfPtLabels(pts, Y, h, cvar) {
+  if (!pts || pts.length < 2) return '';
+  var iMin = 0, iMax = 0;
+  for (var k = 0; k < pts.length; k++) { if (pts[k].value < pts[iMin].value) iMin = k; if (pts[k].value > pts[iMax].value) iMax = k; }
+  var idx = [pts.length - 1, iMax, iMin];
+  function fmt(v) { var a = Math.abs(v); return a >= 1000 ? (v / 1000).toFixed(1) + 'k' : a >= 100 ? v.toFixed(0) : a >= 10 ? v.toFixed(1) : v.toFixed(2); }
+  var placed = [], out = '';
+  idx.forEach(function (ii) {
+    var lx = (ii / (pts.length - 1)) * 100;
+    if (placed.some(function (p) { return Math.abs(p - lx) < 9; })) return;
+    placed.push(lx);
+    var ly = (Y(pts[ii].value) / h) * 100;
+    var lxc = Math.max(8, Math.min(92, lx));
+    var ty = ly > 24 ? '-155%' : '70%';
+    out += '<span style="position:absolute;z-index:2;left:' + lxc.toFixed(1) + '%;top:' + ly.toFixed(1) + '%;transform:translate(-50%,' + ty + ');font-size:9.5px;font-weight:700;color:var(' + cvar + ');background:var(--cf-surface,#fff);padding:0 3px;border-radius:3px;white-space:nowrap;pointer-events:none;box-shadow:0 0 0 1px rgba(0,0,0,0.05)">' + fmt(pts[ii].value) + '</span>';
+  });
+  return out;
+}
 function svgArea(pts: any[], cvar: string, id: string) {
   if (!pts || !pts.length) return '';
   var w = 1000, h = 200, padT = 10, padB = 8;
@@ -74,7 +92,7 @@ function svgArea(pts: any[], cvar: string, id: string) {
   return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">' +
     '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" style="stop-color:var(' + cvar + ');stop-opacity:0.26"/><stop offset="100%" style="stop-color:var(' + cvar + ');stop-opacity:0.02"/></linearGradient></defs>' +
     grid + '<path d="' + area + '" fill="url(#' + id + ')"/>' +
-    '<path d="' + line + '" fill="none" style="stroke:var(' + cvar + ')" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>';
+    '<path d="' + line + '" fill="none" style="stroke:var(' + cvar + ')" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>' + __cfPtLabels(pts, Y, h, cvar);
 }
 function svgSpark(pts: any[], cvar: string) {
   if (!pts || !pts.length) return '';
