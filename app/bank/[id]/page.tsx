@@ -291,7 +291,8 @@ export default function BankPage() {
   __cfIsAr = isAr
   const [imgError, setImgError] = useState(false)
   const [analystNote, setAnalystNote] = useState('')
-  useEffect(() => { if (!bankId) return; supabase.from('banks').select('analyst_note').eq('id', bankId).single().then(({ data }: any) => { if (data && data.analyst_note) setAnalystNote(data.analyst_note) }) }, [bankId])
+  const [nameAr, setNameAr] = useState('')
+  useEffect(() => { if (!bankId) return; supabase.from('banks').select('analyst_note, name_ar').eq('id', bankId).single().then(({ data }: any) => { if (data && data.analyst_note) setAnalystNote(data.analyst_note); if (data && data.name_ar) setNameAr(data.name_ar) }) }, [bankId])
 
   // Data states
   const [financials, setFinancials] = useState<any[]>([])
@@ -381,7 +382,7 @@ export default function BankPage() {
                 )}
                 </div>
               <div>
-                <div className="font-bold text-[var(--cf-ink)] text-[16px]">{bank.name}</div>
+                <div className="font-bold text-[var(--cf-ink)] text-[16px]">{isAr && nameAr ? nameAr : bank.name}</div>
                 <div className="text-[11px] text-[var(--cf-ink2)]">
                   {bank.sector === 'islamic' ? (isAr ? 'بنك إسلامي' : 'Islamic Bank') : (isAr ? 'بنك تجاري' : 'Commercial Bank')} · {bank.ticker} · {isAr ? 'مدرج في بورصة عمّان' : 'ASE listed'}
                 </div>
@@ -560,7 +561,7 @@ export default function BankPage() {
             <div style={{ display: 'grid', gridTemplateColumns: bank && bank.description ? '1fr 1fr' : '1fr', gap: '16px' }}>
               {bank && bank.description && (
                 <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
-                  <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '12px' }}>{isAr ? 'نبذة عن ' : 'About '}{bank.name || 'the Bank'}</div>
+                  <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '12px' }}>{isAr ? 'نبذة عن ' : 'About '}{isAr && nameAr ? nameAr : (bank.name || 'the Bank')}</div>
                   <p style={{ fontSize: '13px', color: 'var(--cf-ink2)', lineHeight: '1.6', margin: 0 }}>{bank.description}</p>
                   {analystNote && (
                     <div style={{ marginTop: '14px', padding: '12px 14px', background: 'var(--cf-surface2)', borderRadius: '10px', borderInlineStart: '3px solid var(--cf-primary)' }}>
@@ -768,7 +769,7 @@ export default function BankPage() {
           <div className="space-y-6">
             <div className="bg-[var(--cf-surface)] border border-[var(--cf-line)] rounded-xl p-5">
               <div className="text-[12px] uppercase tracking-wider text-[var(--cf-ink2)] mb-4">
-                {isAr ? 'من يملك' : 'Who owns'} {bank.shortName}
+                {isAr ? 'من يملك' : 'Who owns'} {isAr && nameAr ? nameAr : bank.shortName}
               </div>
               {ownership.length > 0 ? (
                 <div className="space-y-3">
@@ -919,7 +920,7 @@ export default function BankPage() {
           </div>
         )}
 
-        <ChartPrompt bankId={bankId} bankName={bank.shortName} />
+        <ChartPrompt bankId={bankId} bankName={isAr && nameAr ? nameAr : bank.shortName} />
       </div>
     </div>
   )
