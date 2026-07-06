@@ -106,6 +106,20 @@ function svgSpark(pts: any[], cvar: string) {
   for (var i = 0; i < pts.length; i++) { line += (i === 0 ? 'M' : 'L') + X(i).toFixed(1) + ' ' + Y(pts[i].value).toFixed(1) + ' '; }
   return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><path d="' + line + '" fill="none" style="stroke:var(' + cvar + ');opacity:0.9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>';
 }
+function __cfMultiLabels(seriesArr, cvars, Y, h) {
+  if (!seriesArr || !seriesArr.length) return '';
+  function fmt(v) { var a = Math.abs(v); return a >= 1000 ? (v / 1000).toFixed(1) + 'k' : a >= 100 ? v.toFixed(0) : a >= 10 ? v.toFixed(1) : v.toFixed(2); }
+  var pts = [];
+  for (var si = 0; si < seriesArr.length; si++) { var ser = seriesArr[si]; if (!ser || !ser.length) continue; var last = ser[ser.length - 1]; pts.push({ y: (Y(last.value) / h) * 100, v: last.value, c: cvars[si] || cvars[0] }); }
+  pts.sort(function (a, b) { return a.y - b.y; });
+  for (var i = 1; i < pts.length; i++) { if (pts[i].y - pts[i - 1].y < 7) pts[i].y = pts[i - 1].y + 7; }
+  var out = '';
+  pts.forEach(function (p) {
+    var lyc = Math.max(6, Math.min(94, p.y));
+    out += '<span style="position:absolute;z-index:2;right:1%;top:' + lyc.toFixed(1) + '%;transform:translateY(-50%);font-size:9.5px;font-weight:700;color:var(' + p.c + ');background:var(--cf-surface,#fff);padding:0 3px;border-radius:3px;white-space:nowrap;pointer-events:none;box-shadow:0 0 0 1px rgba(0,0,0,0.05)">' + fmt(p.v) + '</span>';
+  });
+  return out;
+}
 function svgMulti(seriesArr: any[], cvars: string[]) {
   if (!seriesArr || !seriesArr.length || !seriesArr[0].length) return '';
   var all: number[] = [];
@@ -123,7 +137,7 @@ function svgMulti(seriesArr: any[], cvars: string[]) {
     for (var i = 0; i < s.length; i++) { line += (i === 0 ? 'M' : 'L') + X(i).toFixed(1) + ' ' + Y(s[i].value).toFixed(1) + ' '; }
     paths += '<path d="' + line + '" fill="none" style="stroke:var(' + cvars[k] + ')" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>';
   }
-  return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">' + grid + paths + '</svg>';
+  return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">' + grid + paths + '</svg>' + __cfMultiLabels(seriesArr, cvars, Y, h);
 }
 function mdLite(text: any) { return zadMdToHtml(text) }
 
