@@ -423,7 +423,7 @@ export default function EconomyPage() {
       cpiLabels: cpiM.map(function (r) { return r.period.replace('-20', ' ') }), cpiPts: cpiM.map(function (r) { return Number(r.value) }),
       mLabels: mLabels, exPts: exM.map(function (r) { return Number(r.value) }), imPts: imM.map(function (r) { return Number(r.value) }), tbLabels: tbM.map(function (r) { return r.period.replace('-20', ' ') }), tbPts: tbM.map(function (r) { return Number(r.value) }),
       kGdp: last(yearly(pick('jo_gdp', 'Real GDP growth'))), kGdpF: (pick('jo_gdp', 'Real GDP growth forecast').filter(function (r) { return r.period === '2026F' })[0] || null),
-      kCpi: last(cpiM), kUn: last(yearly(pick('jo_social', 'Unemployment rate'))),
+      kCpi: last(cpiM), kUn: last(yearly(pick('jo_social', 'Unemployment rate'))), kUnTotal: last(yearly(pick('jo_social', 'Unemployment rate (total population)'))),
       kDebt: (pick('jo_debt', 'Public debt excl SSIF pct GDP').filter(function (r) { return r.period === 'Jun-2025' })[0] || last(yearly(pick('jo_debt', 'Public debt excl SSIF pct GDP')))),
       kTb: last(tbM),
       kH1b: (pick('jo_trade', 'Trade balance').filter(function (r) { return r.period === 'H1-2025' })[0] || null),
@@ -508,6 +508,15 @@ export default function EconomyPage() {
               <div style={big} dir='ltr'>{k.v}</div>
               <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 2 }} dir='ltr'>{k.s}</div>
             </div>) })}
+        </div>
+        <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderInlineStart: '3px solid var(--cf-primary)', borderRadius: 12, padding: '14px 16px', marginTop: 10 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--cf-primary)', marginBottom: 8 }}>{isAr ? 'لماذا معدلان رسميان للبطالة؟' : 'Why two official unemployment rates?'}</div>
+          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', marginBottom: 8 }}>
+            <div><span style={{ fontSize: 22, fontWeight: 800, color: 'var(--cf-ink)' }} dir='ltr'>{D.kUn ? fmt(D.kUn.value, 1) + '%' : '—'}</span><div style={{ fontSize: 11, color: 'var(--cf-ink2)' }}>{isAr ? 'الأردنيون فقط' : 'Jordanians only'}</div></div>
+            <div><span style={{ fontSize: 22, fontWeight: 800, color: 'var(--cf-ink)' }} dir='ltr'>{D.kUnTotal ? fmt(D.kUnTotal.value, 1) + '%' : '—'}</span><div style={{ fontSize: 11, color: 'var(--cf-ink2)' }}>{isAr ? 'إجمالي السكان (مع المقيمين)' : 'All residents (incl. non-Jordanians)'}</div></div>
+          </div>
+          <div style={{ fontSize: 11.5, color: 'var(--cf-ink2)', lineHeight: 1.65 }}>{isAr ? 'الفارق سببه انخفاض البطالة بين المقيمين غير الأردنيين (نحو 9.2%)، ما يخفض المعدل المدمج. رقم الأردنيين هو الأدل على تحدي التشغيل المحلي، بينما معدل إجمالي السكان هو الرقم الرسمي المعتمد لدى الدائرة والقابل للمقارنة دولياً.' : 'The gap exists because non-Jordanian residents have low unemployment (about 9.2%), which dilutes the blended rate. The Jordanian figure best reflects the domestic employment challenge, while the all-resident rate is the DoS official headline and the internationally comparable one.'}</div>
+          <div style={{ fontSize: 10.5, color: 'var(--cf-ink3)', marginTop: 6 }}>{isAr ? 'المصدر: دائرة الإحصاءات العامة · الأردنيون 2025، إجمالي السكان الربع الأول 2026' : 'Source: Dept. of Statistics (DoS) · Jordanians 2025, all residents Q1 2026'}</div>
         </div>
         <div style={card} data-cf='signals'>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
