@@ -251,7 +251,7 @@ function LoanCalculator() {
   return (
     <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
       <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>{isAr ? 'حاسبة سداد القرض' : 'Loan Repayment Calculator'}</div>
-      <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>Estimate monthly instalments — enter the rate quoted to you</div>
+      <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>{isAr ? 'قدّر أقساطك الشهرية — أدخل الفائدة المعروضة عليك' : 'Estimate monthly instalments — enter the rate quoted to you'}</div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '18px' }}>
         <label><div style={lblStyle}>{isAr ? 'المبلغ (دينار)' : 'Amount (JOD)'}</div><input type="number" value={amount} onChange={(e: any) => setAmount(Math.max(0, Number(e.target.value)))} style={fieldStyle} /></label>
         <label><div style={lblStyle}>{isAr ? 'الفائدة (% سنوياً)' : 'Rate (% APR)'}</div><input type="number" step="0.1" value={rate} onChange={(e: any) => setRate(Math.max(0, Number(e.target.value)))} style={fieldStyle} /></label>
@@ -271,7 +271,7 @@ function LoanCalculator() {
           <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--cf-ink)', marginTop: '5px' }}>{money(total)}</div>
         </div>
       </div>
-      <div style={{ fontSize: '10.5px', color: 'var(--cf-ink3)', marginTop: '14px', lineHeight: '1.5' }}>Illustrative amortising loan. Actual rates, fees and eligibility are set by the bank.</div>
+      <div style={{ fontSize: '10.5px', color: 'var(--cf-ink3)', marginTop: '14px', lineHeight: '1.5' }}>{isAr ? 'قرض تقريبي بالتناقص؛ الأسعار والرسوم وشروط الأهلية الفعلية يحددها البنك.' : 'Illustrative amortising loan. Actual rates, fees and eligibility are set by the bank.'}</div>
     </div>
   )
 }
@@ -520,7 +520,7 @@ export default function BankPage() {
               </div>
               <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
                 <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>{isAr ? 'اتجاه الربحية' : 'Profitability Trend'}</div>
-                <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>ROE, ROA + net interest margin (%), by fiscal year</div>
+                <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>{isAr ? 'العائد على حقوق الملكية والأصول + صافي هامش الفائدة (%)، حسب السنة المالية' : 'ROE, ROA + net interest margin (%), by fiscal year'}</div>
                 <ResponsiveContainer width="100%" height={240}>
                   <LineChart data={financials.map((f: any) => ({ name: 'FY' + f.fiscal_year, ROE: f.roe, ROA: f.roa, NIM: f.net_interest_margin }))} margin={{ top: 4, right: 8, left: -12, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" vertical={false} />
@@ -556,7 +556,7 @@ export default function BankPage() {
             <div style={{ display: 'grid', gridTemplateColumns: bank && bank.description ? '1fr 1fr' : '1fr', gap: '16px' }}>
               {bank && bank.description && (
                 <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
-                  <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '12px' }}>About {bank.name || 'the Bank'}</div>
+                  <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '12px' }}>{isAr ? 'نبذة عن ' : 'About '}{bank.name || 'the Bank'}</div>
                   <p style={{ fontSize: '13px', color: 'var(--cf-ink2)', lineHeight: '1.6', margin: 0 }}>{bank.description}</p>
                   {analystNote && (
                     <div style={{ marginTop: '14px', padding: '12px 14px', background: 'var(--cf-surface2)', borderRadius: '10px', borderInlineStart: '3px solid var(--cf-primary)' }}>
@@ -573,14 +573,14 @@ export default function BankPage() {
               {products && products.length > 0 && (
                 <div style={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '14px', padding: '20px' }}>
                   <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>{isAr ? 'محفظة المنتجات' : 'Product Portfolio'}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>{products.length + ' products across categories'}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>{isAr ? (products.length + ' منتج ضمن مختلف الفئات') : (products.length + ' products across categories')}</div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                     {(() => {
                       const byCat: any = {}
                       products.forEach((p: any) => { const c = (p.category || 'other').replace(/_/g, ' '); byCat[c] = (byCat[c] || 0) + 1 })
                       return Object.keys(byCat).sort((a: any, b: any) => byCat[b] - byCat[a]).slice(0, 6).map((c: any, i: number) => (
                         <div key={i} onClick={() => { setActiveTab('products'); setTimeout(() => { const el = document.getElementById('cat-' + String(c).replace(/ /g, '_')); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }, 150) }} title="View products" style={{ background: 'var(--cf-surface2)', borderRadius: '10px', padding: '11px 13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-                          <span style={{ fontSize: '12px', color: 'var(--cf-ink2)', textTransform: 'capitalize' }}>{c}</span>
+                          <span style={{ fontSize: '12px', color: 'var(--cf-ink2)', textTransform: 'capitalize' }}>{isAr ? (({'retail deposit':'ودائع الأفراد','retail card':'بطاقات الأفراد','retail loan':'قروض الأفراد','retail account':'حسابات الأفراد','retail investment':'استثمارات الأفراد','corporate loan':'قروض الشركات','corporate deposit':'ودائع الشركات','corporate account':'حسابات الشركات','corporate card':'بطاقات الشركات','sme loan':'قروض الشركات الصغيرة والمتوسطة','business loan':'قروض الأعمال','private banking':'الخدمات المصرفية الخاصة','digital':'الخدمات الرقمية','insurance':'التأمين','investment':'الاستثمار','other':'أخرى'} as Record<string, string>)[c] || c) : c}</span>
                           <span style={{ fontSize: '17px', fontWeight: 800, color: 'var(--cf-primary)' }}>{byCat[c]}</span>
                         </div>
                       ))
