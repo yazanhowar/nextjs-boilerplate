@@ -536,7 +536,6 @@ export default function BankPage() {
                     <Legend wrapperStyle={{ fontSize: 11 }} />
                     <Line type="monotone" dataKey="ROE" stroke="var(--cf-primary)" strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
                     <Line type="monotone" dataKey="ROA" stroke="var(--cf-teal)" strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
-                    <Line type="monotone" dataKey="NIM" stroke="var(--cf-gold)" strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} connectNulls={true} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
