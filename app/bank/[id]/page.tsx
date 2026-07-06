@@ -541,7 +541,7 @@ export default function BankPage() {
                 <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--cf-ink)', marginBottom: '2px' }}>{isAr ? 'أبرز النسب — آخر سنة مالية' : 'Key Ratios — Latest FY'}</div>
                 <div style={{ fontSize: '11px', color: 'var(--cf-ink3)', marginBottom: '16px' }}>{isAr ? 'رأس المال والعوائد وجودة الأصول (%)' : 'Capital, returns and asset quality (%)'}</div>
                 <ResponsiveContainer width="100%" height={240}>
-                  <BarChart layout="vertical" data={(() => { const f: any = financials[financials.length - 1] || {}; return [{ name: 'CAR', value: f.car }, { name: 'Loan/Deposit', value: f.loan_to_deposit }, { name: 'ROE', value: f.roe }, { name: 'ROA', value: f.roa }, { name: 'NPL', value: f.npl_ratio }].filter((x: any) => x.value != null) })()} margin={{ top: 4, right: 16, left: 20, bottom: 0 }}>
+                  <BarChart layout="vertical" data={(() => { const f: any = financials[financials.length - 1] || {}; return [{ name: 'CAR', value: f.car }, { name: isAr ? 'قروض/ودائع' : 'Loan/Deposit', value: f.loan_to_deposit }, { name: 'ROE', value: f.roe }, { name: 'ROA', value: f.roa }, { name: 'NPL', value: f.npl_ratio }].filter((x: any) => x.value != null) })()} margin={{ top: 4, right: 16, left: 20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--cf-line)" horizontal={false} />
                     <XAxis type="number" tick={{ fontSize: 11, fill: 'var(--cf-ink2)' }} axisLine={false} tickLine={false} />
                     <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: 'var(--cf-ink2)' }} axisLine={false} tickLine={false} width={82} />
