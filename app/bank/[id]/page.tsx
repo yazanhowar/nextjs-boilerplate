@@ -20,16 +20,19 @@ const supabase = createClient(
 )
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+let __cfIsAr = false
 function fmtJOD(n: number | null | undefined, short = true): string {
   if (n == null) return '—'
-  // DB stores values in JOD thousands — multiply by 1000 to get actual JOD
   const v = n * 1000
+  const A = __cfIsAr
+  const c = A ? ' د.أ' : ''
+  const p = A ? '' : 'JOD '
   if (short) {
-    if (Math.abs(v) >= 1_000_000_000) return `JOD ${(v / 1_000_000_000).toFixed(2)}B`
-    if (Math.abs(v) >= 1_000_000) return `JOD ${(v / 1_000_000).toFixed(1)}M`
-    if (Math.abs(v) >= 1_000) return `JOD ${(v / 1_000).toFixed(0)}K`
+    if (Math.abs(v) >= 1_000_000_000) return p + (v / 1_000_000_000).toFixed(2) + (A ? ' مليار' : 'B') + c
+    if (Math.abs(v) >= 1_000_000) return p + (v / 1_000_000).toFixed(1) + (A ? ' مليون' : 'M') + c
+    if (Math.abs(v) >= 1_000) return p + (v / 1_000).toFixed(0) + (A ? ' ألف' : 'K') + c
   }
-  return `JOD ${v.toLocaleString()}`
+  return p + v.toLocaleString() + c
 }
 
 function pct(n: number | null | undefined): string {
@@ -285,6 +288,7 @@ export default function BankPage() {
   const [activeTab, setActiveTab] = useState('overview')
   const { lang } = useLang()
   const isAr = lang === 'ar'
+  __cfIsAr = isAr
   const [imgError, setImgError] = useState(false)
   const [analystNote, setAnalystNote] = useState('')
   useEffect(() => { if (!bankId) return; supabase.from('banks').select('analyst_note').eq('id', bankId).single().then(({ data }: any) => { if (data && data.analyst_note) setAnalystNote(data.analyst_note) }) }, [bankId])
