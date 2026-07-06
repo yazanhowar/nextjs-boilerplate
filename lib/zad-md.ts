@@ -77,7 +77,8 @@ function cfChartSvg(body: string): string {
 }
 export function zadMdToHtml(md: any): string {
   var t = String(md == null ? '' : md)
-  t = t.replace(/```chart([\s\S]*?)```/g, function (_m: any, b: string) { return cfChartSvg(b) })
+  var __cfCharts: any[] = []
+  t = t.replace(/```chart([\s\S]*?)```/g, function (_m: any, b: string) { __cfCharts.push(cfChartSvg(b)); return 'CFCHARTSLOT' + (__cfCharts.length - 1) + 'ENDSLOT' })
   t = t.replace(/```[\s\S]*?```/g, '')
   function esc(x: string) { return x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }
   function inline(x: string) {
@@ -109,6 +110,7 @@ export function zadMdToHtml(md: any): string {
     if (/^[-*]\s+/.test(tr)) { html += '<div class="zmd-li">\u2022 ' + inline(tr.replace(/^[-*]\s+/, '')) + '</div>'; i++; continue }
     html += '<p class="zmd-p">' + inline(tr) + '</p>'; i++
   }
+  for (var __ci = 0; __ci < __cfCharts.length; __ci++) { var __re = new RegExp('(?:<p>)?CFCHARTSLOT' + __ci + 'ENDSLOT(?:</p>)?'); html = html.replace(__re, function () { return __cfCharts[__ci]; }); }
   return html
 }
 
