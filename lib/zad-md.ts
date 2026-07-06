@@ -9,8 +9,8 @@ function cfChartSvg(body: string): string {
     var series: any[] = Array.isArray(spec.series) ? spec.series.slice(0, 4) : []
     var title = cfEsc(spec.title || '')
     var unit = cfEsc(spec.unit || '')
-    var CLR = ['#0f4c81', '#c9a227', '#2a9d8f', '#7ea8c9', '#8b9bb0', '#b3382c']
-    var W = 460, H = 210, padT = title ? 26 : 10, padB = 24, padL = 6, padR = 6
+    var CLR = ['var(--cf-primary,#0f4c81)', 'var(--cf-gold,#c9a227)', 'var(--cf-teal,#2a9d8f)']
+    var W = 460, H = 210, padT = title ? (series.length > 1 ? 44 : 26) : (series.length > 1 ? 22 : 10), padB = 24, padL = 6, padR = 6
     var body2 = ''
     var head = title ? '<text x="6" y="15" font-size="11.5" font-weight="800" fill="#3d4f66">' + title + '</text>' : ''
     if (type === 'donut') {
@@ -69,7 +69,7 @@ function cfChartSvg(body: string): string {
         })
       }
     }
-    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">' + head + body2 + '</svg>'
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:600px;height:auto;display:block;margin:4px auto 0">' + head + body2 + '</svg>'
     return '<div style="margin:10px 0;border:1px solid #e5eaf2;border-radius:10px;padding:10px 8px;background:#fbfcfe">' + svg + (unit ? '<div style="font-size:10px;color:#7d8ea3;margin-top:4px">' + unit + '</div>' : '') + '</div>'
   } catch (e) {
     return '<pre style="font-size:10.5px;overflow:auto">' + cfEsc(body) + '</pre>'
