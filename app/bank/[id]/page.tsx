@@ -743,9 +743,9 @@ export default function BankPage() {
                 <div className="grid grid-cols-2 gap-3">
                   {products.filter(p => p.category === cat).map((p, i) => (
                     <div key={i} className="p-3 rounded-lg bg-[var(--cf-bg)] border border-[var(--cf-line)]">
-                      <div className="text-[13px] font-medium text-[var(--cf-ink)]">{p.product_name_en}</div>
+                      <div className="text-[13px] font-medium text-[var(--cf-ink)]">{isAr && p.product_name_ar ? p.product_name_ar : p.product_name_en}</div>
                       {p.description_en && (
-                        <div className="text-[11px] text-[var(--cf-ink2)] mt-1 line-clamp-2">{p.description_en}</div>
+                        <div className="text-[11px] text-[var(--cf-ink2)] mt-1 line-clamp-2">{isAr && p.description_ar ? p.description_ar : p.description_en}</div>
                       )}
                       {p.is_islamic && (
                         <span className="mt-2 inline-block text-[10px] text-[var(--cf-positive)] bg-[var(--cf-positive)]/10
@@ -776,7 +776,7 @@ export default function BankPage() {
                   {ownership.map((o, i) => (
                     <div key={i}>
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-[13px] text-[var(--cf-ink)]">{o.shareholder_name_en}</span>
+                        <span className="text-[13px] text-[var(--cf-ink)]">{isAr && o.shareholder_name_ar ? o.shareholder_name_ar : o.shareholder_name_en}</span>
                         <div className="flex items-center gap-3">
                           <span className="text-[11px] text-[var(--cf-ink2)]">{o.country || ''}</span>
                           <span className="text-[14px] font-bold text-[var(--cf-gold)]">
@@ -821,7 +821,7 @@ export default function BankPage() {
                       </span>
                     </div>
                     <div>
-                      <div className="text-[13px] font-medium text-[var(--cf-ink)]">{e.full_name_en}</div>
+                      <div className="text-[13px] font-medium text-[var(--cf-ink)]">{isAr && e.full_name_ar ? e.full_name_ar : e.full_name_en}</div>
                       <div className="text-[11px] text-[var(--cf-ink2)]">{e.title_en}</div>
                     </div>
                   </div>
@@ -845,7 +845,7 @@ export default function BankPage() {
                       </span>
                     </div>
                     <div>
-                      <div className="text-[13px] font-medium text-[var(--cf-ink)]">{b.full_name_en}</div>
+                      <div className="text-[13px] font-medium text-[var(--cf-ink)]">{isAr && b.full_name_ar ? b.full_name_ar : b.full_name_en}</div>
                       {b.notes && (
                         <div className="text-[10.5px] text-[var(--cf-gold)] mt-[1px]">{b.notes}</div>
                       )}
@@ -900,9 +900,9 @@ export default function BankPage() {
                       <span className="text-[10px] text-[var(--cf-ink2)]">FY{a.fiscal_year}</span>
                     )}
                   </div>
-                  <div className="text-[14px] font-medium text-[var(--cf-ink)]">{a.headline_en}</div>
+                  <div className="text-[14px] font-medium text-[var(--cf-ink)]">{isAr && a.headline_ar ? a.headline_ar : a.headline_en}</div>
                   {a.summary_en && (
-                    <div className="text-[12px] text-[var(--cf-ink2)] mt-1.5 line-clamp-2">{a.summary_en}</div>
+                    <div className="text-[12px] text-[var(--cf-ink2)] mt-1.5 line-clamp-2">{isAr && a.summary_ar ? a.summary_ar : a.summary_en}</div>
                   )}
                 </div>
                 {a.source_url && (
