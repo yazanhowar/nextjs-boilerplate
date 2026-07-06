@@ -72,7 +72,7 @@ button[aria-label*="English"]:hover {
 /* ── RTL ────────────────────────────────────────────────────────────────── */
 [dir="rtl"] { font-family: var(--font-ibm-ar), 'Noto Sans Arabic', sans-serif; }
 [dir="rtl"] body { font-family: var(--font-ibm-ar), 'Noto Sans Arabic', sans-serif !important; }
-[dir="rtl"] svg text { font-family: var(--font-ibm-sans), 'IBM Plex Sans', sans-serif !important; direction: ltr; }
+[dir="rtl"] svg text { font-family: var(--font-ibm-ar), 'Noto Kufi Arabic', sans-serif !important; direction: ltr; }
 /* Donut/pie labels carry inline font-size; give their Arabic text the Kufi UI font (override the Latin svg-text rule above). */
 [dir="rtl"] svg text[style*="font-size"] { font-family: var(--font-ibm-ar), 'Noto Kufi Arabic', sans-serif !important; }
 [dir="rtl"] .text-start { text-align: right; }
@@ -321,3 +321,6 @@ body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 .cf-md-table th { background: var(--cf-surface2); color: var(--cf-ink); font-weight: 600; text-align: start; padding: 8px 12px; border: 1px solid var(--cf-line); white-space: nowrap; }
 .cf-md-table td { padding: 8px 12px; border: 1px solid var(--cf-line); color: var(--cf-ink2); }
 .cf-md-table tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--cf-surface2) 40%, transparent); }
+
+/* Charts/SVG text -> Noto brand font (both directions) */
+svg text { font-family: var(--font-ibm-ar), 'Noto Kufi Arabic', sans-serif !important; }
