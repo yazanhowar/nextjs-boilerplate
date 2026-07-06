@@ -292,7 +292,8 @@ export default function BankPage() {
   const [imgError, setImgError] = useState(false)
   const [analystNote, setAnalystNote] = useState('')
   const [nameAr, setNameAr] = useState('')
-  useEffect(() => { if (!bankId) return; supabase.from('banks').select('analyst_note, name_ar').eq('id', bankId).single().then(({ data }: any) => { if (data && data.analyst_note) setAnalystNote(data.analyst_note); if (data && data.name_ar) setNameAr(data.name_ar) }) }, [bankId])
+  const [analystNoteAr, setAnalystNoteAr] = useState('')
+  useEffect(() => { if (!bankId) return; supabase.from('banks').select('analyst_note, name_ar, analyst_note_ar').eq('id', bankId).single().then(({ data }: any) => { if (data && data.analyst_note) setAnalystNote(data.analyst_note); if (data && data.name_ar) setNameAr(data.name_ar); if (data && data.analyst_note_ar) setAnalystNoteAr(data.analyst_note_ar) }) }, [bankId])
 
   // Data states
   const [financials, setFinancials] = useState<any[]>([])
@@ -566,7 +567,7 @@ export default function BankPage() {
                   {analystNote && (
                     <div style={{ marginTop: '14px', padding: '12px 14px', background: 'var(--cf-surface2)', borderRadius: '10px', borderInlineStart: '3px solid var(--cf-primary)' }}>
                       <div style={{ fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--cf-ink3)', marginBottom: '6px' }}>{isAr ? 'رؤية زاد' : 'ZAD Insight'}</div>
-                      <p style={{ fontSize: '12.5px', color: 'var(--cf-ink2)', lineHeight: '1.65', margin: 0 }}>{analystNote}</p>
+                      <p style={{ fontSize: '12.5px', color: 'var(--cf-ink2)', lineHeight: '1.65', margin: 0 }}>{isAr && analystNoteAr ? analystNoteAr : analystNote}</p>
                     </div>
                   )}
                   <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid var(--cf-line)', display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
