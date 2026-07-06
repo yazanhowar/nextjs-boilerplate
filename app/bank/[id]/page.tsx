@@ -151,11 +151,11 @@ function ChartPrompt({ bankId, bankName }: { bankId: number; bankName: string })
         <button
           type="submit"
           disabled={loading}
-          className="bg-[var(--cf-gold)] text-[var(--cf-bg)] font-semibold text-[13px]
-                     px-5 py-3 rounded-lg hover:bg-[var(--cf-gold)] disabled:opacity-50
+          className="bg-[var(--cf-primary)] text-[var(--cf-bg)] font-semibold text-[13px]
+                     px-5 py-3 rounded-lg hover:bg-[var(--cf-primary)] disabled:opacity-50
                      transition-colors whitespace-nowrap"
         >
-          {loading ? (isAr ? 'جارٍ التفكير...' : 'Thinking...') : (isAr ? 'اسأل زاد' : 'Ask ZAD')}
+          {loading ? (isAr ? 'جارٍ التفكير...' : 'Thinking...') : (isAr ? 'اسأل' : 'Ask')}
         </button>
       </form>
 
