@@ -517,7 +517,7 @@ export default function BankPage() {
                     <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--cf-ink2)' }} axisLine={{ stroke: 'var(--cf-line)' }} tickLine={false} />
                     <YAxis tick={{ fontSize: 11, fill: 'var(--cf-ink2)' }} axisLine={false} tickLine={false} />
                     <Tooltip contentStyle={{ background: 'var(--cf-surface)', border: '1px solid var(--cf-line)', borderRadius: '8px', fontSize: '12px', color: 'var(--cf-ink)' }} />
-                    <Legend wrapperStyle={{ fontSize: 11 }} formatter={(v: any) => isAr ? (({'Assets': 'الأصول', 'Liabilities': 'الالتزامات', 'Equity': 'حقوق الملكية', 'Total Assets': 'إجمالي الأصول', 'Customer Deposits': 'ودائع العملاء', 'Loans': 'القروض'} as Record<string, string>)[v] || v) : v} />
+                    <Legend wrapperStyle={{ fontSize: 11 }} formatter={(v: any) => isAr ? (({'Assets': 'الأصول', 'Liabilities': 'الالتزامات', 'Equity': 'حقوق الملكية', 'Total Assets': 'إجمالي الأصول', 'Customer Deposits': 'ودائع العملاء', 'Deposits': 'ودائع العملاء', 'Loans': 'القروض'} as Record<string, string>)[v] || v) : v} />
                     <Bar dataKey="Assets" fill="var(--cf-primary)" isAnimationActive={false} radius={[3, 3, 0, 0]} />
                     <Bar dataKey="Deposits" fill="var(--cf-teal)" isAnimationActive={false} radius={[3, 3, 0, 0]} />
                     <Bar dataKey="Loans" fill="var(--cf-iris)" isAnimationActive={false} radius={[3, 3, 0, 0]} />
@@ -663,7 +663,7 @@ export default function BankPage() {
                     labelStyle={{ color: 'var(--cf-gold)' }}
                     formatter={(v: any) => [`JOD ${v}M`]}
                   />
-                  <Legend formatter={(v: any) => isAr ? (({'Assets': 'الأصول', 'Liabilities': 'الالتزامات', 'Equity': 'حقوق الملكية', 'Total Assets': 'إجمالي الأصول', 'Customer Deposits': 'ودائع العملاء', 'Loans': 'القروض'} as Record<string, string>)[v] || v) : v} />
+                  <Legend formatter={(v: any) => isAr ? (({'Assets': 'الأصول', 'Liabilities': 'الالتزامات', 'Equity': 'حقوق الملكية', 'Total Assets': 'إجمالي الأصول', 'Customer Deposits': 'ودائع العملاء', 'Deposits': 'ودائع العملاء', 'Loans': 'القروض'} as Record<string, string>)[v] || v) : v} />
                   <Bar isAnimationActive={false} dataKey="Total Assets" fill="var(--cf-primary)" radius={[3, 3, 0, 0]} />
                   <Bar isAnimationActive={false} dataKey="Customer Deposits" fill="var(--cf-gold)" radius={[3, 3, 0, 0]} />
                   <Bar isAnimationActive={false} dataKey="Loans" fill="var(--cf-positive)" radius={[3, 3, 0, 0]} />
