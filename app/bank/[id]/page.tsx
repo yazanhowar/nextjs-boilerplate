@@ -778,7 +778,7 @@ export default function BankPage() {
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-[13px] text-[var(--cf-ink)]">{isAr && o.shareholder_name_ar ? o.shareholder_name_ar : o.shareholder_name_en}</span>
                         <div className="flex items-center gap-3">
-                          <span className="text-[11px] text-[var(--cf-ink2)]">{o.country || ''}</span>
+                          <span className="text-[11px] text-[var(--cf-ink2)]">{isAr ? (({'Bahrain':'البحرين','Canada':'كندا','Cayman Islands':'جزر كايمان','Egypt':'مصر','Iraq':'العراق','Jordan':'الأردن','Kuwait':'الكويت','Lebanon':'لبنان','Liberia':'ليبيريا','Libya':'ليبيا','Oman':'عُمان','Palestine':'فلسطين','Qatar':'قطر','Saudi Arabia':'المملكة العربية السعودية','UAE':'الإمارات العربية المتحدة'} as Record<string, string>)[o.country] || o.country || '') : (o.country || '')}</span>
                           <span className="text-[14px] font-bold text-[var(--cf-gold)]">
                             {o.ownership_pct != null ? `${o.ownership_pct.toFixed(2)}%` : (isAr ? 'مسيطر' : 'Controlling')}
                           </span>
@@ -850,7 +850,7 @@ export default function BankPage() {
                         <div className="text-[10.5px] text-[var(--cf-gold)] mt-[1px]">{b.notes}</div>
                       )}
                       <div className="text-[11px] text-[var(--cf-ink2)]">
-                        {b.role}
+                        {isAr ? (({'Chairman':'رئيس مجلس الإدارة','Chairperson':'رئيس مجلس الإدارة','Chairman (Arab Bank nominee)':'رئيس مجلس الإدارة (ممثل البنك العربي)','Vice Chairman':'نائب رئيس مجلس الإدارة','Deputy Chairman':'نائب رئيس مجلس الإدارة','Board Member':'عضو مجلس إدارة','Member':'عضو','Board Member (Independent)':'عضو مجلس إدارة (مستقل)','Board Member — First Jordan Investment Company':'عضو مجلس إدارة — شركة الأردن الأولى للاستثمار','Board Member — Social Security Corporation (1st seat)':'عضو مجلس إدارة — المؤسسة العامة للضمان الاجتماعي (المقعد الأول)','Board Member — Social Security Corporation (2nd seat)':'عضو مجلس إدارة — المؤسسة العامة للضمان الاجتماعي (المقعد الثاني)'} as Record<string, string>)[b.role] || b.role) : b.role}
                         {b.is_independent && (
                           <span className="ml-2 text-[10px] text-[var(--cf-positive)] bg-[var(--cf-positive)]/10
                                            border border-[var(--cf-positive)]/20 px-1.5 py-0 rounded-full">
