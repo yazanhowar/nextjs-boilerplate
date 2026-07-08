@@ -11,7 +11,7 @@ var T = {
   navSector:{ en:'Sector', ar:'2KfZhNmC2LfYp9i5' },
   navCbj:{ en:'CBJ Reports', ar:'2KrZgtin2LHZitixINin2YTZhdix2YPYstmK' },
   eyebrow:{ en:'ZAD INTELLIGENCE', ar:'2KrYrdmE2YrZhNin2Kog2LLYp9iv' },
-  heroTitle:{ en:'Competitive banking intelligence for Jordan', ar:'2LDZg9in2KEg2KrZhtin2YHYs9mKINmE2YTZgti32KfYuSDYp9mE2YXYtdix2YHZiiDYp9mE2KPYsdiv2YbZig==' },
+  heroTitle:{ en:'Jordanian Banking Sector Knowledge Base', ar:'قاعدة المعرفة للقطاع المصرفي الأردني' },
   heroSub:{ en:'Grounded analysis across all 15 licensed Jordanian banks. Choose where to begin.', ar:'2KrYrdmE2YrZhCDZhdmI2KvZkdmCINmE2KzZhdmK2Lkg2KfZhNio2YbZiNmDINin2YTYo9ix2K/ZhtmK2Kkg2KfZhNmF2LHYrtmR2LXYqSDYp9mE2K7ZhdizINi52LTYsdipLiDYp9iu2KrYsSDZhdmGINij2YrZhiDYqtio2K/Yoy4=' },
   stAssets:{ en:'Sector assets', ar:'2YXZiNis2YjYr9in2Kog2KfZhNmC2LfYp9i5' },
   stDeposits:{ en:'Deposits', ar:'2KfZhNmI2K/Yp9im2Lk=' },
