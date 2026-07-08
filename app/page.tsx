@@ -11,7 +11,7 @@ var T = {
   navSector:{ en:'Sector', ar:'2KfZhNmC2LfYp9i5' },
   navCbj:{ en:'CBJ Reports', ar:'2KrZgtin2LHZitixINin2YTZhdix2YPYstmK' },
   eyebrow:{ en:'ZAD INTELLIGENCE', ar:'2KrYrdmE2YrZhNin2Kog2LLYp9iv' },
-  heroTitle:{ en:'Jordanian Banking Sector Knowledge Base', ar:'2YLYp9i52K/YqSDYp9mE2YXYudix2YHYqSDZhNmE2YLYt9in2Lkg2KfZhNmF2LXYsdmB2Yog2KfZhNij2LHYr9mG2Yo=' },
+  heroTitle:{ en:'Jordanian Banking Sector Knowledge Base', ar:'2YXZhti12Kkg2KfZhNmF2LnYsdmB2Kkg2KfZhNmF2LXYsdmB2YrYqSDYp9mE2KPYsdiv2YbZitip' },
   heroSub:{ en:'Grounded analysis across all 15 licensed Jordanian banks. Choose where to begin.', ar:'2KrYrdmE2YrZhCDZhdmI2KvZkdmCINmE2KzZhdmK2Lkg2KfZhNio2YbZiNmDINin2YTYo9ix2K/ZhtmK2Kkg2KfZhNmF2LHYrtmR2LXYqSDYp9mE2K7ZhdizINi52LTYsdipLiDYp9iu2KrYsSDZhdmGINij2YrZhiDYqtio2K/Yoy4=' },
   stAssets:{ en:'Sector assets', ar:'2YXZiNis2YjYr9in2Kog2KfZhNmC2LfYp9i5' },
   stDeposits:{ en:'Deposits', ar:'2KfZhNmI2K/Yp9im2Lk=' },
@@ -77,7 +77,7 @@ export default function Home(){
 
         <section style={{ textAlign:'center', maxWidth:'760px', margin:'0 auto 44px' }}>
           <div className='cf-eyebrow' style={{ marginBottom:'14px' }}>{ t('eyebrow') }</div>
-          <h1 className='cf-hero' style={{ fontSize:'46px', lineHeight:'1.08', fontWeight:'700', letterSpacing:'-0.025em', color:'var(--cf-ink)', margin:'0 0 18px' }}>{ t('heroTitle') }</h1>
+          <h1 className='cf-hero' style={{ whiteSpace: ar ? 'nowrap' : 'normal', fontSize:'46px', lineHeight:'1.08', fontWeight:'700', letterSpacing:'-0.025em', color:'var(--cf-ink)', margin:'0 0 18px' }}>{ t('heroTitle') }</h1>
           <p className='cf-muted' style={{ fontSize:'17px', lineHeight:'1.5', margin:'0' }}>{ t('heroSub') }</p>
         </section>
 
