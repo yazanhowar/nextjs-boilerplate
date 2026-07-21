@@ -164,7 +164,8 @@ export default function TradeFinancePage() {
   const align = ar ? 'right' : 'left'
 
   return (
-    <main className="cf-page" style={{ textAlign: align }}>
+    <main className="cf-page">
+      <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '28px 26px 80px', textAlign: align }}>
       <div className="cf-eyebrow">{L.eyebrow}</div>
       <h1 className="cf-h1 cf-grad-text" style={{ marginBottom: '8px' }}>{L.title}</h1>
       <p className="cf-muted" style={{ maxWidth: '780px', lineHeight: 1.75, marginTop: 0 }}>{L.subtitle}</p>
@@ -269,6 +270,7 @@ export default function TradeFinancePage() {
           )}
         </>
       )}
+      </div>
     </main>
   )
 }
