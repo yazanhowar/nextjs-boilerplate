@@ -162,7 +162,7 @@ export async function POST(req){
     }
   }catch(__e){}
   var __refBlock='';
-    try { var __rref: any = await createClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string).from('tf_reference').select('source_name_en,content_en').order('sort_order', { ascending: true }); if (__rref && __rref.data && __rref.data.length) { __refBlock = '\n\nTRADE FINANCE SOURCE REFERENCE (authoritative primary-source entries; treat these as reference material you must answer from, and do not state specifics absent from them):\n' + __rref.data.map(function(x: any){ return '### ' + x.source_name_en + '\n' + (x.content_en||''); }).join('\n\n'); } } catch(e) { __refBlock=''; }
+    try { var __rref: any = await createClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) as string).from('tf_reference').select('source_name_en,content_en').order('sort_order', { ascending: true }); if (__rref && __rref.data && __rref.data.length) { __refBlock = '\n\nTRADE FINANCE SOURCE REFERENCE (authoritative primary-source entries; treat these as reference material you must answer from, and do not state specifics absent from them):\n' + __rref.data.map(function(x: any){ return '### ' + x.source_name_en + '\n' + (x.content_en||''); }).join('\n\n'); } } catch(e) { __refBlock=''; }
     var ares = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{ 'x-api-key': ANTHROPIC_KEY, 'anthropic-version':'2023-06-01', 'content-type':'application/json' },
