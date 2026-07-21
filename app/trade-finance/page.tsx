@@ -32,7 +32,7 @@ const STR = {
     showFlows: 'Show process flows',
     hideFlows: 'Hide process flows',
     flows: 'Process flows',
-    governs: 'Governed by',
+    governs: 'Governed by', source: 'Source',
     none: 'No terms match your search.',
     loading: 'Loading the encyclopedia',
   },
@@ -47,7 +47,7 @@ const STR = {
     showFlows: 'عرض تدفقات العمليات',
     hideFlows: 'إخفاء تدفقات العمليات',
     flows: 'تدفقات العمليات',
-    governs: 'يحكمه',
+    governs: 'يحكمه', source: 'المصدر',
     none: 'لا توجد مصطلحات مطابقة لبحثك.',
     loading: 'جارٍ تحميل الموسوعة',
   },
@@ -258,9 +258,9 @@ export default function TradeFinancePage() {
                       display: open ? 'block' : '-webkit-box', WebkitLineClamp: open ? 'unset' : 3,
                       WebkitBoxOrient: 'vertical', overflow: open ? 'visible' : 'hidden',
                     }}>{body(t)}</p>
-                    {t.governing_source ? (
+                    {(t.governing_source || t.source_url) ? (
                       <div style={{ marginTop: '12px' }}>
-                        <span className="cf-chip cf-chip-primary" style={{ fontSize: '11px' }}>{L.governs}: {t.governing_source}</span>
+                        {t.source_url ? (<a href={t.source_url} target="_blank" rel="noopener noreferrer" className="cf-chip cf-chip-primary" style={{ fontSize: '11px', textDecoration: 'none' }}>{t.governing_source ? (L.governs + ': ' + t.governing_source) : L.source} ↗</a>) : (<span className="cf-chip cf-chip-primary" style={{ fontSize: '11px' }}>{L.governs}: {t.governing_source}</span>)}
                       </div>
                     ) : null}
                   </div>
