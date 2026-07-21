@@ -3,8 +3,8 @@ import { usePathname } from 'next/navigation';
 import { useLang } from '@/lib/LangContext';
 
 const NAV: any = {
-  en: { fin: 'Financials', sector: 'Sector', economy: 'Economy', cbj: 'CBJ Reports', sub: 'Banking Intelligence', lang: '\u0627\u0644\u0639\u0631\u0628\u064A\u0629' },
-  ar: { fin: '\u0627\u0644\u0645\u0627\u0644\u064A\u0629', sector: '\u0627\u0644\u0642\u0637\u0627\u0639', economy: 'الاقتصاد', cbj: '\u062A\u0642\u0627\u0631\u064A\u0631 \u0627\u0644\u0645\u0631\u0643\u0632\u064A', sub: '\u0630\u0643\u0627\u0621 \u0645\u0635\u0631\u0641\u064A', lang: 'English' },
+  en: { trade: 'Trade Finance', fin: 'Financials', sector: 'Sector', economy: 'Economy', cbj: 'CBJ Reports', sub: 'Banking Intelligence', lang: '\u0627\u0644\u0639\u0631\u0628\u064A\u0629' },
+  ar: { trade: 'التمويل التجاري', fin: '\u0627\u0644\u0645\u0627\u0644\u064A\u0629', sector: '\u0627\u0644\u0642\u0637\u0627\u0639', economy: 'الاقتصاد', cbj: '\u062A\u0642\u0627\u0631\u064A\u0631 \u0627\u0644\u0645\u0631\u0643\u0632\u064A', sub: '\u0630\u0643\u0627\u0621 \u0645\u0635\u0631\u0641\u064A', lang: 'English' },
 };
 
 export default function CfHeader() {
@@ -36,6 +36,7 @@ export default function CfHeader() {
             {navLink('sector', '/sector', t.sector)}
             {navLink('economy', '/economy', t.economy)}
             {navLink('cbj', '/cbj', t.cbj)}
+            {navLink('trade', '/trade-finance', t.trade)}
           </nav>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button onClick={toggleLang} style={{ border: '1px solid var(--cf-line)', background: 'transparent', color: 'var(--cf-ink2)', borderRadius: '9px', padding: '6px 11px', fontSize: '12.5px', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>{t.lang}</button>
