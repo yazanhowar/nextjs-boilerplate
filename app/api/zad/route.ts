@@ -146,10 +146,25 @@ export async function POST(req){
     try { knowledge += await buildMacroBlock() } catch (e) {};
     var system = buildSystem(knowledge);
     var wantStream = false; try { wantStream = req.headers.get('x-cf-stream') === '1' } catch (eS) { wantStream = false }
-    var ares = await fetch('https://api.anthropic.com/v1/messages', {
+    // Trade finance encyclopedia retrieval: match the question against tf_terms and append to context.
+  var __tfBlock='';
+  try{
+    var __tfq='';
+    for(var __i=convo.length-1; __i>=0; __i--){ if(convo[__i] && convo[__i].role==='user'){ __tfq=String(convo[__i].content||''); break; } }
+    if(__tfq){
+      var __tfsb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string);
+      var __tfres = await __tfsb.from('tf_terms').select('term_en,term_ar,body_en,body_ar,governing_source');
+      if(__tfres && __tfres.data){
+        var __words=__tfq.toLowerCase().split(/[\s,.:;!?()"'\/]+/).filter(function(w){return w.length>3;});
+        var __sc=__tfres.data.map(function(t){ var h=((t.term_en||'')+' '+(t.term_ar||'')+' '+(t.body_en||'')+' '+(t.body_ar||'')).toLowerCase(); var c=0; __words.forEach(function(w){ if(h.indexOf(w)>=0)c++; }); return {t:t,c:c}; }).filter(function(x){return x.c>0;}).sort(function(a,b){return b.c-a.c;}).slice(0,8);
+        if(__sc.length){ __tfBlock='\n\nTRADE FINANCE ENCYCLOPEDIA (reference entries matching the question, cite the governing rule when relevant):\n'+__sc.map(function(x){ var t=x.t; return '- '+t.term_en+(t.term_ar?' ('+t.term_ar+')':'')+': '+t.body_en+(t.governing_source?' [Governed by: '+t.governing_source+']':''); }).join('\n'); }
+      }
+    }
+  }catch(__e){}
+  var ares = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{ 'x-api-key': ANTHROPIC_KEY, 'anthropic-version':'2023-06-01', 'content-type':'application/json' },
-      body: JSON.stringify({ model:'claude-opus-4-6', max_tokens:4096, system: system, messages: convo, stream: wantStream })
+      body: JSON.stringify({ model:'claude-opus-4-6', max_tokens:4096, system: (system + __tfBlock), messages: convo, stream: wantStream })
     });
         if (wantStream && ares.ok && ares.body) {
       var enc2 = new TextEncoder();
