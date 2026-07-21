@@ -26,6 +26,7 @@ var T = {
   c3t:{ en:'CBJ Reports', ar:'2KrZgtin2LHZitixINin2YTYqNmG2YMg2KfZhNmF2LHZg9iy2Yo=' },
   c3d:{ en:'Upload regulatory returns and auto-generate dashboards.', ar:'2KfYsdmB2Lkg2KfZhNiq2YLYp9ix2YrYsSDYp9mE2LHZgtin2KjZitipINmI2K/YuSDYp9mE2YXZhti12ZHYqSDYqtio2YbZiiDZhNmI2K3Yp9iq2YfYpyDYqtmE2YLYp9im2YrYp9mLLg==' },
   navEco:{ en:'Economy', ar:'2KfZhNin2YLYqti12KfYrw==' },
+    navTrade:{ en:'Trade Finance', ar:'2KfZhNiq2YXZiNmK2YQg2KfZhNiq2KzYp9ix2Yo=' },
   c4t:{ en:'Economy & Macro', ar:'2KfZhNin2YLYqti12KfYryDZiNin2YTZhdik2LTYsdin2Kog2KfZhNmD2YTZitip' },
   c4d:{ en:'Jordan macro, CBJ series and the regional map - with ZAD signal analytics.', ar:'2YXYpNi02LHYp9iqINin2YTYo9ix2K/ZhiDYp9mE2YPZhNmK2Kkg2YjYs9mE2KfYs9mEINin2YTYqNmG2YMg2KfZhNmF2LHZg9iy2Yog2YjYp9mE2K7YsdmK2LfYqSDYp9mE2KXZgtmE2YrZhdmK2Kkg4oCUINmF2Lkg2KrYrdmE2YrZhNin2Kog2LLYp9ivLg==' },
   open:{ en:'Open', ar:'2KfZgdiq2K0=' },
@@ -70,6 +71,7 @@ export default function Home(){
               <a className='cf-link' href='/sector' style={{ fontSize:'13.5px' }}>{ t('navSector') }</a>
               <a className='cf-link' href='/economy' style={{ fontSize:'13.5px' }}>{ t('navEco') }</a>
               <a className='cf-link' href='/cbj' style={{ fontSize:'13.5px' }}>{ t('navCbj') }</a>
+              <a className='cf-link' href='/trade-finance' style={{ fontSize:'13.5px' }}>{ t('navTrade') }</a>
             </nav>
             <button onClick={function(){ setLang(ar ? 'en' : 'ar') }} className='cf-btn cf-btn-secondary' style={{ fontSize:'12.5px', padding:'7px 14px' }}>{ ar ? 'English' : dec(T.langWord.ar) }</button>
           </div>
