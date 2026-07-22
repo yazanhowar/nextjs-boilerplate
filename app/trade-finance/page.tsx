@@ -103,6 +103,33 @@ function FlowCard({ flow, ar, ready }) {
   )
 }
 
+function renderInline(text) {
+  const parts = String(text).split('**')
+  return parts.map((p, i) => (i % 2 === 1)
+    ? <strong key={i}>{p}</strong>
+    : <React.Fragment key={i}>{p}</React.Fragment>)
+}
+
+function stripHeading(s) {
+  let n = 0
+  while (n < s.length && s[n] === '#') n++
+  if (n > 0 && n <= 6 && s[n] === ' ') return s.slice(n + 1)
+  return null
+}
+
+function renderRich(text) {
+  const NL = String.fromCharCode(10)
+  const CR = String.fromCharCode(13)
+  const lines = String(text).split(CR).join('').split(NL)
+  return lines.map((line, i) => {
+    const trimmed = line.trim()
+    if (trimmed === '') return <div key={i} style={{ height: '8px' }} />
+    const head = stripHeading(trimmed)
+    if (head !== null) return <div key={i} style={{ fontWeight: 700, margin: '6px 0 2px' }}>{renderInline(head)}</div>
+    return <div key={i} style={{ margin: '2px 0' }}>{renderInline(line)}</div>
+  })
+}
+
 function ChatPanel({ L, ar }) {
   const [msgs, setMsgs] = useState([])
   const [input, setInput] = useState('')
@@ -135,7 +162,7 @@ function ChatPanel({ L, ar }) {
           {msgs.map((m, i) => (
             <div key={i} style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '92%' }}>
               <div className="cf-label" style={{ color: 'var(--cf-ink3)', marginBottom: '3px', textAlign: m.role === 'user' ? 'end' : 'start' }}>{m.role === 'user' ? L.you : L.zad}</div>
-              <div style={{ background: m.role === 'user' ? 'var(--cf-primary-soft)' : 'var(--cf-surface)', color: 'var(--cf-ink)', border: '1px solid var(--cf-line)', borderRadius: '12px', padding: '10px 13px', fontSize: '14px', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{m.content}</div>
+              <div style={{ background: m.role === 'user' ? 'var(--cf-primary-soft)' : 'var(--cf-surface)', color: 'var(--cf-ink)', border: '1px solid var(--cf-line)', borderRadius: '12px', padding: '10px 13px', fontSize: '14px', lineHeight: 1.7, whiteSpace: m.role === 'user' ? 'pre-wrap' : 'normal' }}>{m.role === 'user' ? m.content : renderRich(m.content)}</div>
             </div>
           ))}
           {busy ? (<div style={{ alignSelf: 'flex-start' }}><span className="cf-muted" style={{ fontSize: '13px' }}>{L.chatThinking}</span></div>) : null}
