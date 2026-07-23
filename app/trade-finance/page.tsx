@@ -77,7 +77,7 @@ function useMermaid(enabled) {
   return ready
 }
 
-function FlowCard({ flow, ar, ready }) {
+function FlowCard({ flow, ar, ready, rid }) {
   const ref = useRef(null)
   const title = ar ? (flow.title_ar || flow.title_en) : flow.title_en
   const narration = ar ? (flow.narration_ar || flow.narration_en) : flow.narration_en
@@ -87,7 +87,7 @@ function FlowCard({ flow, ar, ready }) {
       const m = window.__cfMermaid
       if (!ready || !m || !ref.current) return
       try {
-        const out = await m.render('cf-flow-' + flow.id, flow.mermaid)
+        const out = await m.render(rid || ('cf-flow-' + flow.id), flow.mermaid)
         if (!cancelled && ref.current) ref.current.innerHTML = out.svg
       } catch (e) {
         if (!cancelled && ref.current) ref.current.innerHTML = ''
@@ -128,20 +128,59 @@ function stripHeading(s) {
   return null
 }
 
+function splitCells(row) {
+  let parts = String(row).split('|').map(function (c) { return c.trim() })
+  if (parts.length && parts[0] === '') parts = parts.slice(1)
+  if (parts.length && parts[parts.length - 1] === '') parts = parts.slice(0, -1)
+  return parts
+}
+
+function isSepRow(line) {
+  const t = line.trim()
+  if (t.indexOf('-') === -1) return false
+  for (let i = 0; i < t.length; i++) { const c = t[i]; if (c !== '|' && c !== '-' && c !== ':' && c !== ' ') return false }
+  return true
+}
+
 function renderRich(text) {
   const NL = String.fromCharCode(10)
   const CR = String.fromCharCode(13)
   const lines = String(text).split(CR).join('').split(NL)
-  return lines.map((line, i) => {
+  const out = []
+  let i = 0
+  while (i < lines.length) {
+    const line = lines[i]
     const trimmed = line.trim()
-    if (trimmed === '') return <div key={i} style={{ height: '8px' }} />
+    if (trimmed.indexOf('|') > -1 && i + 1 < lines.length && isSepRow(lines[i + 1])) {
+      const header = splitCells(line)
+      const rows = []
+      let j = i + 2
+      while (j < lines.length && lines[j].indexOf('|') > -1 && lines[j].trim() !== '') { rows.push(splitCells(lines[j])); j++ }
+      out.push(
+        <div key={'tbl' + i} style={{ overflowX: 'auto', margin: '10px 0' }}>
+          <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: '13px', lineHeight: 1.5 }}>
+            <thead>
+              <tr>{header.map((h, hi) => (<th key={hi} style={{ textAlign: 'start', padding: '7px 10px', borderBottom: '1px solid var(--cf-line)', color: 'var(--cf-ink)', fontWeight: 700 }}>{renderInline(h)}</th>))}</tr>
+            </thead>
+            <tbody>
+              {rows.map((r, ri) => (<tr key={ri}>{r.map((c, ci) => (<td key={ci} style={{ padding: '7px 10px', borderBottom: '1px solid var(--cf-line)', color: 'var(--cf-ink2)', verticalAlign: 'top' }}>{renderInline(c)}</td>))}</tr>))}
+            </tbody>
+          </table>
+        </div>
+      )
+      i = j
+      continue
+    }
+    if (trimmed === '') { out.push(<div key={i} style={{ height: '8px' }} />); i++; continue }
     const head = stripHeading(trimmed)
-    if (head !== null) return <div key={i} style={{ fontWeight: 700, margin: '6px 0 2px' }}>{renderInline(head)}</div>
-    return <div key={i} style={{ margin: '2px 0' }}>{renderInline(line)}</div>
-  })
+    if (head !== null) { out.push(<div key={i} style={{ fontWeight: 700, margin: '6px 0 2px' }}>{renderInline(head)}</div>); i++; continue }
+    out.push(<div key={i} style={{ margin: '2px 0' }}>{renderInline(line)}</div>)
+    i++
+  }
+  return out
 }
 
-function ChatPanel({ L, ar }) {
+function ChatPanel({ L, ar, mermaidReady, matchFlow }) {
   const [msgs, setMsgs] = useState([])
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
@@ -155,7 +194,9 @@ function ChatPanel({ L, ar }) {
     try {
       const r = await fetch('/api/zad', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ messages: next }) })
       const j = await r.json()
-      setMsgs(next.concat([{ role: 'assistant', content: (j.text || '').toString() }]))
+      const answer = (j.text || '').toString()
+      const flow = matchFlow ? matchFlow(query) : null
+      setMsgs(next.concat([{ role: 'assistant', content: answer, flow: flow }]))
     } catch (e) {
       setMsgs(next.concat([{ role: 'assistant', content: L.chatError }]))
     } finally { setBusy(false) }
@@ -169,11 +210,12 @@ function ChatPanel({ L, ar }) {
       </div>
       <p className="cf-muted" style={{ fontSize: '13px', margin: '0 0 12px' }}>{L.chatIntro}</p>
       {msgs.length > 0 ? (
-        <div ref={boxRef} style={{ maxHeight: '340px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', margin: '0 0 12px', paddingInlineEnd: '4px' }}>
+        <div ref={boxRef} style={{ maxHeight: '520px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', margin: '0 0 12px', paddingInlineEnd: '4px' }}>
           {msgs.map((m, i) => (
             <div key={i} style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '92%' }}>
               <div className="cf-label" style={{ color: 'var(--cf-ink3)', marginBottom: '3px', textAlign: m.role === 'user' ? 'end' : 'start' }}>{m.role === 'user' ? L.you : L.zad}</div>
               <div style={{ background: m.role === 'user' ? 'var(--cf-primary-soft)' : 'var(--cf-surface)', color: 'var(--cf-ink)', border: '1px solid var(--cf-line)', borderRadius: '12px', padding: '10px 13px', fontSize: '14px', lineHeight: 1.7, whiteSpace: m.role === 'user' ? 'pre-wrap' : 'normal' }}>{m.role === 'user' ? m.content : renderRich(m.content)}</div>
+              {m.flow ? (<div style={{ marginTop: '10px' }}><FlowCard flow={m.flow} ar={ar} ready={mermaidReady} rid={'cf-flow-chat-' + i + '-' + m.flow.id} /></div>) : null}
             </div>
           ))}
           {busy ? (<div style={{ alignSelf: 'flex-start' }}><span className="cf-muted" style={{ fontSize: '13px' }}>{L.chatThinking}</span></div>) : null}
@@ -233,6 +275,20 @@ export default function TradeFinancePage() {
 
   const termLabel = (t) => (ar ? (t.term_ar || t.term_en) : t.term_en)
   const termBody = (t) => (ar ? (t.body_ar || t.body_en) : t.body_en)
+
+  const matchFlow = (text) => {
+    const hay = String(text || '').toLowerCase()
+    let best = null, bestScore = 0
+    flows.forEach((f) => {
+      const term = terms.find((t) => t.slug === f.term_slug)
+      if (!term) return
+      const names = String(term.term_en || '').split('/').map((p) => p.split('(')[0].trim().toLowerCase()).filter((n) => n.length >= 4)
+      let score = 0
+      names.forEach((n) => { if (hay.indexOf(n) > -1) score += n.length })
+      if (score > bestScore) { bestScore = score; best = f }
+    })
+    return best
+  }
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase()
@@ -300,7 +356,7 @@ export default function TradeFinancePage() {
         <h1 className="cf-h1 cf-grad-text" style={{ marginBottom: '8px' }}>{L.title}</h1>
         <p className="cf-muted" style={{ maxWidth: '760px', lineHeight: 1.7, marginBottom: '22px' }}>{L.subtitle}</p>
 
-        <ChatPanel L={L} ar={ar} />
+        <ChatPanel L={L} ar={ar} mermaidReady={mermaidReady} matchFlow={matchFlow} />
 
         <div style={{ position: 'relative', margin: '0 0 18px' }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ position: 'absolute', top: '50%', insetInlineStart: '16px', transform: 'translateY(-50%)', color: 'var(--cf-ink3)' }}><circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
