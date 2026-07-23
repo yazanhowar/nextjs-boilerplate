@@ -145,18 +145,33 @@ function isSepRow(line) {
 function renderRich(text) {
   const NL = String.fromCharCode(10)
   const CR = String.fromCharCode(13)
+  const FENCE = String.fromCharCode(96) + String.fromCharCode(96) + String.fromCharCode(96)
   const lines = String(text).split(CR).join('').split(NL)
   const out = []
+  const srcOf = []
+  const push = (el, src) => { out.push(el); srcOf.push(src == null ? null : String(src).toLowerCase()) }
   let i = 0
+  let inFence = false
   while (i < lines.length) {
     const line = lines[i]
     const trimmed = line.trim()
+    if (trimmed.indexOf(FENCE) === 0) {
+      if (!inFence) {
+        while (srcOf.length && srcOf[srcOf.length - 1] === '') { out.pop(); srcOf.pop() }
+        const lastSrc = srcOf[srcOf.length - 1]
+        if (lastSrc && lastSrc.indexOf('diagram') > -1) { out.pop(); srcOf.pop() }
+      }
+      inFence = !inFence
+      i++
+      continue
+    }
+    if (inFence) { i++; continue }
     if (trimmed.indexOf('|') > -1 && i + 1 < lines.length && isSepRow(lines[i + 1])) {
       const header = splitCells(line)
       const rows = []
       let j = i + 2
       while (j < lines.length && lines[j].indexOf('|') > -1 && lines[j].trim() !== '') { rows.push(splitCells(lines[j])); j++ }
-      out.push(
+      push(
         <div key={'tbl' + i} style={{ overflowX: 'auto', margin: '10px 0' }}>
           <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: '13px', lineHeight: 1.5 }}>
             <thead>
@@ -166,15 +181,15 @@ function renderRich(text) {
               {rows.map((r, ri) => (<tr key={ri}>{r.map((c, ci) => (<td key={ci} style={{ padding: '7px 10px', borderBottom: '1px solid var(--cf-line)', color: 'var(--cf-ink2)', verticalAlign: 'top' }}>{renderInline(c)}</td>))}</tr>))}
             </tbody>
           </table>
-        </div>
-      )
+        </div>, null)
       i = j
       continue
     }
-    if (trimmed === '') { out.push(<div key={i} style={{ height: '8px' }} />); i++; continue }
+    if (trimmed.length >= 3 && trimmed.split('-').join('') === '') { push(<div key={i} style={{ borderTop: '1px solid var(--cf-line)', margin: '12px 0' }} />, null); i++; continue }
+    if (trimmed === '') { push(<div key={i} style={{ height: '8px' }} />, ''); i++; continue }
     const head = stripHeading(trimmed)
-    if (head !== null) { out.push(<div key={i} style={{ fontWeight: 700, margin: '6px 0 2px' }}>{renderInline(head)}</div>); i++; continue }
-    out.push(<div key={i} style={{ margin: '2px 0' }}>{renderInline(line)}</div>)
+    if (head !== null) { push(<div key={i} style={{ fontWeight: 700, margin: '6px 0 2px' }}>{renderInline(head)}</div>, head); i++; continue }
+    push(<div key={i} style={{ margin: '2px 0' }}>{renderInline(line)}</div>, trimmed)
     i++
   }
   return out
