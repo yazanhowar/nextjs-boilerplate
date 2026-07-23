@@ -68,7 +68,7 @@ function useMermaid(enabled) {
     s.type = 'module'
     s.textContent =
       "import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';" +
-      "mermaid.initialize({ startOnLoad:false, securityLevel:'strict', theme:'neutral', fontFamily:'inherit' });" +
+      "mermaid.initialize({ startOnLoad:false, securityLevel:'strict', theme:'base', fontFamily:'Alexandria, sans-serif', themeVariables:{ fontFamily:'Alexandria, sans-serif', fontSize:'13px', primaryColor:'#ffffff', primaryTextColor:'#2a2722', primaryBorderColor:'#b49245', lineColor:'#c4b898', secondaryColor:'#faf7f0', tertiaryColor:'#ffffff', edgeLabelBackground:'#ffffff' }, flowchart:{ curve:'basis', nodeSpacing:48, rankSpacing:48, padding:16, useMaxWidth:true }, themeCSS:'.node rect,.node polygon,.node circle,.cluster rect{rx:12px;ry:12px;} .edgePath .path,.flowchart-link{stroke-width:1.5px;}' });" +
       "window.__cfMermaid = mermaid;" +
       "window.dispatchEvent(new Event('cf-mermaid-ready'));"
     document.head.appendChild(s)
