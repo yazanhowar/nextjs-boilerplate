@@ -236,7 +236,7 @@ export default function TradeFinancePage() {
 
   const openFeatured = (t) => {
     setActiveCat('all'); setQ(''); setOpenTerm(t.id)
-    setTimeout(function () { var el = document.getElementById('tf-term-' + t.id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }, 80)
+    setTimeout(function () { var el = document.getElementById('tf-term-' + t.id); if (el) el.scrollIntoView({ block: 'start' }) }, 80)
   }
 
   const align = ar ? 'right' : 'left'
