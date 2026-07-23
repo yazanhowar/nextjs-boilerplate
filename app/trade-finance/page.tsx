@@ -180,6 +180,52 @@ function renderRich(text) {
   return out
 }
 
+function flowSteps(mermaid) {
+  const src = String(mermaid || '')
+  const steps = []
+  const seen = {}
+  let i = 0
+  while (i < src.length) {
+    const ch = src[i]
+    if (ch === '[' || ch === '(' || ch === '{') {
+      const close = ch === '[' ? ']' : (ch === '(' ? ')' : '}')
+      const j = src.indexOf(close, i + 1)
+      if (j === -1) { i++; continue }
+      let label = src.slice(i + 1, j)
+      label = label.split('<br/>').join(' ').split('<br>').join(' ').split('<br />').join(' ').trim()
+      while (label.length && (label[0] === '(' || label[0] === '[' || label[0] === '"')) label = label.slice(1).trim()
+      while (label.length && (label[label.length - 1] === ')' || label[label.length - 1] === ']' || label[label.length - 1] === '"')) label = label.slice(0, -1).trim()
+      if (label && !seen[label]) { seen[label] = true; steps.push(label) }
+      i = j + 1
+    } else { i++ }
+  }
+  return steps
+}
+
+function ChatFlow({ flow, ar }) {
+  const title = ar ? (flow.title_ar || flow.title_en) : flow.title_en
+  const narration = ar ? (flow.narration_ar || flow.narration_en) : flow.narration_en
+  const steps = flowSteps(flow.mermaid)
+  if (!steps.length) return null
+  return (
+    <div style={{ marginTop: '10px', border: '1px solid var(--cf-line)', borderRadius: '12px', padding: '14px 16px', background: 'var(--cf-surface)' }}>
+      <div className="cf-label" style={{ color: 'var(--cf-ink3)', marginBottom: '12px' }}>{title}</div>
+      <div>
+        {steps.map((s, i) => (
+          <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'stretch' }}>
+            <div style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ width: '24px', height: '24px', borderRadius: '12px', background: 'var(--cf-primary-soft)', color: 'var(--cf-primary)', fontSize: '11px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto' }}>{i + 1}</span>
+              {i < steps.length - 1 ? <span style={{ width: '2px', flex: '1 1 auto', minHeight: '10px', background: 'var(--cf-line)', margin: '2px 0' }} /> : null}
+            </div>
+            <span style={{ fontSize: '13.5px', lineHeight: 1.55, color: 'var(--cf-ink)', paddingTop: '3px', paddingBottom: i < steps.length - 1 ? '10px' : 0 }}>{s}</span>
+          </div>
+        ))}
+      </div>
+      {narration ? <p className="cf-md-p" style={{ color: 'var(--cf-ink3)', fontSize: '12.5px', lineHeight: 1.6, margin: '12px 0 0' }}>{narration}</p> : null}
+    </div>
+  )
+}
+
 function ChatPanel({ L, ar, mermaidReady, matchFlow }) {
   const [msgs, setMsgs] = useState([])
   const [input, setInput] = useState('')
@@ -215,7 +261,7 @@ function ChatPanel({ L, ar, mermaidReady, matchFlow }) {
             <div key={i} style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '92%' }}>
               <div className="cf-label" style={{ color: 'var(--cf-ink3)', marginBottom: '3px', textAlign: m.role === 'user' ? 'end' : 'start' }}>{m.role === 'user' ? L.you : L.zad}</div>
               <div style={{ background: m.role === 'user' ? 'var(--cf-primary-soft)' : 'var(--cf-surface)', color: 'var(--cf-ink)', border: '1px solid var(--cf-line)', borderRadius: '12px', padding: '10px 13px', fontSize: '14px', lineHeight: 1.7, whiteSpace: m.role === 'user' ? 'pre-wrap' : 'normal' }}>{m.role === 'user' ? m.content : renderRich(m.content)}</div>
-              {m.flow ? (<div style={{ marginTop: '10px' }}><FlowCard flow={m.flow} ar={ar} ready={mermaidReady} rid={'cf-flow-chat-' + i + '-' + m.flow.id} /></div>) : null}
+              {m.flow ? (<ChatFlow flow={m.flow} ar={ar} />) : null}
             </div>
           ))}
           {busy ? (<div style={{ alignSelf: 'flex-start' }}><span className="cf-muted" style={{ fontSize: '13px' }}>{L.chatThinking}</span></div>) : null}
