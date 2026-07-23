@@ -264,14 +264,17 @@ export default function TradeFinancePage() {
   const renderTermCard = (t) => {
     const open = openTerm === t.id
     const flow = flowByTerm[t.slug]
+    const showCat = !showGrouped
     return (
       <div key={t.id} id={'tf-term-' + t.id} className="cf-card" onClick={() => setOpenTerm(open ? null : t.id)} style={{ padding: '16px 18px', cursor: 'pointer', gridColumn: open ? '1 / -1' : 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'baseline' }}>
-          <h3 className="cf-h3" style={{ margin: 0 }}>{termLabel(t)}</h3>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-            {flow ? <FlowBadge label={L.flowLabel} /> : null}
-            <span className="cf-label" style={{ color: 'var(--cf-ink3)', whiteSpace: 'nowrap' }}>{catName(t.category_id)}</span>
-          </span>
+          <h3 className="cf-h3" style={{ margin: 0, flex: '1 1 auto' }}>{termLabel(t)}</h3>
+          {(flow || showCat) ? (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end', flex: '0 0 auto' }}>
+              {flow ? <FlowBadge label={L.flowLabel} /> : null}
+              {showCat ? <span className="cf-label" style={{ color: 'var(--cf-ink3)', whiteSpace: 'nowrap' }}>{catName(t.category_id)}</span> : null}
+            </span>
+          ) : null}
         </div>
         <p className="cf-md-p" style={{ color: 'var(--cf-ink2)', fontSize: '14px', lineHeight: 1.7, margin: '8px 0 0', display: open ? 'block' : '-webkit-box', WebkitLineClamp: open ? 'unset' : 3, WebkitBoxOrient: 'vertical', overflow: open ? 'visible' : 'hidden' }}>{termBody(t)}</p>
         {(t.governing_source || t.source_url) ? (
