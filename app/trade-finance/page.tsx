@@ -198,6 +198,7 @@ export default function TradeFinancePage() {
   const [q, setQ] = useState('')
   const [activeCat, setActiveCat] = useState('all')
   const [openTerm, setOpenTerm] = useState(null)
+  const [openCats, setOpenCats] = useState({})
   const mermaidReady = useMermaid(flows.length > 0)
 
   useEffect(() => {
@@ -255,11 +256,12 @@ export default function TradeFinancePage() {
 
   const openFeatured = (t) => {
     setActiveCat('all'); setQ(''); setOpenTerm(t.id)
+    setOpenCats((prev) => ({ ...prev, [t.category_id]: true }))
     setTimeout(function () { var el = document.getElementById('tf-term-' + t.id); if (el) el.scrollIntoView({ block: 'start' }) }, 80)
   }
 
   const align = ar ? 'right' : 'left'
-  const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '14px' }
+  const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px', alignItems: 'start' }
 
   const renderTermCard = (t) => {
     const open = openTerm === t.id
@@ -320,30 +322,29 @@ export default function TradeFinancePage() {
           </div>
         ) : null}
 
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', margin: '0 0 22px' }}>
-          <button className={activeCat === 'all' ? 'cf-chip cf-chip-primary' : 'cf-chip'} onClick={() => { setActiveCat('all'); setOpenTerm(null) }}>{L.all}</button>
-          {cats.map((c) => (
-            <button key={c.id} className={activeCat === c.id ? 'cf-chip cf-chip-primary' : 'cf-chip'} onClick={() => { setActiveCat(c.id); setOpenTerm(null) }}>{ar ? c.name_ar : c.name_en}</button>
-          ))}
-        </div>
-
         {loading ? (
           <p className="cf-muted">{L.loading}</p>
         ) : filtered.length === 0 ? (
           <p className="cf-muted">{L.noResults}</p>
         ) : showGrouped ? (
-          <div>
-            {grouped.map((g) => (
-              <div key={g.cat.id} style={{ marginBottom: '30px' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', margin: '0 0 14px', paddingBottom: '8px', borderBottom: '1px solid var(--cf-line)' }}>
-                  <h2 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--cf-ink)' }}>{ar ? g.cat.name_ar : g.cat.name_en}</h2>
-                  <span className="cf-label" style={{ color: 'var(--cf-ink3)' }}>{g.items.length}</span>
+          <div style={{ borderTop: '1px solid var(--cf-line)' }}>
+            {grouped.map((g) => {
+              const expanded = !!openCats[g.cat.id]
+              return (
+                <div key={g.cat.id} style={{ borderBottom: '1px solid var(--cf-line)' }}>
+                  <button onClick={() => setOpenCats((prev) => ({ ...prev, [g.cat.id]: !prev[g.cat.id] }))} style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: '15px 2px', color: 'var(--cf-ink)', fontFamily: 'inherit' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s', flex: '0 0 auto', color: 'var(--cf-primary)' }}><path d="M9 6 l6 6 l-6 6" /></svg>
+                    <span style={{ fontSize: '15px', fontWeight: 700, flex: '1 1 auto', textAlign: 'start' }}>{ar ? g.cat.name_ar : g.cat.name_en}</span>
+                    <span className="cf-label" style={{ color: 'var(--cf-ink3)', flex: '0 0 auto' }}>{g.items.length}</span>
+                  </button>
+                  {expanded ? (
+                    <div style={{ ...gridStyle, margin: '2px 0 20px' }}>
+                      {g.items.map(renderTermCard)}
+                    </div>
+                  ) : null}
                 </div>
-                <div style={gridStyle}>
-                  {g.items.map(renderTermCard)}
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         ) : (
           <div>
