@@ -2,7 +2,7 @@
 
 // convo.finance - Trade Finance Encyclopedia tab.
 // Reads tf_categories, tf_terms and tf_flows (public read). Bilingual via LangContext.
-// A ZAD chat panel sits alongside a searchable term browser; each term shows its own process flow.
+// A ZAD chat panel sits alongside a searchable term browser grouped by category; each term shows its own process flow.
 
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useLang } from '@/lib/LangContext'
@@ -21,6 +21,7 @@ const STR = {
     noResults: 'No terms match your search.',
     loading: 'Loading the encyclopedia',
     featured: 'Most asked about',
+    flowLabel: 'Flowchart',
     chatTitle: 'Ask ZAD',
     chatIntro: 'Ask anything about trade finance and its rules. Answers are grounded in the source register.',
     chatPlaceholder: 'How does a confirmed letter of credit work?',
@@ -42,6 +43,7 @@ const STR = {
     noResults: 'لا توجد مصطلحات مطابقة لبحثك.',
     loading: 'جارٍ تحميل الموسوعة',
     featured: 'الأكثر طلباً',
+    flowLabel: 'مخطط',
     chatTitle: 'اسأل زاد',
     chatIntro: 'اسأل عن أي شيء في التمويل التجاري وقواعده. الإجابات مستندة إلى سجل المصادر.',
     chatPlaceholder: 'كيف يعمل الاعتماد المستندي المعزّز؟',
@@ -100,6 +102,15 @@ function FlowCard({ flow, ar, ready }) {
       <div ref={ref} dir="ltr" style={{ overflowX: 'auto', display: 'flex', justifyContent: 'center' }} />
       {narration ? (<p className="cf-md-p" style={{ color: 'var(--cf-ink2)', fontSize: '13px', lineHeight: 1.7, marginTop: '8px' }}>{narration}</p>) : null}
     </div>
+  )
+}
+
+function FlowBadge({ label, compact }) {
+  return (
+    <span title={label} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--cf-primary)', background: 'var(--cf-primary-soft)', border: '1px solid var(--cf-primary-soft)', borderRadius: '5px', padding: compact ? '3px' : '2px 6px', whiteSpace: 'nowrap', flex: '0 0 auto' }}>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="6" rx="1.5" /><rect x="14" y="15" width="7" height="6" rx="1.5" /><path d="M6.5 9 v3.5 a2 2 0 0 0 2 2 h5.5" /></svg>
+      {compact ? null : label}
+    </span>
   )
 }
 
@@ -232,6 +243,14 @@ export default function TradeFinancePage() {
     })
   }, [terms, q, activeCat, ar])
 
+  const grouped = useMemo(() => {
+    return cats
+      .map((c) => ({ cat: c, items: filtered.filter((t) => t.category_id === c.id) }))
+      .filter((g) => g.items.length > 0)
+  }, [cats, filtered])
+
+  const showGrouped = !q.trim() && activeCat === 'all'
+
   const featuredTerms = useMemo(() => FEATURED.map((sl) => terms.find((t) => t.slug === sl)).filter(Boolean), [terms])
 
   const openFeatured = (t) => {
@@ -240,6 +259,34 @@ export default function TradeFinancePage() {
   }
 
   const align = ar ? 'right' : 'left'
+  const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '14px' }
+
+  const renderTermCard = (t) => {
+    const open = openTerm === t.id
+    const flow = flowByTerm[t.slug]
+    return (
+      <div key={t.id} id={'tf-term-' + t.id} className="cf-card" onClick={() => setOpenTerm(open ? null : t.id)} style={{ padding: '16px 18px', cursor: 'pointer', gridColumn: open ? '1 / -1' : 'auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'baseline' }}>
+          <h3 className="cf-h3" style={{ margin: 0 }}>{termLabel(t)}</h3>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            {flow ? <FlowBadge label={L.flowLabel} /> : null}
+            <span className="cf-label" style={{ color: 'var(--cf-ink3)', whiteSpace: 'nowrap' }}>{catName(t.category_id)}</span>
+          </span>
+        </div>
+        <p className="cf-md-p" style={{ color: 'var(--cf-ink2)', fontSize: '14px', lineHeight: 1.7, margin: '8px 0 0', display: open ? 'block' : '-webkit-box', WebkitLineClamp: open ? 'unset' : 3, WebkitBoxOrient: 'vertical', overflow: open ? 'visible' : 'hidden' }}>{termBody(t)}</p>
+        {(t.governing_source || t.source_url) ? (
+          <div style={{ marginTop: '12px' }}>
+            {t.source_url ? (
+              <a href={t.source_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="cf-chip cf-chip-primary" style={{ fontSize: '11.5px', textDecoration: 'none' }}>{t.governing_source ? (L.governs + ': ' + t.governing_source) : L.source} ↗</a>
+            ) : (
+              <span className="cf-chip cf-chip-primary" style={{ fontSize: '11.5px' }}>{L.governs}: {t.governing_source}</span>
+            )}
+          </div>
+        ) : null}
+        {open && flow ? (<FlowCard flow={flow} ar={ar} ready={mermaidReady} />) : null}
+      </div>
+    )
+  }
 
   return (
     <main className="cf-page">
@@ -262,7 +309,8 @@ export default function TradeFinancePage() {
               {featuredTerms.map((t) => (
                 <button key={t.id} className="cf-card" onClick={() => openFeatured(t)} style={{ display: 'flex', alignItems: 'center', gap: '9px', padding: '14px 16px', cursor: 'pointer', textAlign: 'start', background: 'var(--cf-surface)' }}>
                   <span style={{ width: '7px', height: '7px', borderRadius: '8px', background: 'var(--cf-primary)', flex: '0 0 auto' }} />
-                  <span style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--cf-ink)' }}>{termLabel(t)}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--cf-ink)', flex: '1 1 auto' }}>{termLabel(t)}</span>
+                  {flowByTerm[t.slug] ? <FlowBadge label={L.flowLabel} compact /> : null}
                 </button>
               ))}
             </div>
@@ -278,39 +326,29 @@ export default function TradeFinancePage() {
 
         {loading ? (
           <p className="cf-muted">{L.loading}</p>
-        ) : (
-          <>
-            <p className="cf-label" style={{ marginBottom: '12px', color: 'var(--cf-ink3)' }}>{filtered.length} {L.terms}</p>
-            {filtered.length === 0 ? (
-              <p className="cf-muted">{L.noResults}</p>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '14px' }}>
-                {filtered.map((t) => {
-                  const open = openTerm === t.id
-                  const flow = flowByTerm[t.slug]
-                  return (
-                    <div key={t.id} id={'tf-term-' + t.id} className="cf-card" onClick={() => setOpenTerm(open ? null : t.id)} style={{ padding: '16px 18px', cursor: 'pointer', gridColumn: open ? '1 / -1' : 'auto' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'baseline' }}>
-                        <h3 className="cf-h3" style={{ margin: 0 }}>{termLabel(t)}</h3>
-                        <span className="cf-label" style={{ color: 'var(--cf-ink3)', whiteSpace: 'nowrap' }}>{catName(t.category_id)}</span>
-                      </div>
-                      <p className="cf-md-p" style={{ color: 'var(--cf-ink2)', fontSize: '14px', lineHeight: 1.7, margin: '8px 0 0', display: open ? 'block' : '-webkit-box', WebkitLineClamp: open ? 'unset' : 3, WebkitBoxOrient: 'vertical', overflow: open ? 'visible' : 'hidden' }}>{termBody(t)}</p>
-                      {(t.governing_source || t.source_url) ? (
-                        <div style={{ marginTop: '12px' }}>
-                          {t.source_url ? (
-                            <a href={t.source_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="cf-chip cf-chip-primary" style={{ fontSize: '11.5px', textDecoration: 'none' }}>{t.governing_source ? (L.governs + ': ' + t.governing_source) : L.source} ↗</a>
-                          ) : (
-                            <span className="cf-chip cf-chip-primary" style={{ fontSize: '11.5px' }}>{L.governs}: {t.governing_source}</span>
-                          )}
-                        </div>
-                      ) : null}
-                      {open && flow ? (<FlowCard flow={flow} ar={ar} ready={mermaidReady} />) : null}
-                    </div>
-                  )
-                })}
+        ) : filtered.length === 0 ? (
+          <p className="cf-muted">{L.noResults}</p>
+        ) : showGrouped ? (
+          <div>
+            {grouped.map((g) => (
+              <div key={g.cat.id} style={{ marginBottom: '30px' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', margin: '0 0 14px', paddingBottom: '8px', borderBottom: '1px solid var(--cf-line)' }}>
+                  <h2 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--cf-ink)' }}>{ar ? g.cat.name_ar : g.cat.name_en}</h2>
+                  <span className="cf-label" style={{ color: 'var(--cf-ink3)' }}>{g.items.length}</span>
+                </div>
+                <div style={gridStyle}>
+                  {g.items.map(renderTermCard)}
+                </div>
               </div>
-            )}
-          </>
+            ))}
+          </div>
+        ) : (
+          <div>
+            <p className="cf-label" style={{ marginBottom: '12px', color: 'var(--cf-ink3)' }}>{filtered.length} {L.terms}</p>
+            <div style={gridStyle}>
+              {filtered.map(renderTermCard)}
+            </div>
+          </div>
         )}
       </div>
     </main>
