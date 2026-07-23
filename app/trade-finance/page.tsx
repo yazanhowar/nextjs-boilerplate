@@ -234,7 +234,10 @@ export default function TradeFinancePage() {
 
   const featuredTerms = useMemo(() => FEATURED.map((sl) => terms.find((t) => t.slug === sl)).filter(Boolean), [terms])
 
-  const openFeatured = (t) => { setActiveCat('all'); setQ(''); setOpenTerm(t.id) }
+  const openFeatured = (t) => {
+    setActiveCat('all'); setQ(''); setOpenTerm(t.id)
+    setTimeout(function () { var el = document.getElementById('tf-term-' + t.id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }) }, 80)
+  }
 
   const align = ar ? 'right' : 'left'
 
@@ -286,7 +289,7 @@ export default function TradeFinancePage() {
                   const open = openTerm === t.id
                   const flow = flowByTerm[t.slug]
                   return (
-                    <div key={t.id} className="cf-card" onClick={() => setOpenTerm(open ? null : t.id)} style={{ padding: '16px 18px', cursor: 'pointer', gridColumn: open ? '1 / -1' : 'auto' }}>
+                    <div key={t.id} id={'tf-term-' + t.id} className="cf-card" onClick={() => setOpenTerm(open ? null : t.id)} style={{ padding: '16px 18px', cursor: 'pointer', gridColumn: open ? '1 / -1' : 'auto' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'baseline' }}>
                         <h3 className="cf-h3" style={{ margin: 0 }}>{termLabel(t)}</h3>
                         <span className="cf-label" style={{ color: 'var(--cf-ink3)', whiteSpace: 'nowrap' }}>{catName(t.category_id)}</span>
