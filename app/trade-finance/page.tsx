@@ -210,7 +210,7 @@ function ChatPanel({ L, ar, mermaidReady, matchFlow }) {
       const r = await fetch('/api/zad', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ messages: next }) })
       const j = await r.json()
       const answer = (j.text || '').toString()
-      const flow = matchFlow ? matchFlow(query) : null
+      const flow = matchFlow ? matchFlow(query + ' ' + answer) : null
       setMsgs(next.concat([{ role: 'assistant', content: answer, flow: flow }]))
     } catch (e) {
       setMsgs(next.concat([{ role: 'assistant', content: L.chatError }]))
